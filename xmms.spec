@@ -1,5 +1,5 @@
 %define	name	xmms
-%define	version	1.2.6
+%define	version	0.0.1
 %define	release	1
 %define	serial	1
 %define	prefix	/usr

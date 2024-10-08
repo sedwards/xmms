@@ -1,11 +1,20 @@
 dnl Process this file with autoconf to produce a configure script.
-AC_INIT(xmms/main.c)
+AC_INIT
+AC_CONFIG_SRCDIR([xmms/main.c])
 AC_CANONICAL_HOST
 
 cflags_set=${CFLAGS+set}
 AM_CONFIG_HEADER(config.h xmms/i18n.h)
+AC_CONFIG_AUX_DIR([autoconf])
+AC_CONFIG_MACRO_DIR([autoconf-m4])
+AM_INIT_AUTOMAKE(xmms, 0.0.1)
 
-AM_INIT_AUTOMAKE(xmms, 1.2.6)
+m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
+#m4_ifdef([AC_CONFIG_HEADERS], [AC_CONFIG_HEADERS([config.h])], [AC_CONFIG_HEADERS([config.h])])
+m4_ifdef([AM_PROG_AR], [AM_PROG_AR])
+m4_ifdef([AM_MAINTAINER_MODE], [AM_MAINTAINER_MODE])
+AM_GNU_GETTEXT([external])
+
 
 AC_ARG_ENABLE( one-plugin-dir,
 [  --enable-one-plugin-dir  use a single plugin dir [default=no]],,
@@ -33,11 +42,47 @@ AC_ARG_WITH(cdda-dir,
   [  --with-cdda-dir=path    Path to default cdaudio directory.],
   AC_DEFINE_UNQUOTED(CDDA_DIRECTORY,"$withval", [Path to default cdaudio directory.]))
 
+
+AC_ARG_ENABLE(gtk2,
+              [  --disable-gtk2          Do not look for GTK+ 2.0 libraries],
+              enable_gtk2=$enableval,
+              enable_gtk2="no")
+
+AC_ARG_ENABLE(gtk3,
+              [  --enable-gtk3           Enable GTK+ 3.0 (Experimental)],
+              enable_gtk3=$enableval,
+              enable_gtk3="yes")
+
+AC_ARG_ENABLE(gtk4,
+              [  --enable-gtk4           Enable GTK+ 4.0 (Experimental)],
+              enable_gtk4=$enableval,
+              enable_gtk4="no")
+
+AC_ARG_ENABLE(gtkport,
+              [  --disable-gtkport       Disable compiling the GTK+ port],
+              enable_gtkport=$enableval,
+              enable_gtkport="yes")
+
+AC_ARG_ENABLE(gtk_warnings,
+              [  --enable-gtk-warnings   So you can see what is deprecated in GTK2...],
+              gtk_warnings=$enableval,
+              gtk_warnings='np')
+
+AC_ARG_ENABLE(debug,
+              [  --enable-debug      Print debug info to std output],
+              enable_debug=$enableval,
+              enable_debug="no")
+
+AC_ARG_WITH(libxml2,
+              [  --with-libxml2          use libxml2 [default=libxml1 unless GTK2 is enabled]],
+              with_libxml2="no") 
+
+
 AC_PREFIX_PROGRAM(xmms)
 
 dnl Various compiler setup.
 AC_PROG_CC
-AC_ISC_POSIX
+AC_SEARCH_LIBS([strerror],[cposix])
 dnl AC_PROG_CXX
 AC_C_BIGENDIAN
 AC_C_INLINE
@@ -53,12 +98,12 @@ AM_PROG_LIBTOOL
 
 AC_CHECK_HEADER(pthread.h,,AC_MSG_ERROR([*** POSIX thread support not installed - please install first ***]))
 
-AM_PATH_GLIB(1.2.2,,AC_MSG_ERROR([*** GLIB >= 1.2.2 not installed - please install first ***]))
-AM_PATH_GTK(1.2.2,,AC_MSG_ERROR([*** GTK+ >= 1.2.2 not installed - please install first ***]),gthread)
 AC_PATH_PROG(XMMS_PATH,xmms,no)
 
+AM_PROG_AS
+CCASFLAGS=""
 LIBS_save=$LIBS
-LIBS="$LIBS $GTK_LIBS"
+LIBS="$LIBS"
 SM_LIBS=""
 AC_CHECK_LIB(SM, SmcOpenConnection,[
 AC_DEFINE(WITH_SM)
@@ -71,7 +116,7 @@ AC_PATH_X
 CFLAGS_save=$CFLAGS
 LIBS_save=$LIBS
 CFLAGS="$CFLAGS $GTK_CFLAGS"
-LIBS="$LIBS $GTK_LIBS"
+LIBS="$LIBS"
 AC_CHECK_LIB(Xxf86vm,XF86VidModeQueryExtension,[
     AC_DEFINE(XF86VIDMODE,1,[XF86VidMode extension is present])
         VM_LIBS="-lXxf86vm"],,
@@ -110,6 +155,9 @@ if test "x$PTHREAD_LIBS" = xerror; then
 fi
 AC_SUBST(PTHREAD_LIBS)
 
+HAVE_ORBIT_FALSE=
+HAVE_ORBIT=
+
 dnl *** OpenGL
 AC_ARG_ENABLE( opengl,
 [  --disable-opengl        Disable OpenGL plugin(s) [default=yes]],,
@@ -117,7 +165,7 @@ AC_ARG_ENABLE( opengl,
 
 if test "x$enable_opengl" = xyes; then
 	LIBS_save=$LIBS
-	LIBS="$LIBS $GTK_LIBS"
+	LIBS="$LIBS"
 	OPENGL_LIBS=error
 	AC_CHECK_LIB(GL, glBegin, OPENGL_LIBS="-lGL")
 
@@ -156,21 +204,68 @@ AC_CHECK_LIB(z, inflate, [Z_LIBS="-lz"
 AC_SUBST(Z_LIBS)
 LIBS=$LIBS_save
 
-dnl *** libxml
-AC_ARG_ENABLE( cdindex,
-[  --disable-cdindex       Disable cdindex support [default=enabled]],,
-		enable_cdindex="yes")
 
-if test "x$enable_cdindex" = xyes; then
-	AM_PATH_LIBXML(1.7.0, 
-	   [AC_DEFINE(WITH_CDINDEX,,[Define if libxml is present])
-	    AC_CHECK_LIB(xml, xmlDocGetRootElement, 
-	       AC_DEFINE(HAVE_XMLDOCGETROOTELEMENT,,
-		  [Define if libxml has the xmlDocGetRootElement function]), , $XML_LIBS)], 
-	   [AC_MSG_WARN([*** libxml not installed, disabling CDindex support ***])])
+dnl *** Look for the XML libraries
+AC_PATH_PROG(HAVEXML, xml${XMLVER}-config, $PATH)
+if test ! -z "$HAVEXML"; then
+    XML_CFLAGS=`$HAVEXML --cflags`
+    XML_PREFIX=`$HAVEXML --prefix`
+
+        if "$HAVEXML" --help|grep libtool-libs > /dev/null; then
+                XML_LIBTOOL=`$HAVEXML --libtool-libs`
+                if test -f "$XML_LIBTOOL"; then
+                        . "$XML_LIBTOOL"
+                        XML_LIBS="$dependency_libs"
+                else
+                        XML_LIBS="-lm"
+                fi
+        elif "$HAVEXML" --libs | grep thread > /dev/null; then
+                XML_LIBS="$PTHREAD -lm"
+        fi
+
+    CFLAGS="$CFLAGS $XML_CFLAGS"
+    if test "$STATIC" = ""; then
+        LIBS="$LIBS $XML_STATIC -L$XML_PREFIX/lib$LIBSUFFIX -lxml${XMLVER} $BDYNAMIC $XML_LIBS"
+        GUI_LIBS="$GUI_LIBS $XML_STATIC -L$XML_PREFIX/lib$LIBSUFFIX -lxml${XMLVER} $BDYNAMIC $XML_LIBS"
+        CARBON_LIBS="$CARBON_LIBS -L$XML_PREFIX/lib$LIBSUFFIX -lxml${XMLVER} $XML_LIBS"
+    else
+        LIBS="$LIBS -l${XMLVER} $XML_LIBS"
+        GUI_LIBS="$GUI_LIBS -l${XMLVER} $XML_LIBS"
+        CARBON_LIBS="$CARBON_LIBS -l${XMLVER} $XML_LIBS"
+    fi
 else
-	AC_MSG_RESULT([*** CDindex support disabled per user request ***])
+    AC_MSG_ERROR([*** xml${XMLVER}-config not found. You need a working libxml${XMLVER} installation.])
 fi
+
+XMMS_GTK=""
+
+dnl *** disable gtk warnings
+if test x"$gtk_warnings" = x"yes"; then
+   CPPFLAGS="$CPPFLAGS -DGDK_DISABLE_DEPRECATED -DGDK_PIXBUF_DISABLE_DEPRECATED -DGDK_PIXBUF_DISABLE_SINGLE_INCLUDES -DGTK_DISABLE_DEPRECATED -DGTK_DISABLE_SINGLE_INCLUDES"
+fi
+
+
+dnl *** check for gtk2
+if test "x$enable_gtk2" = "xyes" ; then
+  dnl Test for gtk+-2.0
+  PKG_CHECK_MODULES([GTK], [gtk+-2.0 >= 2.14.0], XMMS_GTK=xmms-gtk, AC_MSG_ERROR(You have GLIB 2.0 installed but I cannot find GTK+ 2.0. Run configure with --disable-gtk2 or install GTK+ 2.0))
+  PKG_CHECK_MODULES([GTHREAD], gthread-2.0 >=  2.18.0, HAVE_GTHREADS="yes")
+fi
+
+
+dnl *** enable gtk3
+if test "x$enable_gtk3" = "xyes" ; then
+  dnl Test for gtk-3.0
+  PKG_CHECK_MODULES([GTK3], [gtk+-3.0 >= 3.0.0], XMMS_GTK=xmms-gtk, AC_MSG_ERROR(You have GLIB 2.0 installed but I cannot find GTK+ 3.0. Run configure without --enable-gtk3 or install GTK+ 3.0))
+fi
+
+dnl *** enable gtk4
+if test "x$enable_gtk4" = "xyes" ; then
+  dnl Test for gtk-4.0
+  PKG_CHECK_MODULES([GTK4], [gtk4.0 >= 4.0.0], XMMS_GTK=xmms-gtk, AC_MSG_ERROR(You have GLIB 2.0 installed but I cannot find GTK+ 3.0. Run configure without --enable-gtk4 or install GTK+ 4.0))
+fi
+
+AC_SUBST(XMMS_GTK)
 
 dnl *** esound
 AC_ARG_ENABLE( esd,
@@ -218,17 +313,13 @@ if test "x$enable_vorbis" = xyes; then
 	  LIBS_save=$LIBS
 	  CFLAGS="$CFLAGS $VORBIS_CFLAGS"
 	  LIBS="$LIBS $VORBIS_LIBS"
-	  AC_TRY_LINK(
-		[#include <vorbis/codec.h>],
-		[int main(void)
+	  AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <vorbis/codec.h>]], [[int main(void)
 		 {
 		       vorbis_info info;
 		       ogg_packet op;
                        vorbis_packet_blocksize(&info, &op);
                        return 0;
-		 }],
-		[AC_MSG_RESULT(yes)],
-		[AC_MSG_RESULT([no (need atleast 1.0rc1)])
+		 }]])],[AC_MSG_RESULT(yes)],[AC_MSG_RESULT([no (need atleast 1.0rc1)])
 		 have_vorbis=no])
 	  CFLAGS=$CFLAGS_save
 	  LIBS=$LIBS_save
@@ -247,46 +338,10 @@ else
 fi
 AM_CONDITIONAL(HAVE_OGGVORBIS,test $have_oggvorbis = yes)
 
-dnl *** Gnome
-
-have_gnome="no"
-GNOME_INIT_HOOK(have_gnome=yes,,"applets")
-if test "x$have_gnome" = xyes
-then
-    AC_MSG_CHECKING(for GNOME's sysconf dir)
-    GNOME_SYSCONFDIR=`$GNOME_CONFIG --sysconfdir`
-    AC_SUBST(GNOME_SYSCONFDIR)
-    AC_MSG_RESULT($GNOME_SYSCONFDIR)
-
-    AC_MSG_CHECKING(for GNOME's data dir)
-    GNOME_DATADIR=`$GNOME_CONFIG --datadir`
-    AC_SUBST(GNOME_DATADIR)
-    AC_MSG_RESULT($GNOME_DATADIR)
-fi
-AM_CONDITIONAL(HAVE_GNOME,test "x$have_gnome" = xyes)
-
-dnl *** Thread-safe xlib check
-CFLAGS_save=$CFLAGS
-LIBS_save=$LIBS
-CFLAGS="$CFLAGS $GTK_CFLAGS"
-LIBS="$LIBS $GTK_LIBS"
-AC_CACHE_CHECK(for thread-safe Xlib, xmms_cv_lib_xlibs_threadsafe,
-[AC_TRY_RUN([
-#include <X11/Xlib.h>
-int main()
-{
-   exit(!(XInitThreads()));
-}],
-xmms_cv_lib_xlibs_threadsafe=yes,
-xmms_cv_lib_xlibs_threadsafe=no,
-xmms_cv_lib_xlibs_threadsafe=yes)])
-CFLAGS=$CFLAGS_save
-LIBS=$LIBS_save
+HAVE_ORBIT=no
 
 dnl Set of available languages.
 ALL_LINGUAS="af az bg ca cs da de el eo es eu fr ga gl hr hu id it ja ko lt lv nn nl no pl pt pt_BR ro ru sk sr sv tg th tr uk vi wa zh_CN.GB2312 zh_TW"
-
-AM_GNU_GETTEXT
 
 localedir=${datadir}/locale
 AC_SUBST(localedir)
@@ -327,10 +382,8 @@ AC_SUBST(USE_3DNOW_TRUE)
 dnl ========================
 
 AC_CACHE_CHECK(for socklen_t, xmms_cv_type_socklen_t,
-[AC_TRY_COMPILE(
-[#include <sys/types.h>
-#include <sys/socket.h>],
-[socklen_t s;], xmms_cv_type_socklen_t=yes, xmms_cv_type_socklen_t=no)])
+[AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <sys/types.h>
+#include <sys/socket.h>]], [[socklen_t s;]])],[xmms_cv_type_socklen_t=yes],[xmms_cv_type_socklen_t=no])])
 if test "x$xmms_cv_type_socklen_t" = "xno"; then
   AC_DEFINE(socklen_t, int, [Define to int if the socklen_t type is missing])
 fi
@@ -405,10 +458,7 @@ AC_CHECK_FUNCS(srandomdev)
 AC_CHECK_FUNCS(iconv_open)
 
 AC_CACHE_CHECK([for nl_langinfo(CODESET)], xmms_cv_func_langinfo, [
-AC_TRY_COMPILE([#include <langinfo.h>],
-        [char *codeset = nl_langinfo (CODESET);],
-   xmms_cv_func_langinfo=yes,
-   xmms_cv_func_langinfo=no)])
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <langinfo.h>]], [[char *codeset = nl_langinfo (CODESET);]])],[xmms_cv_func_langinfo=yes],[xmms_cv_func_langinfo=no])])
 if test "x$xmms_cv_func_langinfo" = "xyes"; then
   AC_DEFINE(HAVE_CODESET,,[Define if nl_langinfo(CODESET) is available.])
 fi
@@ -506,7 +556,7 @@ AC_CONFIG_SUBDIRS(libxmms)
 AC_SUBST(xmmsdir)
 AC_SUBST(plugindir)
 
-AC_OUTPUT([
+AC_CONFIG_FILES([
 Makefile
 xmms.1
 wmxmms.1
@@ -543,13 +593,14 @@ Visualization/opengl_spectrum/Makefile
 wmxmms/Makefile
 gnomexmms/Makefile
 po/Makefile.in
-intl/Makefile],
-[sed -e '/POTFILES =/{r po/POTFILES
+intl/Makefile])
+AC_CONFIG_COMMANDS([default],[sed -e '/POTFILES =/{r po/POTFILES
 a\
 \
 export OLD_PO_FILE_INPUT = yes
 }' po/Makefile.in > po/Makefile
-chmod +x xmms-config])
+chmod +x xmms-config],[])
+AC_OUTPUT
 
 echo ""
 echo "Configuration:"

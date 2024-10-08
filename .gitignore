@@ -1,0 +1,11 @@
+.gitignore
+autom4te.cache/
+config.h.in~
+configure.in~
+configure~
+config.log
+configure.ac~
+*.Plo
+.deps
+
+
