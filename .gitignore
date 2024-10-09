@@ -11,5 +11,5 @@ Makefile.in
 *.m4~
 *.lo
 *.o
-
-
+libxmms/autom4te.cache/
+traces.*
