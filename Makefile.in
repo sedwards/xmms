@@ -102,7 +102,6 @@ am__aclocal_m4_deps = $(top_srcdir)/autoconf-m4/build-to-host.m4 \
 	$(top_srcdir)/autoconf-m4/lib-link.m4 \
 	$(top_srcdir)/autoconf-m4/lib-prefix.m4 \
 	$(top_srcdir)/autoconf-m4/nls.m4 \
-	$(top_srcdir)/autoconf-m4/pkg.m4 \
 	$(top_srcdir)/autoconf-m4/po.m4 \
 	$(top_srcdir)/autoconf-m4/progtest.m4 \
 	$(top_srcdir)/acinclude.m4 $(top_srcdir)/configure.ac
@@ -305,14 +304,6 @@ GENERAL_PLUGIN_DIR = @GENERAL_PLUGIN_DIR@
 GETTEXT_MACRO_VERSION = @GETTEXT_MACRO_VERSION@
 GMSGFMT = @GMSGFMT@
 GMSGFMT_015 = @GMSGFMT_015@
-GTHREAD_CFLAGS = @GTHREAD_CFLAGS@
-GTHREAD_LIBS = @GTHREAD_LIBS@
-GTK3_CFLAGS = @GTK3_CFLAGS@
-GTK3_LIBS = @GTK3_LIBS@
-GTK4_CFLAGS = @GTK4_CFLAGS@
-GTK4_LIBS = @GTK4_LIBS@
-GTK_CFLAGS = @GTK_CFLAGS@
-GTK_LIBS = @GTK_LIBS@
 HAVEXML = @HAVEXML@
 INPUT_PLUGINS = @INPUT_PLUGINS@
 INPUT_PLUGIN_DIR = @INPUT_PLUGIN_DIR@
@@ -358,9 +349,6 @@ PACKAGE_TARNAME = @PACKAGE_TARNAME@
 PACKAGE_URL = @PACKAGE_URL@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
-PKG_CONFIG = @PKG_CONFIG@
-PKG_CONFIG_LIBDIR = @PKG_CONFIG_LIBDIR@
-PKG_CONFIG_PATH = @PKG_CONFIG_PATH@
 PLUGIN_LDFLAGS = @PLUGIN_LDFLAGS@
 POSIX_LIBS = @POSIX_LIBS@
 POSUB = @POSUB@

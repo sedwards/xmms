@@ -100,7 +100,6 @@ am__aclocal_m4_deps = $(top_srcdir)/autoconf-m4/build-to-host.m4 \
 	$(top_srcdir)/autoconf-m4/lib-link.m4 \
 	$(top_srcdir)/autoconf-m4/lib-prefix.m4 \
 	$(top_srcdir)/autoconf-m4/nls.m4 \
-	$(top_srcdir)/autoconf-m4/pkg.m4 \
 	$(top_srcdir)/autoconf-m4/po.m4 \
 	$(top_srcdir)/autoconf-m4/progtest.m4 \
 	$(top_srcdir)/acinclude.m4 $(top_srcdir)/configure.ac
@@ -205,7 +204,7 @@ CCAS = gcc
 CCASDEPMODE = depmode=gcc3
 CCASFLAGS = 
 CCDEPMODE = depmode=gcc3
-CFLAGS = -L/opt/homebrew/lib  -Wall -Wpointer-arith -finline-functions -ffast-math -fomit-frame-pointer -funroll-all-loops
+CFLAGS = -g -O2  -Wall -Wpointer-arith -finline-functions -ffast-math -funroll-all-loops
 CPP = gcc -E
 CPPFLAGS = -I/opt/homebrew/opt/ruby/include
 CSCOPE = cscope
@@ -229,14 +228,6 @@ GENERAL_PLUGIN_DIR = General
 GETTEXT_MACRO_VERSION = 0.20
 GMSGFMT = /opt/local/bin/msgfmt
 GMSGFMT_015 = /opt/local/bin/msgfmt
-GTHREAD_CFLAGS = 
-GTHREAD_LIBS = 
-GTK3_CFLAGS = 
-GTK3_LIBS = 
-GTK4_CFLAGS = 
-GTK4_LIBS = 
-GTK_CFLAGS = 
-GTK_LIBS = 
 HAVEXML = /opt/homebrew/opt/e2fsprogs/sbin:/opt/homebrew/opt/e2fsprogs/bin:/opt/local/bin:/opt/local/sbin:/Library/Frameworks/Python.framework/Versions/3.12/bin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/opt/X11/bin:/Library/Apple/usr/bin:/usr/local/go/bin:/opt/homebrew/bin
 INPUT_PLUGINS = $(ALL_PLUGINS)
 INPUT_PLUGIN_DIR = Input
@@ -270,7 +261,7 @@ MSGMERGE_FOR_MSGFMT_OPTION = --for-msgfmt
 OBJEXT = o
 OGG_CFLAGS = 
 OGG_LIBS = 
-OPENGL_LIBS = -lGL
+OPENGL_LIBS = error
 OSS_CFLAGS = 
 OUTPUT_PLUGINS = $(ALL_PLUGINS)
 OUTPUT_PLUGIN_DIR = Output
@@ -282,13 +273,10 @@ PACKAGE_TARNAME =
 PACKAGE_URL = 
 PACKAGE_VERSION = 
 PATH_SEPARATOR = :
-PKG_CONFIG = 
-PKG_CONFIG_LIBDIR = 
-PKG_CONFIG_PATH = 
 PLUGIN_LDFLAGS = -module -avoid-version -export-symbols-regex "get_.plugin_info"
 POSIX_LIBS = 
 POSUB = 
-PTHREAD_LIBS = -lpthread
+PTHREAD_LIBS = 
 RANLIB = ranlib
 SED = /opt/homebrew/bin/gsed
 SET_MAKE = 
@@ -299,14 +287,14 @@ USE_NLS = no
 VERSION = 0.0.1
 VISUALIZATION_PLUGINS = $(ALL_PLUGINS)
 VISUALIZATION_PLUGIN_DIR = Visualization
-VM_LIBS = -lXxf86vm
+VM_LIBS = 
 VORBIS_CFLAGS = 
 VORBIS_LIBS = 
 XGETTEXT = /opt/local/bin/xgettext
 XGETTEXT_015 = /opt/local/bin/xgettext
 XGETTEXT_EXTRA_OPTIONS = 
 XMKMF = 
-XMMS_DEFINES = -L/opt/homebrew/lib  -Wall -Wpointer-arith -finline-functions -ffast-math -fomit-frame-pointer -funroll-all-loops -DDATA_DIR=\"${datarootdir}/xmms\" -DPLUGIN_DIR=\"${exec_prefix}/lib/xmms\" -DPLUGINSUBS=\"Output\",\"Input\",\"Effect\",\"General\",\"Visualization\" -DLOCALEDIR=\"${datarootdir}/locale\"
+XMMS_DEFINES = -g -O2  -Wall -Wpointer-arith -finline-functions -ffast-math -funroll-all-loops -DDATA_DIR=\"${datarootdir}/xmms\" -DPLUGIN_DIR=\"${exec_prefix}/lib/xmms\" -DPLUGINSUBS=\"Output\",\"Input\",\"Effect\",\"General\",\"Visualization\" -DLOCALEDIR=\"${datarootdir}/locale\"
 XMMS_GTK = 
 XMMS_PATH = no
 Z_LIBS = -lz

@@ -36,7 +36,7 @@ XGETTEXT = PATH=../src:$$PATH /opt/local/bin/xgettext
 MSGMERGE = PATH=../src:$$PATH msgmerge
 
 DEFS = -DHAVE_CONFIG_H
-CFLAGS = -L/opt/homebrew/lib  -Wall -Wpointer-arith -finline-functions -ffast-math -fomit-frame-pointer -funroll-all-loops
+CFLAGS = -g -O2  -Wall -Wpointer-arith -finline-functions -ffast-math -funroll-all-loops
 CPPFLAGS = -I/opt/homebrew/opt/ruby/include
 
 INCLUDES = -I.. -I$(top_srcdir)/intl

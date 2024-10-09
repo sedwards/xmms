@@ -26,8 +26,8 @@ if ( (gtk-config --version) > /dev/null 2>&1)  then
    gtk_libs=`gtk-config --libs`
    gtk_cflags=`gtk-config --cflags`
 else
-   gtk_libs=""
-   gtk_cflags=""
+   gtk_libs="@GTK_LIBS@"
+   gtk_cflags="@GTK_CFLAGS@"
 fi
 
 plugin_dir="${exec_prefix}/lib/xmms"

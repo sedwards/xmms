@@ -260,7 +260,7 @@ void g_free_orig (gpointer mem);
 #endif
 
 /* XF86VidMode extension is present */
-#define XF86VIDMODE 1
+/* #undef XF86VIDMODE */
 
 /* Define to empty if 'const' does not conform to ANSI C. */
 /* #undef const */

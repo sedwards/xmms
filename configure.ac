@@ -117,42 +117,11 @@ CFLAGS_save=$CFLAGS
 LIBS_save=$LIBS
 CFLAGS="$CFLAGS $GTK_CFLAGS"
 LIBS="$LIBS"
-AC_CHECK_LIB(Xxf86vm,XF86VidModeQueryExtension,[
-    AC_DEFINE(XF86VIDMODE,1,[XF86VidMode extension is present])
-        VM_LIBS="-lXxf86vm"],,
-    -L$x_libraries -lXext)
 
 CFLAGS=$CFLAGS_save
 LIBS=$LIBS_save
 AC_SUBST(VM_LIBS)
 
-PTHREAD_LIBS=error
-AC_MSG_CHECKING(for old style FreeBSD -pthread flag)
-AC_EGREP_CPP(yes,
-	[#if defined(__FreeBSD_cc_version) && __FreeBSD_cc_version <= 500001
-	  yes
-	#endif
-	], AC_MSG_RESULT(yes)
-	CFLAGS="$CFLAGS -D_THREAD_SAFE" PTHREAD_LIBS="-pthread",
-	AC_MSG_RESULT(no))
-if test "x$PTHREAD_LIBS" = xerror; then
-	AC_CHECK_LIB(pthread, pthread_attr_init,
-		PTHREAD_LIBS="-lpthread")
-fi
-if test "x$PTHREAD_LIBS" = xerror; then
-        AC_CHECK_LIB(pthreads, pthread_attr_init,
-		PTHREAD_LIBS="-lpthreads")
-fi
-if test "x$PTHREAD_LIBS" = xerror; then
-        AC_CHECK_LIB(c_r, pthread_attr_init,
-		PTHREAD_LIBS="-lc_r")
-fi
-if test "x$PTHREAD_LIBS" = xerror; then
-	AC_CHECK_FUNC(pthread_attr_init, PTHREAD_LIBS="")
-fi
-if test "x$PTHREAD_LIBS" = xerror; then
-	AC_MSG_ERROR(*** Unable to locate working posix thread library ***)
-fi
 AC_SUBST(PTHREAD_LIBS)
 
 HAVE_ORBIT_FALSE=
@@ -242,27 +211,6 @@ XMMS_GTK=""
 dnl *** disable gtk warnings
 if test x"$gtk_warnings" = x"yes"; then
    CPPFLAGS="$CPPFLAGS -DGDK_DISABLE_DEPRECATED -DGDK_PIXBUF_DISABLE_DEPRECATED -DGDK_PIXBUF_DISABLE_SINGLE_INCLUDES -DGTK_DISABLE_DEPRECATED -DGTK_DISABLE_SINGLE_INCLUDES"
-fi
-
-
-dnl *** check for gtk2
-if test "x$enable_gtk2" = "xyes" ; then
-  dnl Test for gtk+-2.0
-  PKG_CHECK_MODULES([GTK], [gtk+-2.0 >= 2.14.0], XMMS_GTK=xmms-gtk, AC_MSG_ERROR(You have GLIB 2.0 installed but I cannot find GTK+ 2.0. Run configure with --disable-gtk2 or install GTK+ 2.0))
-  PKG_CHECK_MODULES([GTHREAD], gthread-2.0 >=  2.18.0, HAVE_GTHREADS="yes")
-fi
-
-
-dnl *** enable gtk3
-if test "x$enable_gtk3" = "xyes" ; then
-  dnl Test for gtk-3.0
-  PKG_CHECK_MODULES([GTK3], [gtk+-3.0 >= 3.0.0], XMMS_GTK=xmms-gtk, AC_MSG_ERROR(You have GLIB 2.0 installed but I cannot find GTK+ 3.0. Run configure without --enable-gtk3 or install GTK+ 3.0))
-fi
-
-dnl *** enable gtk4
-if test "x$enable_gtk4" = "xyes" ; then
-  dnl Test for gtk-4.0
-  PKG_CHECK_MODULES([GTK4], [gtk4.0 >= 4.0.0], XMMS_GTK=xmms-gtk, AC_MSG_ERROR(You have GLIB 2.0 installed but I cannot find GTK+ 3.0. Run configure without --enable-gtk4 or install GTK+ 4.0))
 fi
 
 AC_SUBST(XMMS_GTK)

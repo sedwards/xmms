@@ -51,7 +51,7 @@ RANLIB = ranlib
 DEFS = -DLOCALEDIR=\"$(localedir)\" -DGNULOCALEDIR=\"$(gnulocaledir)\" \
 -DLOCALE_ALIAS_PATH=\"$(aliaspath)\" -DHAVE_CONFIG_H
 CPPFLAGS = -I/opt/homebrew/opt/ruby/include
-CFLAGS = -L/opt/homebrew/lib  -Wall -Wpointer-arith -finline-functions -ffast-math -fomit-frame-pointer -funroll-all-loops
+CFLAGS = -g -O2  -Wall -Wpointer-arith -finline-functions -ffast-math -funroll-all-loops
 LDFLAGS = -L/opt/homebrew/opt/ruby/lib
 
 COMPILE = $(CC) -c $(DEFS) $(INCLUDES) $(CPPFLAGS) $(CFLAGS) $(XCFLAGS)
