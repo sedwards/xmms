@@ -1,19 +1,29 @@
 dnl Process this file with autoconf to produce a configure script.
-AC_INIT
-AC_CONFIG_SRCDIR([xmms/main.c])
-AC_CANONICAL_HOST
 
-cflags_set=${CFLAGS+set}
-AM_CONFIG_HEADER(config.h xmms/i18n.h)
+AC_INIT([xmms],[0.0.1],[https://updatez.org])
 AC_CONFIG_AUX_DIR([autoconf])
 AC_CONFIG_MACRO_DIR([autoconf-m4])
-AM_INIT_AUTOMAKE(xmms, 0.0.1)
-
+#AM_CONFIG_HEADERS(config.h xmms/i18n.h)
+AM_INIT_AUTOMAKE([-Wall foreign])
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
-#m4_ifdef([AC_CONFIG_HEADERS], [AC_CONFIG_HEADERS([config.h])], [AC_CONFIG_HEADERS([config.h])])
+
+m4_ifdef([AC_CONFIG_HEADERS], [AC_CONFIG_HEADERS([config.h])], [AC_CONFIG_HEADERS([config.h])])
+AM_GNU_GETTEXT([external])
 m4_ifdef([AM_PROG_AR], [AM_PROG_AR])
 m4_ifdef([AM_MAINTAINER_MODE], [AM_MAINTAINER_MODE])
-AM_GNU_GETTEXT([external])
+
+AC_PROG_RANLIB
+
+
+
+
+#dnl Process this file with autoconf to produce a configure script.
+#AC_INIT
+#AC_CONFIG_SRCDIR([xmms/main.c])
+#AC_CANONICAL_HOST
+
+#cflags_set=${CFLAGS+set}
+
 
 
 AC_ARG_ENABLE( one-plugin-dir,
@@ -94,7 +104,7 @@ AC_PROG_LN_S
 AC_PROG_MAKE_SET
 
 AM_DISABLE_STATIC
-AM_PROG_LIBTOOL
+#AM_PROG_LIBTOOL
 
 AC_CHECK_HEADER(pthread.h,,AC_MSG_ERROR([*** POSIX thread support not installed - please install first ***]))
 

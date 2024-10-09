@@ -57,7 +57,7 @@ dnl Now check if the installed ESD is sufficiently new. (Also sanity
 dnl checks the results of esd-config to some extent
 dnl
       rm -f conf.esdtest
-      AC_TRY_RUN([
+      AC_RUN_IFELSE([
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -133,7 +133,7 @@ int main ()
           echo "*** Could not run ESD test program, checking why..."
           CFLAGS="$CFLAGS $ESD_CFLAGS"
           LIBS="$LIBS $ESD_LIBS"
-          AC_TRY_LINK([
+          AC_LINK_IFELSE([
 #include <stdio.h>
 #include <esd.h>
 ],      [ return 0; ],
@@ -414,7 +414,7 @@ dnl Now check if the installed libmikmod is sufficiently new. (Also sanity
 dnl checks the results of libmikmod-config to some extent
 dnl
       rm -f conf.mikmodtest
-      AC_TRY_RUN([
+      AC_RUN_IFELSE([
 #include <mikmod.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -524,7 +524,7 @@ int main()
           echo "*** Could not run libmikmod test program, checking why..."
           CFLAGS="$CFLAGS $LIBMIKMOD_CFLAGS"
           LIBS="$LIBS $LIBMIKMOD_LIBS"
-          AC_TRY_LINK([
+          AC_LINK_IFELSE([
 #include <mikmod.h>
 #include <stdio.h>
 ],      [ return (MikMod_GetVersion()!=0); ],
@@ -659,7 +659,7 @@ LIBS="-lsidplay"
 
 AC_CACHE_VAL(ac_cv_sidplay_works,
 [
-    AC_TRY_LINK(
+    AC_LINK_IFELSE(
 	    [#include <sidplay/sidtune.h>],
 		[sidTune* myTest;],
 		[ac_cv_sidplay_works=yes],
@@ -722,7 +722,7 @@ dnl
 dnl Now check if the installed Ogg is sufficiently new.
 dnl
       rm -f conf.oggtest
-      AC_TRY_RUN([
+      AC_RUN_IFELSE([
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -750,7 +750,7 @@ int main ()
        echo "*** Could not run Ogg test program, checking why..."
        CFLAGS="$CFLAGS $OGG_CFLAGS"
        LIBS="$LIBS $OGG_LIBS"
-       AC_TRY_LINK([
+       AC_LINK_IFELSE([
 #include <stdio.h>
 #include <ogg/ogg.h>
 ],     [ return 0; ],
@@ -815,7 +815,7 @@ dnl
 dnl Now check if the installed Vorbis is sufficiently new.
 dnl
       rm -f conf.vorbistest
-      AC_TRY_RUN([
+      AC_RUN_IFELSE([
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -843,7 +843,7 @@ int main ()
        echo "*** Could not run Vorbis test program, checking why..."
        CFLAGS="$CFLAGS $VORBIS_CFLAGS"
        LIBS="$LIBS $VORBIS_LIBS $OGG_LIBS"
-       AC_TRY_LINK([
+       AC_LINK_IFELSE([
 #include <stdio.h>
 #include <vorbis/codec.h>
 ],     [ return 0; ],
@@ -918,7 +918,7 @@ dnl Now check if the installed libxml is sufficiently new. (Also sanity
 dnl checks the results of xml-config to some extent
 dnl
       rm -f conf.libxmltest
-      AC_TRY_RUN([
+      AC_RUN_IFELSE([
 #include <stdio.h>
 #include <stdlib.h>
 #include <parser.h>
@@ -996,7 +996,7 @@ main ()
           echo "*** Could not run LIBXML test program, checking why..."
           CFLAGS="$CFLAGS $XML_CFLAGS"
           LIBS="$LIBS $XML_LIBS"
-          AC_TRY_LINK([
+          AC_LINK_IFELSE([
 #include <parser.h>
 #include <stdio.h>
 ],      [ return 0; ],
@@ -1147,7 +1147,7 @@ case $host in
   AC_CACHE_CHECK([whether the C compiler needs -belf], lt_cv_cc_needs_belf,
     [AC_LANG_SAVE
      AC_LANG_C
-     AC_TRY_LINK([],[],[lt_cv_cc_needs_belf=yes],[lt_cv_cc_needs_belf=no])
+     AC_LINK_IFELSE([],[],[lt_cv_cc_needs_belf=yes],[lt_cv_cc_needs_belf=no])
      AC_LANG_RESTORE])
   if test x"$lt_cv_cc_needs_belf" != x"yes"; then
     # this is probably gcc 2.8.0, egcs 1.0 or newer; no need for -belf
@@ -1164,7 +1164,7 @@ ifdef([AC_PROVIDE_AC_LIBTOOL_WIN32_DLL],
   # recent cygwin and mingw systems supply a stub DllMain which the user
   # can override, but on older systems we have to supply one
   AC_CACHE_CHECK([if libtool should supply DllMain function], lt_cv_need_dllmain,
-    [AC_TRY_LINK([],
+    [AC_LINK_IFELSE([],
       [extern int __attribute__((__stdcall__)) DllMain(void*, int, void*);
       DllMain (0, 0, 0);],
       [lt_cv_need_dllmain=no],[lt_cv_need_dllmain=yes])])
@@ -1176,7 +1176,7 @@ ifdef([AC_PROVIDE_AC_LIBTOOL_WIN32_DLL],
     SAVE_CFLAGS="$CFLAGS"
     CFLAGS="$CFLAGS -mdll"
     AC_CACHE_CHECK([how to link DLLs], lt_cv_cc_dll_switch,
-      [AC_TRY_LINK([], [], [lt_cv_cc_dll_switch=-mdll],[lt_cv_cc_dll_switch=-dll])])
+      [AC_LINK_IFELSE([], [], [lt_cv_cc_dll_switch=-mdll],[lt_cv_cc_dll_switch=-dll])])
     CFLAGS="$SAVE_CFLAGS" ;;
   *-*-cygwin* | *-*-pw32*)
     # cygwin systems need to pass --dll to the linker, and not link
@@ -2080,7 +2080,7 @@ AC_CACHE_VAL([lt_cv_prog_cc_static_works], [dnl
   lt_cv_prog_cc_static_works=no
   save_LDFLAGS="$LDFLAGS"
   LDFLAGS="$LDFLAGS $lt_cv_prog_cc_static"
-  AC_TRY_LINK([], [], [lt_cv_prog_cc_static_works=yes])
+  AC_LINK_IFELSE([], [], [lt_cv_prog_cc_static_works=yes])
   LDFLAGS="$save_LDFLAGS"
 ])
 
