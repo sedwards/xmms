@@ -1,6 +1,8 @@
 AUTOMAKE_OPTIONS = foreign
 xmmsincludedir = $(includedir)/xmms
 
+ACLOCAL_AMFLAGS = -I autoconf-m4
+
 lib_LTLIBRARIES = libxmms.la
 
 libxmms_la_LDFLAGS = -export-dynamic -version-info $(LIBXMMS_MAJOR_VERSION):$(LIBXMMS_MINOR_VERSION):$(LIBXMMS_MICRO_VERSION)
@@ -11,3 +13,4 @@ libxmms_la_SOURCES = configfile.c configfile.h xmmsctrl.c xmmsctrl.h dirbrowser.
 
 xmmsinclude_HEADERS = configfile.h xmmsctrl.h dirbrowser.h util.h formatter.h titlestring.h
 
+SUBDIRS = po
