@@ -244,19 +244,6 @@ fi
 
 AM_CONDITIONAL(HAVE_ESD,test "x$have_esd" = xyes)
 
-dnl *** mikmod
-AC_ARG_ENABLE( mikmod,
-[  --disable-mikmod        Disable mikmod input plugin [default=enabled]],,
-		enable_mikmod="yes")
-
-if test "x$enable_mikmod" = xyes; then
-	AM_PATH_LIBMIKMOD(3.1.5,have_mikmod=yes, have_mikmod=no)
-else
-	AC_MSG_RESULT([*** mikmod plugin disabled per user request ***])
-	have_mikmod=no
-fi
-AM_CONDITIONAL(HAVE_MIKMOD,test "x$have_mikmod" = xyes)
-
 dnl *** Ogg Vorbis
 AC_ARG_ENABLE( vorbis,
 [  --disable-vorbis        Disable Ogg Vorbis input plugin [default=enabled]],,

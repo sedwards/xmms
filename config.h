@@ -105,7 +105,7 @@ void g_free_orig (gpointer mem);
 /* #undef HAVE_DCGETTEXT */
 
 /* Define to 1 if you have the <dlfcn.h> header file. */
-#define HAVE_DLFCN_H 1
+/* #undef HAVE_DLFCN_H */
 
 /* Define if libesd has the esd_get_latency function */
 /* #undef HAVE_ESD_GET_LATENCY */
@@ -216,22 +216,22 @@ void g_free_orig (gpointer mem);
 #define PACKAGE "xmms"
 
 /* Define to the address where bug reports for this package should be sent. */
-#define PACKAGE_BUGREPORT ""
+#define PACKAGE_BUGREPORT "https://updatez.org"
 
 /* Define to the full name of this package. */
-#define PACKAGE_NAME ""
+#define PACKAGE_NAME "xmms"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING ""
+#define PACKAGE_STRING "xmms 0.0.1"
 
 /* Define to the one symbol short name of this package. */
-#define PACKAGE_TARNAME ""
+#define PACKAGE_TARNAME "xmms"
 
 /* Define to the home page for this package. */
 #define PACKAGE_URL ""
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION ""
+#define PACKAGE_VERSION "0.0.1"
 
 /* The size of 'long', as computed by sizeof. */
 #define SIZEOF_LONG 0

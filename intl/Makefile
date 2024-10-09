@@ -45,7 +45,7 @@ l = @l@
 
 AR = ar
 CC = gcc
-LIBTOOL = $(SHELL) $(top_builddir)/libtool
+LIBTOOL = @LIBTOOL@
 RANLIB = ranlib
 
 DEFS = -DLOCALEDIR=\"$(localedir)\" -DGNULOCALEDIR=\"$(gnulocaledir)\" \
