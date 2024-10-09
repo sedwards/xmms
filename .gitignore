@@ -13,3 +13,5 @@ Makefile.in
 *.o
 libxmms/autom4te.cache/
 traces.*
+output.*
+./autom4te.cache/output.*
