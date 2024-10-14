@@ -703,7 +703,6 @@ localedir_c
 POSUB
 LTLIBINTL
 LIBINTL
-INTLLIBS
 LTLIBICONV
 LIBICONV
 INTL_MACOSX_LIBS
@@ -15348,7 +15347,7 @@ printf "%s\n" "#define HAVE_DCGETTEXT 1" >>confdefs.h
 
 
 
-        INTLLIBS="$LIBINTL"
+        LIBINTL="$LIBINTL"
 
 
 

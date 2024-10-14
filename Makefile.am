@@ -1,4 +1,6 @@
-SUBDIRS = intl libxmms xmms Output Input Effect General Visualization wmxmms gnomexmms po
+ACLOCAL_AMFLAGS = -I autoconf-m4
+
+SUBDIRS = libxmms xmms Output Input Effect General Visualization wmxmms gnomexmms po
 
 bin_SCRIPTS = xmms-config
 

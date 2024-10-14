@@ -118,26 +118,6 @@ esac
 AC_SUBST([AR])dnl
 ])
 
-# Figure out how to run the assembler.                      -*- Autoconf -*-
-
-# Copyright (C) 2001-2024 Free Software Foundation, Inc.
-#
-# This file is free software; the Free Software Foundation
-# gives unlimited permission to copy and/or distribute it,
-# with or without modifications, as long as this notice is preserved.
-
-# AM_PROG_AS
-# ----------
-AC_DEFUN([AM_PROG_AS],
-[# By default we simply use the C compiler to build assembly code.
-AC_REQUIRE([AC_PROG_CC])
-test "${CCAS+set}" = set || CCAS=$CC
-test "${CCASFLAGS+set}" = set || CCASFLAGS=$CFLAGS
-AC_ARG_VAR([CCAS],      [assembler compiler command (defaults to CC)])
-AC_ARG_VAR([CCASFLAGS], [assembler compiler flags (defaults to CFLAGS)])
-_AM_IF_OPTION([no-dependencies],, [_AM_DEPENDENCIES([CCAS])])dnl
-])
-
 # AM_AUX_DIR_EXPAND                                         -*- Autoconf -*-
 
 # Copyright (C) 2001-2024 Free Software Foundation, Inc.
@@ -1431,7 +1411,13 @@ m4_include([autoconf-m4/intlmacosx.m4])
 m4_include([autoconf-m4/lib-ld.m4])
 m4_include([autoconf-m4/lib-link.m4])
 m4_include([autoconf-m4/lib-prefix.m4])
+m4_include([autoconf-m4/libtool.m4])
+m4_include([autoconf-m4/ltoptions.m4])
+m4_include([autoconf-m4/ltsugar.m4])
+m4_include([autoconf-m4/ltversion.m4])
+m4_include([autoconf-m4/lt~obsolete.m4])
 m4_include([autoconf-m4/nls.m4])
+m4_include([autoconf-m4/pkg.m4])
 m4_include([autoconf-m4/po.m4])
 m4_include([autoconf-m4/progtest.m4])
 m4_include([acinclude.m4])

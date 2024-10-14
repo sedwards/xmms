@@ -16,4 +16,8 @@ automake --add-missing
 
 
 
+#autopoint
+#gettextize
+
+
 

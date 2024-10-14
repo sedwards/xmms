@@ -18,7 +18,7 @@ top_srcdir = ..
 
 prefix = /usr/local
 exec_prefix = ${prefix}
-datadir = $(prefix)/@DATADIRNAME@
+datadir = $(prefix)/share
 localedir = $(datadir)/locale
 gnulocaledir = $(prefix)/share/locale
 gettextsrcdir = $(prefix)/share/gettext/po

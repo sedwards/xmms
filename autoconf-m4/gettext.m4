@@ -354,8 +354,8 @@ return * gettext ("")$gt_expression_test_code + __GNU_GETTEXT_SYMBOL_EXPRESSION
 
   m4_if(gt_building_libintl_in_same_build_tree, yes, [], [
     dnl For backward compatibility. Some Makefiles may be using this.
-    INTLLIBS="$LIBINTL"
-    AC_SUBST([INTLLIBS])
+    LIBINTL="$LIBINTL"
+    AC_SUBST([LIBINTL])
   ])
 
   dnl Make all documented variables known to autoconf.

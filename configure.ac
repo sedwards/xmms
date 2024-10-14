@@ -1,28 +1,78 @@
-dnl Process this file with autoconf to produce a configure script.
+# Process this file with autoconf to produce a configure script.
 
 AC_INIT([xmms],[0.0.1],[https://updatez.org])
+
+# Enable automatic archive creation if available
+m4_ifdef([AM_PROG_AR], [AM_PROG_AR])
+
+LT_INIT
+
+# Define auxiliary directories
 AC_CONFIG_AUX_DIR([autoconf])
 AC_CONFIG_MACRO_DIR([autoconf-m4])
-#AM_CONFIG_HEADERS(config.h xmms/i18n.h)
-AM_INIT_AUTOMAKE([-Wall foreign])
+
+# Enable silent rules for cleaner build output
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 
-m4_ifdef([AC_CONFIG_HEADERS], [AC_CONFIG_HEADERS([config.h])], [AC_CONFIG_HEADERS([config.h])])
-AM_GNU_GETTEXT([external])
-m4_ifdef([AM_PROG_AR], [AM_PROG_AR])
+# Enable maintainer mode for developers
 m4_ifdef([AM_MAINTAINER_MODE], [AM_MAINTAINER_MODE])
 
-AC_PROG_RANLIB
+# Initialize gettext for translations
+AM_GNU_GETTEXT([external])
+
+# Check for required libraries
+PKG_CHECK_MODULES([GLIB], [glib-2.0 >= 2.30])
+PKG_CHECK_MODULES([GTK], [gtk+-3.0 >= 3.0])
+
+# Specify the source file for version control
+AC_CONFIG_SRCDIR([libxmms/configfile.c])
+
+# Configure header files
+AC_CONFIG_HEADERS([config.h])
+
+# Versioning for libxmms
+LIBXMMS_MAJOR_VERSION=3
+LIBXMMS_MINOR_VERSION=0
+LIBXMMS_MICRO_VERSION=2
+LIBXMMS_VERSION=$LIBXMMS_MAJOR_VERSION.$LIBXMMS_MINOR_VERSION.$LIBXMMS_MICRO_VERSION
+
+#AM_INIT_AUTOMAKE([foreign])
+AM_INIT_AUTOMAKE([-Wall foreign])
+
+# Substitute versioning info in the Makefile
+AC_SUBST([LIBXMMS_MAJOR_VERSION])
+AC_SUBST([LIBXMMS_MINOR_VERSION])
+AC_SUBST([LIBXMMS_MICRO_VERSION])
+
+# Specify program to be built
+AC_PREFIX_PROGRAM([xmms])
+
+# Checks for required programs
+AC_PROG_CC
+AC_PROG_INSTALL
+AC_PROG_LN_S
+AC_PROG_MAKE_SET
+
+AC_PROG_CC
+AC_SEARCH_LIBS([strerror],[cposix])
+dnl AC_PROG_CXX
+AC_C_BIGENDIAN
+AC_C_INLINE
+AC_C_CONST
+
+AM_DISABLE_STATIC
+
+# Enable libtool for shared and static library building
+#AC_ENABLE_STATIC([])
+AC_ENABLE_SHARED([])
+
+# Check for POSIX functions
+AC_CHECK_FUNCS([sched_setscheduler nanosleep])
 
 
-
-
-#dnl Process this file with autoconf to produce a configure script.
-#AC_INIT
-#AC_CONFIG_SRCDIR([xmms/main.c])
-#AC_CANONICAL_HOST
-
-#cflags_set=${CFLAGS+set}
+#m4_ifde([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
+#m4_ifdef([AC_CONFIG_HEADERS], [AC_CONFIG_HEADERS([config.h])], [AC_CONFIG_HEADERS([config.h])])
+#m4_ifdef([AM_MAINTAINER_MODE], [AM_MAINTAINER_MODE])
 
 
 
@@ -88,29 +138,13 @@ AC_ARG_WITH(libxml2,
               with_libxml2="no") 
 
 
-AC_PREFIX_PROGRAM(xmms)
-
-dnl Various compiler setup.
-AC_PROG_CC
-AC_SEARCH_LIBS([strerror],[cposix])
-dnl AC_PROG_CXX
-AC_C_BIGENDIAN
-AC_C_INLINE
-AC_C_CONST
-
-dnl Checks for programs.
-AC_PROG_INSTALL
-AC_PROG_LN_S
-AC_PROG_MAKE_SET
-
-AM_DISABLE_STATIC
-#AM_PROG_LIBTOOL
-
-AC_CHECK_HEADER(pthread.h,,AC_MSG_ERROR([*** POSIX thread support not installed - please install first ***]))
+# Check for required libraries
+PKG_CHECK_MODULES([GLIB], [glib-2.0 >= 2.30])
+PKG_CHECK_MODULES([GTK], [gtk+-3.0 >= 3.0])
 
 AC_PATH_PROG(XMMS_PATH,xmms,no)
 
-AM_PROG_AS
+#AM_PROG_AS
 CCASFLAGS=""
 LIBS_save=$LIBS
 LIBS="$LIBS"
@@ -132,10 +166,6 @@ CFLAGS=$CFLAGS_save
 LIBS=$LIBS_save
 AC_SUBST(VM_LIBS)
 
-AC_SUBST(PTHREAD_LIBS)
-
-HAVE_ORBIT_FALSE=
-HAVE_ORBIT=
 
 dnl *** OpenGL
 AC_ARG_ENABLE( opengl,
@@ -488,98 +518,3 @@ AC_SUBST(pluginsubs)
 XMMS_DEFINES="$CFLAGS -DDATA_DIR=\\\"$datadir/xmms\\\" -DPLUGIN_DIR=\\\"$plugindir\\\" -DPLUGINSUBS=$pluginsubs -DLOCALEDIR=\\\"$localedir\\\""
 
 if test "x$enable_user_plugin_dir" = "xno"; then
-	AC_DEFINE(DISABLE_USER_PLUGIN_DIR,, [Define to disable per user plugin directory])
-fi
-
-AC_SUBST(XMMS_DEFINES)
-
-PLUGIN_LDFLAGS='-module -avoid-version -export-symbols-regex "get_.plugin_info"'
-AC_SUBST(PLUGIN_LDFLAGS)
-
-AC_CONFIG_SUBDIRS(libxmms)
-
-AC_SUBST(xmmsdir)
-AC_SUBST(plugindir)
-
-AC_CONFIG_FILES([
-Makefile
-xmms.1
-wmxmms.1
-gnomexmms.1
-xmms.spec
-xmms-config
-xmms/Makefile
-xmms/defskin/Makefile
-Output/Makefile
-Output/OSS/Makefile
-Output/esd/Makefile
-Output/disk_writer/Makefile
-Output/solaris/Makefile
-Input/Makefile
-Input/wav/Makefile
-Input/mpg123/Makefile
-Input/mikmod/Makefile
-Input/cdaudio/Makefile
-Input/idcin/Makefile
-Input/tonegen/Makefile
-Input/vorbis/Makefile
-Effect/Makefile
-Effect/voice/Makefile
-Effect/echo_plugin/Makefile
-Effect/stereo_plugin/Makefile
-General/Makefile
-General/ir/Makefile
-General/joystick/Makefile
-General/song_change/Makefile
-Visualization/Makefile
-Visualization/blur_scope/Makefile
-Visualization/sanalyzer/Makefile
-Visualization/opengl_spectrum/Makefile
-wmxmms/Makefile
-gnomexmms/Makefile
-po/Makefile.in
-intl/Makefile])
-AC_CONFIG_COMMANDS([default],[sed -e '/POTFILES =/{r po/POTFILES
-a\
-\
-export OLD_PO_FILE_INPUT = yes
-}' po/Makefile.in > po/Makefile
-chmod +x xmms-config],[])
-AC_OUTPUT
-
-echo ""
-echo "Configuration:"
-echo "  Install path:               ${prefix}"
-if test "$XMMS_PATH" != "no"; then
-echo "  Current xmms                $XMMS_PATH"
-fi
-
-echo "  Build esd plugin:           $have_esd"
-echo "  Build mikmod plugin:        $have_mikmod"
-echo "  Build Ogg Vorbis plugin:    $have_oggvorbis"
-echo "  Build Solaris plugin:       $have_solaris"
-echo "  Build gnomexmms:            $have_gnome"
-echo "  Build OpenGL plugins:       $have_opengl"
-echo "  Pthread flag:               $PTHREAD_LIBS"
-echo "  Use one plugin dir:         $enable_one_plugin_dir"
-echo "  Allow user plugin dir:      $enable_user_plugin_dir"
-echo ""
-
-echo ""
-if test "$xmms_cv_lib_xlibs_threadsafe" = "no"; then
-  echo "Note: You need to have thread-safe xlibs to use xmms."
-  echo "If you are using libc5 thread aware Xlibs just skip this." 
-  echo ""
-  echo "If you don't have those libs and you are on a libc5 system get them at:"
-  echo "ftp://ftp.dent.med.uni-muenchen.de/pub/wmglo/"
-fi
-
-if test "$XMMS_PATH" != "no" && test "$prefix/bin/xmms" != "$XMMS_PATH" ; then
-  echo ""
-  echo "Note: Configure has discovered that you already have xmms installed"
-  echo "and it do not match with the given --prefix. You have xmms installed "
-  echo "in $XMMS_PATH and you chose $prefix/bin/xmms."
-  echo "If you don't want two copies of XMMS installed, rerun configure with"
-  echo "the --prefix option set to the location of the old xmms, or uninstall"
-  echo "the old xmms."
-fi

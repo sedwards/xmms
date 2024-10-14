@@ -105,7 +105,7 @@ void g_free_orig (gpointer mem);
 /* #undef HAVE_DCGETTEXT */
 
 /* Define to 1 if you have the <dlfcn.h> header file. */
-/* #undef HAVE_DLFCN_H */
+#define HAVE_DLFCN_H 1
 
 /* Define if libesd has the esd_get_latency function */
 /* #undef HAVE_ESD_GET_LATENCY */

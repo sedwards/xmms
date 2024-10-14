@@ -257,7 +257,7 @@ INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
 INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
-INTLLIBS = @INTLLIBS@
+LIBINTL = @LIBINTL@
 INTL_MACOSX_LIBS = @INTL_MACOSX_LIBS@
 LDFLAGS = @LDFLAGS@
 LIBICONV = @LIBICONV@
@@ -380,7 +380,7 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 xmmsdir = @xmmsdir@
-wmxmms_LDADD = @GTK_LIBS@ $(top_builddir)/libxmms/libxmms.la @INTLLIBS@
+wmxmms_LDADD = @GTK_LIBS@ $(top_builddir)/libxmms/libxmms.la @LIBINTL@
 wmxmms_SOURCES = \
 getopt.c \
 getopt1.c \

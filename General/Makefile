@@ -99,7 +99,13 @@ am__aclocal_m4_deps = $(top_srcdir)/autoconf-m4/build-to-host.m4 \
 	$(top_srcdir)/autoconf-m4/lib-ld.m4 \
 	$(top_srcdir)/autoconf-m4/lib-link.m4 \
 	$(top_srcdir)/autoconf-m4/lib-prefix.m4 \
+	$(top_srcdir)/autoconf-m4/libtool.m4 \
+	$(top_srcdir)/autoconf-m4/ltoptions.m4 \
+	$(top_srcdir)/autoconf-m4/ltsugar.m4 \
+	$(top_srcdir)/autoconf-m4/ltversion.m4 \
+	$(top_srcdir)/autoconf-m4/lt~obsolete.m4 \
 	$(top_srcdir)/autoconf-m4/nls.m4 \
+	$(top_srcdir)/autoconf-m4/pkg.m4 \
 	$(top_srcdir)/autoconf-m4/po.m4 \
 	$(top_srcdir)/autoconf-m4/progtest.m4 \
 	$(top_srcdir)/acinclude.m4 $(top_srcdir)/configure.ac
@@ -107,7 +113,7 @@ am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 DIST_COMMON = $(srcdir)/Makefile.am $(am__DIST_COMMON)
 mkinstalldirs = $(install_sh) -d
-CONFIG_HEADER = $(top_builddir)/config.h $(top_builddir)/xmms/i18n.h
+CONFIG_HEADER = $(top_builddir)/config.h
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 AM_V_P = $(am__v_P_$(V))
@@ -200,9 +206,6 @@ AUTOHEADER = ${SHELL} '/Users/sedwards/source/xmms/autoconf/missing' autoheader
 AUTOMAKE = ${SHELL} '/Users/sedwards/source/xmms/autoconf/missing' automake-1.17
 AWK = gawk
 CC = gcc
-CCAS = gcc
-CCASDEPMODE = depmode=gcc3
-CCASFLAGS = 
 CCDEPMODE = depmode=gcc3
 CFLAGS = -g -O2  -Wall -Wpointer-arith -finline-functions -ffast-math -funroll-all-loops
 CPP = gcc -E
@@ -212,22 +215,32 @@ CTAGS = ctags
 CYGPATH_W = echo
 DEFS = -DHAVE_CONFIG_H
 DEPDIR = .deps
-ECHO = @ECHO@
+DLLTOOL = dlltool
+DSYMUTIL = dsymutil
+DUMPBIN = 
 ECHO_C = \c
 ECHO_N = 
 ECHO_T = 
 EFFECT_PLUGINS = $(ALL_PLUGINS)
 EFFECT_PLUGIN_DIR = Effect
+EGREP = /usr/bin/grep -E
 ESD_CFLAGS = 
 ESD_CONFIG = no
 ESD_LIBS = 
 ETAGS = etags
 EXEEXT = 
+FGREP = /usr/bin/grep -F
+FILECMD = file
 GENERAL_PLUGINS = $(ALL_PLUGINS)
 GENERAL_PLUGIN_DIR = General
 GETTEXT_MACRO_VERSION = 0.20
+GLIB_CFLAGS = -I/opt/homebrew/Cellar/glib/2.82.1/include/glib-2.0 -I/opt/homebrew/Cellar/glib/2.82.1/lib/glib-2.0/include -I/opt/homebrew/opt/gettext/include -I/opt/homebrew/Cellar/pcre2/10.44/include
+GLIB_LIBS = -L/opt/homebrew/Cellar/glib/2.82.1/lib -L/opt/homebrew/opt/gettext/lib -lglib-2.0 -lintl
 GMSGFMT = /opt/local/bin/msgfmt
 GMSGFMT_015 = /opt/local/bin/msgfmt
+GREP = /usr/bin/grep
+GTK_CFLAGS = -I/opt/homebrew/Cellar/gtk+3/3.24.43/include/gtk-3.0 -I/opt/homebrew/Cellar/glib/2.82.1/include/gio-unix-2.0 -I/opt/homebrew/Cellar/cairo/1.18.2/include -I/opt/homebrew/Cellar/libepoxy/1.5.10/include -I/opt/homebrew/Cellar/pango/1.54.0/include/pango-1.0 -I/opt/homebrew/Cellar/harfbuzz/10.0.1_1/include/harfbuzz -I/opt/homebrew/Cellar/pango/1.54.0/include/pango-1.0 -I/opt/homebrew/Cellar/fribidi/1.0.16/include/fribidi -I/opt/homebrew/Cellar/harfbuzz/10.0.1_1/include/harfbuzz -I/opt/homebrew/Cellar/graphite2/1.3.14/include -I/opt/homebrew/Cellar/at-spi2-core/2.54.0/include/atk-1.0 -I/opt/homebrew/Cellar/cairo/1.18.2/include/cairo -I/opt/homebrew/Cellar/fontconfig/2.15.0/include -I/opt/homebrew/opt/freetype/include/freetype2 -I/opt/homebrew/Cellar/libxext/1.3.6/include -I/opt/homebrew/Cellar/libxrender/0.9.11/include -I/opt/homebrew/Cellar/libx11/1.8.10/include -I/opt/homebrew/Cellar/libxcb/1.17.0/include -I/opt/homebrew/Cellar/libxau/1.0.11/include -I/opt/homebrew/Cellar/libxdmcp/1.1.5/include -I/opt/homebrew/Cellar/pixman/0.42.2/include/pixman-1 -I/opt/homebrew/Cellar/gdk-pixbuf/2.42.12/include/gdk-pixbuf-2.0 -I/opt/homebrew/opt/libpng/include/libpng16 -I/opt/homebrew/Cellar/libtiff/4.7.0/include -I/opt/homebrew/opt/zstd/include -I/opt/homebrew/Cellar/xz/5.6.3/include -I/opt/homebrew/Cellar/jpeg-turbo/3.0.4/include -I/opt/homebrew/Cellar/glib/2.82.1/include -I/opt/homebrew/Cellar/glib/2.82.1/include/glib-2.0 -I/opt/homebrew/Cellar/glib/2.82.1/lib/glib-2.0/include -I/opt/homebrew/opt/gettext/include -I/opt/homebrew/Cellar/pcre2/10.44/include -I/opt/homebrew/Cellar/xorgproto/2024.1/include -I/Library/Developer/CommandLineTools/SDKs/MacOSX14.sdk/usr/include/ffi
+GTK_LIBS = -L/opt/homebrew/Cellar/gtk+3/3.24.43/lib -L/opt/homebrew/Cellar/pango/1.54.0/lib -L/opt/homebrew/Cellar/harfbuzz/10.0.1_1/lib -L/opt/homebrew/Cellar/at-spi2-core/2.54.0/lib -L/opt/homebrew/Cellar/cairo/1.18.2/lib -L/opt/homebrew/Cellar/gdk-pixbuf/2.42.12/lib -L/opt/homebrew/Cellar/glib/2.82.1/lib -L/opt/homebrew/opt/gettext/lib -lgtk-3 -lgdk-3 -Wl,-framework,Cocoa -Wl,-framework,Carbon -Wl,-framework,CoreGraphics -lpangocairo-1.0 -lpango-1.0 -lharfbuzz -latk-1.0 -lcairo-gobject -lcairo -lgdk_pixbuf-2.0 -lgio-2.0 -lgobject-2.0 -lglib-2.0 -lintl
 HAVEXML = /opt/homebrew/opt/e2fsprogs/sbin:/opt/homebrew/opt/e2fsprogs/bin:/opt/local/bin:/opt/local/sbin:/Library/Frameworks/Python.framework/Versions/3.12/bin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/opt/X11/bin:/Library/Apple/usr/bin:/usr/local/go/bin:/opt/homebrew/bin
 INPUT_PLUGINS = $(ALL_PLUGINS)
 INPUT_PLUGIN_DIR = Input
@@ -236,33 +249,41 @@ INSTALL_DATA = ${INSTALL} -m 644
 INSTALL_PROGRAM = ${INSTALL}
 INSTALL_SCRIPT = ${INSTALL}
 INSTALL_STRIP_PROGRAM = $(install_sh) -c -s
-INTLLIBS = 
+LIBINTL = 
 INTL_MACOSX_LIBS = -Wl,-framework -Wl,CoreFoundation -Wl,-framework -Wl,CoreServices
+LD = /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ld
 LDFLAGS = -L/opt/homebrew/opt/ruby/lib
 LIBICONV = -liconv
 LIBINTL = 
-LIBMIKMOD_CFLAGS = @LIBMIKMOD_CFLAGS@
-LIBMIKMOD_CONFIG = @LIBMIKMOD_CONFIG@
-LIBMIKMOD_LDADD = @LIBMIKMOD_LDADD@
-LIBMIKMOD_LIBS = @LIBMIKMOD_LIBS@
 LIBOBJS = 
 LIBS =   -L/lib -lxml  
-LIBTOOL = @LIBTOOL@
+LIBTOOL = $(SHELL) $(top_builddir)/libtool
+LIBXMMS_MAJOR_VERSION = 3
+LIBXMMS_MICRO_VERSION = 2
+LIBXMMS_MINOR_VERSION = 0
+LIPO = lipo
 LN_S = ln -s
 LTLIBICONV = -liconv
 LTLIBINTL = 
 LTLIBOBJS = 
+LT_SYS_LIBRARY_PATH = 
 MAINT = #
 MAKEINFO = ${SHELL} '/Users/sedwards/source/xmms/autoconf/missing' makeinfo
+MANIFEST_TOOL = :
 MKDIR_P = /opt/homebrew/bin/gmkdir -p
 MSGFMT = /opt/local/bin/msgfmt
 MSGMERGE = /opt/local/bin/msgmerge
 MSGMERGE_FOR_MSGFMT_OPTION = --for-msgfmt
+NM = /usr/bin/nm -B
+NMEDIT = nmedit
+OBJDUMP = objdump
 OBJEXT = o
 OGG_CFLAGS = 
 OGG_LIBS = 
 OPENGL_LIBS = error
 OSS_CFLAGS = 
+OTOOL = otool
+OTOOL64 = :
 OUTPUT_PLUGINS = $(ALL_PLUGINS)
 OUTPUT_PLUGIN_DIR = Output
 PACKAGE = xmms
@@ -273,16 +294,18 @@ PACKAGE_TARNAME = xmms
 PACKAGE_URL = 
 PACKAGE_VERSION = 0.0.1
 PATH_SEPARATOR = :
+PKG_CONFIG = /opt/homebrew/bin/pkg-config
+PKG_CONFIG_LIBDIR = 
+PKG_CONFIG_PATH = 
 PLUGIN_LDFLAGS = -module -avoid-version -export-symbols-regex "get_.plugin_info"
 POSIX_LIBS = 
 POSUB = 
-PTHREAD_LIBS = 
 RANLIB = ranlib
 SED = /opt/homebrew/bin/gsed
 SET_MAKE = 
 SHELL = /bin/sh
 SM_LIBS = 
-STRIP = 
+STRIP = strip
 USE_NLS = no
 VERSION = 0.0.1
 VISUALIZATION_PLUGINS = $(ALL_PLUGINS)
@@ -304,6 +327,7 @@ abs_top_builddir = /Users/sedwards/source/xmms
 abs_top_srcdir = /Users/sedwards/source/xmms
 ac_ct_AR = ar
 ac_ct_CC = gcc
+ac_ct_DUMPBIN = 
 ac_prefix_program = 
 am__include = include
 am__leading_dot = .
@@ -373,9 +397,9 @@ $(srcdir)/Makefile.in: # $(srcdir)/Makefile.am  $(am__configure_deps)
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu General/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign General/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --gnu General/Makefile
+	  $(AUTOMAKE) --foreign General/Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
 	  *config.status*) \

@@ -219,9 +219,9 @@ AUTOHEADER = ${SHELL} '/Users/sedwards/source/xmms/autoconf/missing' autoheader
 AUTOMAKE = ${SHELL} '/Users/sedwards/source/xmms/autoconf/missing' automake-1.17
 AWK = gawk
 CC = gcc
-CCAS = gcc
-CCASDEPMODE = depmode=gcc3
-CCASFLAGS = 
+CCAS = @CCAS@
+CCASDEPMODE = @CCASDEPMODE@
+CCASFLAGS = @CCASFLAGS@
 CCDEPMODE = depmode=gcc3
 CFLAGS = -g -O2  -Wall -Wpointer-arith -finline-functions -ffast-math -funroll-all-loops
 CPP = gcc -E
@@ -255,7 +255,7 @@ INSTALL_DATA = ${INSTALL} -m 644
 INSTALL_PROGRAM = ${INSTALL}
 INSTALL_SCRIPT = ${INSTALL}
 INSTALL_STRIP_PROGRAM = $(install_sh) -c -s
-INTLLIBS = 
+LIBINTL = 
 INTL_MACOSX_LIBS = -Wl,-framework -Wl,CoreFoundation -Wl,-framework -Wl,CoreServices
 LDFLAGS = -L/opt/homebrew/opt/ruby/lib
 LIBICONV = -liconv
@@ -266,7 +266,7 @@ LIBMIKMOD_LDADD = @LIBMIKMOD_LDADD@
 LIBMIKMOD_LIBS = @LIBMIKMOD_LIBS@
 LIBOBJS = 
 LIBS =   -L/lib -lxml  
-LIBTOOL = @LIBTOOL@
+LIBTOOL = $(SHELL) $(top_builddir)/libtool
 LN_S = ln -s
 LTLIBICONV = -liconv
 LTLIBINTL = 
@@ -295,13 +295,13 @@ PATH_SEPARATOR = :
 PLUGIN_LDFLAGS = -module -avoid-version -export-symbols-regex "get_.plugin_info"
 POSIX_LIBS = 
 POSUB = 
-PTHREAD_LIBS = 
+PTHREAD_LIBS = @PTHREAD_LIBS@
 RANLIB = ranlib
 SED = /opt/homebrew/bin/gsed
 SET_MAKE = 
 SHELL = /bin/sh
 SM_LIBS = 
-STRIP = 
+STRIP = strip
 USE_NLS = no
 VERSION = 0.0.1
 VISUALIZATION_PLUGINS = $(ALL_PLUGINS)
@@ -381,7 +381,7 @@ xmmsdir =
 lib_LTLIBRARIES = libtonegen.la
 libtonegen_la_LDFLAGS = -module -avoid-version -export-symbols-regex "get_.plugin_info"
 libtonegen_la_SOURCES = tonegen.c
-INCLUDES = @GTK_CFLAGS@ -I$(top_builddir)/intl
+INCLUDES = -I/opt/homebrew/Cellar/gtk+3/3.24.43/include/gtk-3.0 -I/opt/homebrew/Cellar/glib/2.82.1/include/gio-unix-2.0 -I/opt/homebrew/Cellar/cairo/1.18.2/include -I/opt/homebrew/Cellar/libepoxy/1.5.10/include -I/opt/homebrew/Cellar/pango/1.54.0/include/pango-1.0 -I/opt/homebrew/Cellar/harfbuzz/10.0.1_1/include/harfbuzz -I/opt/homebrew/Cellar/pango/1.54.0/include/pango-1.0 -I/opt/homebrew/Cellar/fribidi/1.0.16/include/fribidi -I/opt/homebrew/Cellar/harfbuzz/10.0.1_1/include/harfbuzz -I/opt/homebrew/Cellar/graphite2/1.3.14/include -I/opt/homebrew/Cellar/at-spi2-core/2.54.0/include/atk-1.0 -I/opt/homebrew/Cellar/cairo/1.18.2/include/cairo -I/opt/homebrew/Cellar/fontconfig/2.15.0/include -I/opt/homebrew/opt/freetype/include/freetype2 -I/opt/homebrew/Cellar/libxext/1.3.6/include -I/opt/homebrew/Cellar/libxrender/0.9.11/include -I/opt/homebrew/Cellar/libx11/1.8.10/include -I/opt/homebrew/Cellar/libxcb/1.17.0/include -I/opt/homebrew/Cellar/libxau/1.0.11/include -I/opt/homebrew/Cellar/libxdmcp/1.1.5/include -I/opt/homebrew/Cellar/pixman/0.42.2/include/pixman-1 -I/opt/homebrew/Cellar/gdk-pixbuf/2.42.12/include/gdk-pixbuf-2.0 -I/opt/homebrew/opt/libpng/include/libpng16 -I/opt/homebrew/Cellar/libtiff/4.7.0/include -I/opt/homebrew/opt/zstd/include -I/opt/homebrew/Cellar/xz/5.6.3/include -I/opt/homebrew/Cellar/jpeg-turbo/3.0.4/include -I/opt/homebrew/Cellar/glib/2.82.1/include -I/opt/homebrew/Cellar/glib/2.82.1/include/glib-2.0 -I/opt/homebrew/Cellar/glib/2.82.1/lib/glib-2.0/include -I/opt/homebrew/opt/gettext/include -I/opt/homebrew/Cellar/pcre2/10.44/include -I/opt/homebrew/Cellar/xorgproto/2024.1/include -I/Library/Developer/CommandLineTools/SDKs/MacOSX14.sdk/usr/include/ffi -I$(top_builddir)/intl
 all: all-am
 
 .SUFFIXES:
