@@ -23,7 +23,7 @@
 
 #ifndef XF86VIDMODE
 
-gboolean xmms_fullscreen_available(Display * dpy)
+gboolean xmms_fullscreen_available(GdkDisplay * dpy)
 {
 	return FALSE;
 }

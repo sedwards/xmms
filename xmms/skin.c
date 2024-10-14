@@ -114,8 +114,6 @@ static void load_def_pixmap(SkinPixmap *skinpixmap, gchar **skindata)
 	/* g_object_unref(pixbuf); */
 }
 
-}
-
 static glong skin_calc_luminance(GdkColor *c)
 {
 	return (0.212671 * c->red + 0.715160 * c->green + 0.072169 * c->blue);
@@ -336,7 +334,7 @@ cairo_surface_t *skin_create_transparent_mask(const gchar * path, const gchar * 
 		return NULL;
 	}
 
-	mask = cairo_image_surface_create(window, width, height, 1);
+	mask = cairo_image_surface_create(window, width, height);
 	cairo_t *gc = gdk_cairo_create(mask);
 	
 	pattern.pixel = 0;
@@ -431,7 +429,7 @@ static void skin_numbers_generate_dash(SkinPixmap *numbers)
 		return;
 
 	cairo_t *gc = gdk_cairo_create(numbers->pixmap);
-	pixmap = cairo_image_surface_create(mainwin->window, 108,
+	pixmap = cairo_image_surface_create(gtk_widget_get_window(mainwin), 108,
 				numbers->current_height,
 				gdk_rgb_get_visual()->depth);
 	skin_draw_pixmap(pixmap, gc, SKIN_NUMBERS,

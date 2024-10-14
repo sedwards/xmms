@@ -19,6 +19,8 @@
  */
 #include "xmms.h"
 
+#include <pango.h>
+
 #ifdef HAVE_WCHAR_H
 #include <wchar.h>
 #endif
@@ -229,10 +231,10 @@ void playlist_list_button_release_cb(GtkWidget * widget, GdkEventButton * event,
 
 #ifdef HAVE_WCHAR_H
 
-static GdkWChar * find_in_wstr(GdkWChar *haystack, char * needle)
+static gunichar * find_in_wstr(gunichar *haystack, char * needle)
 {
 	/* This will only work if needle is 7bit ASCII characters only */
-	GdkWChar *tmp = haystack;
+	gunichar *tmp = haystack;
 	int i = 0;
 
 	if (haystack == NULL)
@@ -261,7 +263,7 @@ static GdkWChar * find_in_wstr(GdkWChar *haystack, char * needle)
 
 void playlist_list_draw_string_wc(PlayList_List *pl, PangoFontDescription *font, gint line, gint width, gchar *text)
 {
-	GdkWChar *wtext;
+	gunichar *wtext;
 	int len, newlen;
 	/*
 	 * Convert the string to a wide character string to avoid
@@ -272,7 +274,7 @@ void playlist_list_draw_string_wc(PlayList_List *pl, PangoFontDescription *font,
 	 * Allocate some extra space, we might extend it by one
 	 * character below
 	 */
-	wtext = g_malloc((strlen(text) + 3) * sizeof(GdkWChar));
+	wtext = g_malloc((strlen(text) + 3) * sizeof(gunichar));
 	len = gdk_mbstowcs(wtext, text, strlen(text) + 1);
 	if (len == -1)
 	{
@@ -291,10 +293,10 @@ void playlist_list_draw_string_wc(PlayList_List *pl, PangoFontDescription *font,
 
 	if (cfg.convert_twenty && len > 2)
 	{
-		GdkWChar *wtmp;
+		gunichar *wtmp;
 		while ((wtmp = find_in_wstr(wtext, "%20")) != NULL)
 		{
-			GdkWChar *wtmp2 = wtmp + 3;
+			gunichar *wtmp2 = wtmp + 3;
 			*(wtmp++) = L' ';
 			while (*wtmp2)
 				*(wtmp++) = *(wtmp2++);

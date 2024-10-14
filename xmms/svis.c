@@ -99,7 +99,8 @@ void svis_draw(Widget * w)
 	guchar svis_color[24][3];
 	guchar rgb_data[SVIS_WIDTH * 2 * SVIS_HEIGHT * 2], *ptr, c;
 	guint32 colors[24];
-	GdkRgbCmap *cmap;
+	GdkPixbuf *cmap;
+	//GdkRgbCmap *cmap;
 
 
 	get_skin_viscolor(svis_color);
@@ -157,7 +158,7 @@ void svis_draw(Widget * w)
 			}
 		}
 
-		gdk_draw_indexed_image(mainwin->window, mainwin_gc, svis->vs_widget.x, svis->vs_widget.y, svis->vs_widget.width, svis->vs_widget.height, GDK_RGB_DITHER_NORMAL, (guchar *) rgb_data, 38, cmap);
+		gdk_draw_indexed_image(gtk_widget_get_window(mainwin), mainwin_gc, svis->vs_widget.x, svis->vs_widget.y, svis->vs_widget.width, svis->vs_widget.height, CAIRO_DITHER_NONE, (guchar *) rgb_data, 38, cmap);
 	}
 	else /* doublesize */
 	{
@@ -210,7 +211,7 @@ void svis_draw(Widget * w)
 			}
 		}
 
-		gdk_draw_indexed_image(mainwin->window, mainwin_gc, svis->vs_widget.x << 1, svis->vs_widget.y << 1, svis->vs_widget.width << 1, svis->vs_widget.height << 1, GDK_RGB_DITHER_NONE, (guchar *) rgb_data, 76, cmap);
+		gdk_draw_indexed_image(gtk_widget_get_window(mainwin), mainwin_gc, svis->vs_widget.x << 1, svis->vs_widget.y << 1, svis->vs_widget.width << 1, svis->vs_widget.height << 1, CAIRO_DITHER_NONE, (guchar *) rgb_data, 76, cmap);
 	}
 	gdk_rgb_cmap_free(cmap);
 }
@@ -228,9 +229,9 @@ void svis_clear_data(SVis * svis)
 void svis_clear(SVis * svis)
 {
 	if (!cfg.doublesize)
-		gdk_window_clear_area(mainwin->window, svis->vs_widget.x, svis->vs_widget.y, svis->vs_widget.width, svis->vs_widget.height);
+		gdk_window_clear_area(gtk_widget_get_window(mainwin), svis->vs_widget.x, svis->vs_widget.y, svis->vs_widget.width, svis->vs_widget.height);
 	else
-		gdk_window_clear_area(mainwin->window, svis->vs_widget.x << 1, svis->vs_widget.y << 1, svis->vs_widget.width << 1, svis->vs_widget.height << 1);
+		gdk_window_clear_area(gtk_widget_get_window(mainwin), svis->vs_widget.x << 1, svis->vs_widget.y << 1, svis->vs_widget.width << 1, svis->vs_widget.height << 1);
 }
 
 SVis *create_svis(GList ** wlist, cairo_surface_t * parent, cairo_t * gc, gint x, gint y)

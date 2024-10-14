@@ -488,11 +488,11 @@ void check_ctrlsocket(void)
 			break;
 			case CMD_TOGGLE_REPEAT:
 				mainwin_repeat_pushed(!cfg.repeat);
-				tbutton_set_toggled(mainwin_repeat, GTK_CHECK_MENU_ITEM(gtk_item_factory_get_widget(mainwin_options_menu, "/Repeat"))->active);
+				tbutton_set_toggled(mainwin_repeat, gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(gtk_item_factory_get_widget(mainwin_options_menu, "/Repeat"))));
 				break;
 			case CMD_TOGGLE_SHUFFLE:
 				mainwin_shuffle_pushed(!cfg.shuffle);
-				tbutton_set_toggled(mainwin_shuffle, GTK_CHECK_MENU_ITEM(gtk_item_factory_get_widget(mainwin_options_menu, "/Shuffle"))->active);
+				tbutton_set_toggled(mainwin_shuffle, gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(gtk_item_factory_get_widget(mainwin_options_menu, "/Shuffle"))));
 				break;
 			case CMD_MAIN_WIN_TOGGLE:
 				tbool = *((gboolean *) data);

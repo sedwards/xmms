@@ -46,7 +46,7 @@ void create_skin_window(void)
 	char *titles[1];
 	GtkWidget *vbox, *hbox, *main_hbox, *separator, *scrolled_win, *checkbox;
 
-	skinwin = gtk_window_new(GTK_WINDOW_DIALOG);
+	skinwin = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 	gtk_window_set_title(GTK_WINDOW(skinwin), _("Skin selector"));
 	gtk_window_set_transient_for(GTK_WINDOW(skinwin), GTK_WINDOW(mainwin));
 	gtk_signal_connect(G_OBJECT(skinwin), "delete_event", GTK_SIGNAL_FUNC(skinwin_delete_event), NULL);
@@ -84,7 +84,7 @@ void create_skin_window(void)
 	gtk_button_box_set_spacing(GTK_BUTTON_BOX(hbox), 5);
 	gtk_box_pack_start(GTK_BOX(main_hbox), hbox, TRUE, TRUE, 0);
 	skinwin_close = gtk_button_new_with_label(_("Close"));
-	GTK_WIDGET_SET_FLAGS(skinwin_close, GTK_CAN_DEFAULT);
+	GTK_WIDGET_SET_FLAGS(skinwin_close, tk_widget_set_can_default(skinwin_close, TRUE));
 	gtk_signal_connect(G_OBJECT(skinwin_close), "clicked", GTK_SIGNAL_FUNC(skinwin_delete_event), NULL);
 	gtk_box_pack_start(GTK_BOX(hbox), skinwin_close, FALSE, FALSE, 0);
 	gtk_widget_grab_default(skinwin_close);
@@ -238,9 +238,19 @@ void show_skin_window(void)
 	gtk_window_set_position(GTK_WINDOW(skinwin), GTK_WIN_POS_MOUSE);
 	gtk_widget_show_all(skinwin);
 	gtk_widget_grab_focus(skinwin_list);
-	if (GTK_CLIST(skinwin_list)->selection)
+
+/*
+	GtkTreeSelection *selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(skinwin_list));
+	if (gtk_tree_selection_count_selected_rows(selection) > 0)
 	{
-		gtk_clist_moveto(GTK_CLIST(skinwin_list), GPOINTER_TO_INT(GTK_CLIST(skinwin_list)->selection->data), 0, 0.5, 0.0);
-		GTK_CLIST(skinwin_list)->focus_row = GPOINTER_TO_INT(GTK_CLIST(skinwin_list)->selection->data);
+	//	gtk_clist_moveto(GTK_CLIST(skinwin_list), GPOINTER_TO_INT(GTK_CLIST(skinwin_list)->selection->data), 0, 0.5, 0.0);
+		GtkTreePath *path = gtk_tree_path_new_from_indices(row_index, -1); // Replace row_index appropriately
+		gtk_tree_view_scroll_to_cell(GTK_TREE_VIEW(skinwin_list), path, NULL, TRUE, 0.5, 0.0);
+		gtk_tree_path_free(path);
+
+		// Focus Row?
+		//GTK_CLIST(skinwin_list)->focus_row = GPOINTER_TO_INT(GTK_CLIST(skinwin_list)->selection->data);
 	}
+*/
 }
+

@@ -443,7 +443,7 @@ static gboolean equalizerwin_configure(GtkWidget * window, GdkEventConfigure *ev
 		gdk_window_get_root_origin(window->window,
 					   &cfg.equalizer_x, &cfg.equalizer_y);
 	else
-		gdk_window_get_deskrelative_origin(window->window,
+		gdk_window_get_deskrelative_origin(gtk_widget_get_window(window),
 						   &cfg.equalizer_x,
 						   &cfg.equalizer_y);
 	return FALSE;
