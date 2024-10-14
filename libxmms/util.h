@@ -6,7 +6,7 @@
 extern "C" {
 #endif
 
-GtkWidget *xmms_show_message(gchar * title, gchar * text, gchar * button_text, gboolean modal, GtkSignalFunc button_action, gpointer action_data);
+GtkWidget *xmms_show_message(gchar * title, gchar * text, gchar * button_text, gboolean modal, GCallback button_action, gpointer action_data);
 gboolean xmms_check_realtime_priority(void);
 void xmms_usleep(gint usec);
 

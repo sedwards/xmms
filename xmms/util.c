@@ -491,13 +491,13 @@ static void util_menu_position(GtkMenu *menu, gint *x, gint *y, gpointer data)
 	*y = CLAMP(pos->y - 2, 0, MAX(0, screen_height - requisition.height));
 }
 
-static void util_menu_delete_popup_data(GtkObject *object,
+static void util_menu_delete_popup_data(GObject *object,
 					GtkUIManager *ifactory)
 {
 	gtk_signal_disconnect_by_func(object,
 				      GTK_SIGNAL_FUNC(util_menu_delete_popup_data),
 				      ifactory);
-	gtk_object_remove_data_by_id(GTK_OBJECT(ifactory), quark_popup_data);
+	gtk_object_remove_data_by_id(G_OBJECT(ifactory), quark_popup_data);
 }
 
 
@@ -525,13 +525,13 @@ void util_item_factory_popup_with_data(GtkUIManager * ifactory,
 		quark_popup_data =
 			g_quark_from_static_string("GtkUIManager-popup-data");
 
-	pos = gtk_object_get_data_by_id(GTK_OBJECT(ifactory),
+	pos = gtk_object_get_data_by_id(G_OBJECT(ifactory),
 					quark_user_menu_pos);
 	if (!pos)
 	{
 		pos = g_malloc0(sizeof (struct MenuPos));
 
-		gtk_object_set_data_by_id_full(GTK_OBJECT(ifactory->widget),
+		gtk_object_set_data_by_id_full(G_OBJECT(ifactory->widget),
 					       quark_user_menu_pos, pos, g_free_func);
 	}
 	pos->x = x;
@@ -539,10 +539,10 @@ void util_item_factory_popup_with_data(GtkUIManager * ifactory,
 
 	if (data != NULL)
 	{
-		gtk_object_set_data_by_id_full(GTK_OBJECT (ifactory),
+		gtk_object_set_data_by_id_full(G_OBJECT (ifactory),
 					       quark_popup_data,
 					       data, destroy);
-		gtk_signal_connect(GTK_OBJECT(ifactory->widget),
+		gtk_signal_connect(G_OBJECT(ifactory->widget),
 				   "selection-done",
 				   GTK_SIGNAL_FUNC(util_menu_delete_popup_data),
 				   ifactory);
@@ -599,8 +599,8 @@ GtkWidget* util_create_add_url_window(gchar *caption, GCallback ok_func, GCallba
 	combo = gtk_combo_new();
 	if(cfg.url_history)
 		gtk_combo_set_popdown_strings(GTK_COMBO(combo), cfg.url_history);
-	gtk_signal_connect(GTK_OBJECT(GTK_COMBO(combo)->entry), "activate", util_add_url_callback, GTK_COMBO(combo)->entry);
-	gtk_signal_connect(GTK_OBJECT(GTK_COMBO(combo)->entry), "activate", ok_func, GTK_COMBO(combo)->entry);
+	gtk_signal_connect(G_OBJECT(GTK_COMBO(combo)->entry), "activate", util_add_url_callback, GTK_COMBO(combo)->entry);
+	gtk_signal_connect(G_OBJECT(GTK_COMBO(combo)->entry), "activate", ok_func, GTK_COMBO(combo)->entry);
 	gtk_box_pack_start(GTK_BOX(vbox), combo, FALSE, FALSE, 0);
 	gtk_window_set_focus(GTK_WINDOW(win), GTK_COMBO(combo)->entry);
 	gtk_entry_set_text(GTK_ENTRY(GTK_COMBO(combo)->entry), "");
@@ -612,8 +612,8 @@ GtkWidget* util_create_add_url_window(gchar *caption, GCallback ok_func, GCallba
 	gtk_button_box_set_spacing(GTK_BUTTON_BOX(bbox), 5);
 	
 	ok = gtk_button_new_with_label(_("Ok"));
-	gtk_signal_connect(GTK_OBJECT(ok), "clicked", util_add_url_callback, GTK_COMBO(combo)->entry);
-	gtk_signal_connect(GTK_OBJECT(ok), "clicked", ok_func, GTK_COMBO(combo)->entry);
+	gtk_signal_connect(G_OBJECT(ok), "clicked", util_add_url_callback, GTK_COMBO(combo)->entry);
+	gtk_signal_connect(G_OBJECT(ok), "clicked", ok_func, GTK_COMBO(combo)->entry);
 	
 	GTK_WIDGET_SET_FLAGS(ok, GTK_CAN_DEFAULT);
 	gtk_window_set_default(GTK_WINDOW(win), ok);
@@ -624,15 +624,15 @@ GtkWidget* util_create_add_url_window(gchar *caption, GCallback ok_func, GCallba
 	{
 		/* I18N note: "Enqueue" here means "Add to playlist" */
 		enqueue = gtk_button_new_with_label(_("Enqueue"));
-		gtk_signal_connect(GTK_OBJECT(enqueue), "clicked", util_add_url_callback, GTK_COMBO(combo)->entry);
-		gtk_signal_connect(GTK_OBJECT(enqueue), "clicked", enqueue_func, GTK_COMBO(combo)->entry);
+		gtk_signal_connect(G_OBJECT(enqueue), "clicked", util_add_url_callback, GTK_COMBO(combo)->entry);
+		gtk_signal_connect(G_OBJECT(enqueue), "clicked", enqueue_func, GTK_COMBO(combo)->entry);
 		GTK_WIDGET_SET_FLAGS(enqueue, GTK_CAN_DEFAULT);
 		gtk_box_pack_start(GTK_BOX(bbox), enqueue, FALSE, FALSE, 0);
 		gtk_widget_show(enqueue);
 	}
 	
 	cancel = gtk_button_new_with_label(_("Cancel"));
-	gtk_signal_connect_object(GTK_OBJECT(cancel), "clicked", GTK_SIGNAL_FUNC(gtk_widget_destroy), GTK_OBJECT(win));
+	gtk_signal_connect_object(G_OBJECT(cancel), "clicked", GTK_SIGNAL_FUNC(gtk_widget_destroy), G_OBJECT(win));
 	GTK_WIDGET_SET_FLAGS(cancel, GTK_CAN_DEFAULT);
 	gtk_box_pack_start(GTK_BOX(bbox), cancel, FALSE, FALSE, 0);
 	gtk_widget_show(cancel);
@@ -748,7 +748,7 @@ static void filebrowser_add_files(GtkFileChooserDialog * filesel)
 	else
 		node = sel_list;
 
-	clear_on_ok = gtk_object_get_data(GTK_OBJECT(filesel),
+	clear_on_ok = gtk_object_get_data(G_OBJECT(filesel),
 					  "clear_pl_on_ok");
 	if (clear_on_ok && *clear_on_ok == 2)
 	{
@@ -792,7 +792,7 @@ static void filebrowser_add_files(GtkFileChooserDialog * filesel)
 
 static void filebrowser_ok(GtkWidget * w, GtkWidget * filesel)
 {
-	gboolean *clear_on_ok = gtk_object_get_data(GTK_OBJECT(filesel),
+	gboolean *clear_on_ok = gtk_object_get_data(G_OBJECT(filesel),
 						    "clear_pl_on_ok");
 	if (util_filebrowser_is_dir(GTK_FILE_SELECTION(filesel)))
 		return;
@@ -843,13 +843,13 @@ GtkWidget * util_create_filebrowser(gboolean clear_pl_on_ok)
 		
 	gtk_clist_set_selection_mode(GTK_CLIST(fb->file_list),
 				     GTK_SELECTION_EXTENDED);
-	gtk_signal_connect(GTK_OBJECT(fb->selection_entry), "changed",
+	gtk_signal_connect(G_OBJECT(fb->selection_entry), "changed",
 			   GTK_SIGNAL_FUNC(filebrowser_changed), filebrowser);
-	gtk_signal_connect(GTK_OBJECT(fb->ok_button), "clicked",
+	gtk_signal_connect(G_OBJECT(fb->ok_button), "clicked",
 			   GTK_SIGNAL_FUNC(filebrowser_ok), filebrowser);
-	gtk_signal_connect_object(GTK_OBJECT(fb->cancel_button), "clicked",
+	gtk_signal_connect_object(G_OBJECT(fb->cancel_button), "clicked",
 				  GTK_SIGNAL_FUNC(gtk_widget_destroy),
-				  GTK_OBJECT(filebrowser));
+				  G_OBJECT(filebrowser));
 
 	if (cfg.filesel_path)
 		gtk_file_selection_set_filename(fb, cfg.filesel_path);
@@ -859,12 +859,12 @@ GtkWidget * util_create_filebrowser(gboolean clear_pl_on_ok)
 	gtk_box_pack_end(GTK_BOX(fb->action_area), bbox, TRUE, TRUE, 0);
 	add_selected  = gtk_button_new_with_label(_("Add selected files"));
 	gtk_box_pack_start(GTK_BOX(bbox), add_selected, FALSE, FALSE, 0);
-	gtk_signal_connect(GTK_OBJECT(add_selected), "clicked",
+	gtk_signal_connect(G_OBJECT(add_selected), "clicked",
 			   GTK_SIGNAL_FUNC(filebrowser_add_selected_files),
 			   filebrowser);
 	add_all = gtk_button_new_with_label(_("Add all files in directory"));
 	gtk_box_pack_start(GTK_BOX(bbox), add_all, FALSE, FALSE, 0);
-	gtk_signal_connect(GTK_OBJECT(add_all), "clicked",
+	gtk_signal_connect(G_OBJECT(add_all), "clicked",
 			   GTK_SIGNAL_FUNC(filebrowser_add_all_files),
 			   filebrowser);
 	gtk_widget_show_all(bbox);
@@ -883,7 +883,7 @@ GtkWidget * util_create_filebrowser(gboolean clear_pl_on_ok)
 
 	ptr = g_malloc(sizeof (gint));
 	*ptr = !!clear_pl_on_ok * 2;
-	gtk_object_set_data_full(GTK_OBJECT(filebrowser), "clear_pl_on_ok", ptr, g_free_func);
+	gtk_object_set_data_full(G_OBJECT(filebrowser), "clear_pl_on_ok", ptr, g_free_func);
 
 	gtk_widget_show(filebrowser);
 	return filebrowser;

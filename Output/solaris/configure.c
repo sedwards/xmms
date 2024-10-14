@@ -79,7 +79,7 @@ static gchar * device_name(gchar *file_name)
 }
 
 static gint scan_devices(gchar *type, GtkWidget *option_menu,
-			 GtkSignalFunc sigfunc, gchar *default_name)
+			 GCallback sigfunc, gchar *default_name)
 {
 	GtkWidget *menu, *item;
 	gchar *name;

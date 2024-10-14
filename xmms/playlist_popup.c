@@ -130,9 +130,9 @@ void playlist_popup(gint x, gint y, gint num_items, gint * nx, gint * ny, gint *
 
 	gtk_widget_set_usize(popup->window, 25, num_items * 18);
 	popup->gc = gdk_gc_new(gtk_widget_get_window(popup->window));
-	gtk_signal_connect(GTK_OBJECT(popup->window), "expose_event", GTK_SIGNAL_FUNC(playlist_popup_expose), NULL);
-	gtk_signal_connect(GTK_OBJECT(popup->window), "motion_notify_event", GTK_SIGNAL_FUNC(playlist_popup_motion), NULL);
-	gtk_signal_connect(GTK_OBJECT(popup->window), "button_release_event", GTK_SIGNAL_FUNC(playlist_popup_release), NULL);
+	gtk_signal_connect(G_OBJECT(popup->window), "expose_event", GTK_SIGNAL_FUNC(playlist_popup_expose), NULL);
+	gtk_signal_connect(G_OBJECT(popup->window), "motion_notify_event", GTK_SIGNAL_FUNC(playlist_popup_motion), NULL);
+	gtk_signal_connect(G_OBJECT(popup->window), "button_release_event", GTK_SIGNAL_FUNC(playlist_popup_release), NULL);
 	util_set_cursor(popup->window);
 	gdk_window_move(gtk_widget_get_window(popup->window), x - 1, y - 1);
 	gtk_widget_show(popup->window);

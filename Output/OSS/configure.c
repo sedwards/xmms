@@ -99,7 +99,7 @@ static void mixer_device_toggled(GtkToggleButton * widget, gpointer data)
 	gtk_widget_set_sensitive(mixer_alt_device_entry, use_alt_device);
 }
 
-static void scan_devices(gchar * type, GtkWidget * option_menu, GtkSignalFunc sigfunc)
+static void scan_devices(gchar * type, GtkWidget * option_menu, GCallback sigfunc)
 {
 	GtkWidget *menu, *item;
 	FILE *file;

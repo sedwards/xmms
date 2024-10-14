@@ -234,7 +234,7 @@ void show_about_window(void)
 	about_window = gtk_window_new(GTK_WINDOW_POPUP);
 	gtk_window_set_title(GTK_WINDOW(about_window), _("About XMMS"));
 	gtk_container_set_border_width(GTK_CONTAINER(about_window), 10);
-	g_signal_connect(GTK_OBJECT(about_window), "destroy",
+	g_signal_connect(G_OBJECT(about_window), "destroy",
 			   GTK_SIGNAL_FUNC(gtk_widget_destroyed), &about_window);
 	gtk_widget_realize(about_window);
 	
