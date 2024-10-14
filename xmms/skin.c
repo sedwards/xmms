@@ -137,7 +137,7 @@ static void skin_get_textcolors(cairo_surface_t *text, GdkColor *bgc, GdkColor *
 	
 	/* Get the first line of text */
 	gi = gdk_image_get(text, 0, 0, 155, 6);
-	cm = gdk_window_get_colormap(playlistwin->window);
+	cm = gdk_window_get_colormap(gtk_widget_get_window(playlistwin));
 	for (i = 0; i < 6; i ++)
 	{
 		GdkColor c;
@@ -189,29 +189,29 @@ void init_skins(void)
 	skin->def_pledit_normal.red = 0x2400;
 	skin->def_pledit_normal.green = 0x9900;
 	skin->def_pledit_normal.blue = 0xffff;
-	gdk_color_alloc(gdk_window_get_colormap(playlistwin->window), &skin->def_pledit_normal);
+	gdk_color_alloc(gdk_window_get_colormap(gtk_widget_get_window(playlistwin)), &skin->def_pledit_normal);
 	skin->def_pledit_current.red = 0xffff;
 	skin->def_pledit_current.green = 0xee00;
 	skin->def_pledit_current.blue = 0xffff;
-	gdk_color_alloc(gdk_window_get_colormap(playlistwin->window), &skin->def_pledit_current);
+	gdk_color_alloc(gdk_window_get_colormap(gtk_widget_get_window(playlistwin)), &skin->def_pledit_current);
 	skin->def_pledit_normalbg.red = 0x0A00;
 	skin->def_pledit_normalbg.green = 0x1200;
 	skin->def_pledit_normalbg.blue = 0x0A00;
-	gdk_color_alloc(gdk_window_get_colormap(playlistwin->window), &skin->def_pledit_normalbg);
+	gdk_color_alloc(gdk_window_get_colormap(gtk_widget_get_window(playlistwin)), &skin->def_pledit_normalbg);
 	skin->def_pledit_selectedbg.red = 0x0A00;
 	skin->def_pledit_selectedbg.green = 0x1200;
 	skin->def_pledit_selectedbg.blue = 0x4A00;
-	gdk_color_alloc(gdk_window_get_colormap(playlistwin->window), &skin->def_pledit_selectedbg);
+	gdk_color_alloc(gdk_window_get_colormap(gtk_widget_get_window(playlistwin)), &skin->def_pledit_selectedbg);
 	for (i = 0; i < 24; i++)
 	{
 		skin->vis_color[i][0] = skin_default_viscolor[i][0];
 		skin->vis_color[i][1] = skin_default_viscolor[i][1];
 		skin->vis_color[i][2] = skin_default_viscolor[i][2];
 	}
-	skin->def_mask = create_default_mask(mainwin->window, 275, 116);
-	skin->def_mask_ds = create_default_mask(mainwin->window, 550, 232);
-	skin->def_mask_shade = create_default_mask(mainwin->window, 275, 14);
-	skin->def_mask_shade_ds = create_default_mask(mainwin->window, 550, 28);
+	skin->def_mask = create_default_mask(gtk_widget_get_window(mainwin), 275, 116);
+	skin->def_mask_ds = create_default_mask(gtk_widget_get_window(mainwin), 550, 232);
+	skin->def_mask_shade = create_default_mask(gtk_widget_get_window(mainwin), 275, 14);
+	skin->def_mask_shade_ds = create_default_mask(gtk_widget_get_window(mainwin), 550, 28);
 
 	setup_skin_masks();
 
@@ -273,7 +273,7 @@ GdkColor *load_skin_color(const gchar * path, const gchar * file, const gchar * 
 							       *(ptr + 1));
 				
 
-			gdk_color_alloc(gdk_window_get_colormap(playlistwin->window), color);
+			gdk_color_alloc(gdk_window_get_colormap(gtk_widget_get_window(playlistwin)), color);
 			g_free(value);
 		}
 		g_free(filename);
@@ -548,14 +548,14 @@ static void skin_load_pixmaps(const char *path)
 	skin->pledit_current = load_skin_color(path, "pledit.txt", "text", "current");
 	skin->pledit_normalbg = load_skin_color(path, "pledit.txt", "text", "normalbg");
 	skin->pledit_selectedbg = load_skin_color(path, "pledit.txt", "text", "selectedbg");
-	skin->mask_main = skin_create_transparent_mask(path, "region.txt", "Normal", mainwin->window, 275, 116, FALSE);
-	skin->mask_main_ds = skin_create_transparent_mask(path, "region.txt", "Normal", mainwin->window, 550, 232, TRUE);
-	skin->mask_shade = skin_create_transparent_mask(path, "region.txt", "WindowShade", mainwin->window, 275, 14, FALSE);
-	skin->mask_shade_ds = skin_create_transparent_mask(path, "region.txt", "WindowShade", mainwin->window, 550, 28, TRUE);
-	skin->mask_eq = skin_create_transparent_mask(path, "region.txt", "Equalizer", equalizerwin->window, 275, 116, FALSE);
-	skin->mask_eq_ds = skin_create_transparent_mask(path, "region.txt", "Equalizer", equalizerwin->window, 550, 232, TRUE);
-	skin->mask_eq_shade = skin_create_transparent_mask(path, "region.txt", "EqualizerWS", equalizerwin->window, 275, 14, FALSE);
-	skin->mask_eq_shade_ds = skin_create_transparent_mask(path, "region.txt", "EqualizerWS", equalizerwin->window, 550, 28, TRUE);
+	skin->mask_main = skin_create_transparent_mask(path, "region.txt", "Normal", gtk_widget_get_window(mainwin), 275, 116, FALSE);
+	skin->mask_main_ds = skin_create_transparent_mask(path, "region.txt", "Normal", gtk_widget_get_window(mainwin), 550, 232, TRUE);
+	skin->mask_shade = skin_create_transparent_mask(path, "region.txt", "WindowShade", gtk_widget_get_window(mainwin), 275, 14, FALSE);
+	skin->mask_shade_ds = skin_create_transparent_mask(path, "region.txt", "WindowShade", gtk_widget_get_window(mainwin), 550, 28, TRUE);
+	skin->mask_eq = skin_create_transparent_mask(path, "region.txt", "Equalizer", gtk_widget_get_window(equalizerwin), 275, 116, FALSE);
+	skin->mask_eq_ds = skin_create_transparent_mask(path, "region.txt", "Equalizer", gtk_widget_get_window(equalizerwin), 550, 232, TRUE);
+	skin->mask_eq_shade = skin_create_transparent_mask(path, "region.txt", "EqualizerWS", gtk_widget_get_window(equalizerwin), 275, 14, FALSE);
+	skin->mask_eq_shade_ds = skin_create_transparent_mask(path, "region.txt", "EqualizerWS", gtk_widget_get_window(equalizerwin), 550, 28, TRUE);
 	
 	load_skin_viscolor(path, "viscolor.txt");
 }

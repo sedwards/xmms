@@ -278,7 +278,7 @@ AUTOMAKE = ${SHELL} '/Users/sedwards/source/xmms/autoconf/missing' automake-1.17
 AWK = gawk
 CC = gcc
 CCDEPMODE = depmode=gcc3
-CFLAGS = -g -O2  -Wall -Wpointer-arith -finline-functions -ffast-math -Wno-incompatible-pointer-types-discards-qualifiers -Wno-invalid-source-encoding -Wno-pointer-sign -Wno-int-to-void-pointer-cast -Wno-deprecated-non-prototype
+CFLAGS = -g -O2  -Wall -Wpointer-arith -finline-functions -ffast-math -Wno-incompatible-pointer-types-discards-qualifiers -Wno-invalid-source-encoding -Wno-pointer-sign -Wno-int-to-void-pointer-cast -Wno-deprecated-non-prototype -Wno-int-conversion -Wno-implicit-function-declaration -Wno-deprecated-declarations -Wno-unused-value -Wno-incompatible-pointer-types
 CPP = gcc -E
 CPPFLAGS = -I/opt/homebrew/opt/ruby/include
 CSCOPE = cscope
@@ -386,7 +386,7 @@ XGETTEXT = /opt/local/bin/xgettext
 XGETTEXT_015 = /opt/local/bin/xgettext
 XGETTEXT_EXTRA_OPTIONS = 
 XMKMF = 
-XMMS_DEFINES = -g -O2  -Wall -Wpointer-arith -finline-functions -ffast-math -Wno-incompatible-pointer-types-discards-qualifiers -Wno-invalid-source-encoding -Wno-pointer-sign -Wno-int-to-void-pointer-cast -Wno-deprecated-non-prototype -DDATA_DIR=\"${datarootdir}/xmms\" -DPLUGIN_DIR=\"${exec_prefix}/lib/xmms\" -DPLUGINSUBS=\"Output\",\"Input\",\"Effect\",\"General\",\"Visualization\" -DLOCALEDIR=\"${datarootdir}/locale\"
+XMMS_DEFINES = -g -O2  -Wall -Wpointer-arith -finline-functions -ffast-math -Wno-incompatible-pointer-types-discards-qualifiers -Wno-invalid-source-encoding -Wno-pointer-sign -Wno-int-to-void-pointer-cast -Wno-deprecated-non-prototype -Wno-int-conversion -Wno-implicit-function-declaration -Wno-deprecated-declarations -Wno-unused-value -Wno-incompatible-pointer-types -DDATA_DIR=\"${datarootdir}/xmms\" -DPLUGIN_DIR=\"${exec_prefix}/lib/xmms\" -DPLUGINSUBS=\"Output\",\"Input\",\"Effect\",\"General\",\"Visualization\" -DLOCALEDIR=\"${datarootdir}/locale\"
 XMMS_GTK = 
 XMMS_PATH = no
 Z_LIBS = -lz

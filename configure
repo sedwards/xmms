@@ -21158,7 +21158,7 @@ then
     *-*-freebsd*)
 	;;
     *)
-	CFLAGS="$CFLAGS -Wno-incompatible-pointer-types-discards-qualifiers -Wno-invalid-source-encoding -Wno-pointer-sign -Wno-int-to-void-pointer-cast -Wno-deprecated-non-prototype"
+	CFLAGS="$CFLAGS -Wno-incompatible-pointer-types-discards-qualifiers -Wno-invalid-source-encoding -Wno-pointer-sign -Wno-int-to-void-pointer-cast -Wno-deprecated-non-prototype -Wno-int-conversion -Wno-implicit-function-declaration -Wno-deprecated-declarations -Wno-unused-value -Wno-incompatible-pointer-types"
 	;;
   esac
 fi

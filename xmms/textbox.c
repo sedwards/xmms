@@ -172,7 +172,7 @@ static void textbox_generate_xfont_pixmap(TextBox * tb, gchar *pixmaptext)
 	tb->tb_pixmap_width = gdk_text_width(tb->tb_font, pixmaptext, length);
 	if (tb->tb_pixmap_width < tb->tb_widget.width)
 		tb->tb_pixmap_width = tb->tb_widget.width;
-	tb->tb_pixmap = cairo_image_surface_create(mainwin->window, tb->tb_pixmap_width,
+	tb->tb_pixmap = cairo_image_surface_create(gtk_widget_get_window(mainwin), tb->tb_pixmap_width,
 				       tb->tb_widget.height,
 				       gdk_rgb_get_visual()->depth);
 	gc = tb->tb_widget.gc;
@@ -415,7 +415,7 @@ static void textbox_generate_pixmap(TextBox * tb)
 	}
 
 	tb->tb_pixmap_width = length * 5;
-	tb->tb_pixmap = cairo_image_surface_create(mainwin->window,
+	tb->tb_pixmap = cairo_image_surface_create(gtk_widget_get_window(mainwin),
 				       tb->tb_pixmap_width, 6,
 				       gdk_rgb_get_visual()->depth);
 	gc = tb->tb_widget.gc;

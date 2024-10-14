@@ -70,7 +70,7 @@ enum
 	PLAYLISTWIN_SORT_RANDOMIZE, PLAYLISTWIN_SORT_REVERSE
 };
 
-GtkUIManagerEntry playlistwin_sort_menu_entries[] =
+GtkActionEntry playlistwin_sort_menu_entries[] =
 {
 	{N_("/Sort List"), NULL, NULL, 0, "<Branch>"},
 	{N_("/Sort List/By Title"), NULL, playlistwin_sort_menu_callback, PLAYLISTWIN_SORT_BYTITLE, "<Item>"},
@@ -96,7 +96,7 @@ enum
 	PLAYLISTWIN_REMOVE_DEAD_FILES, PLAYLISTWIN_PHYSICALLY_DELETE
 };
 
-GtkUIManagerEntry playlistwin_sub_menu_entries[] =
+GtkActionEntry playlistwin_sub_menu_entries[] =
 {
 	{N_("/Remove Dead Files"), NULL, playlistwin_sub_menu_callback, PLAYLISTWIN_REMOVE_DEAD_FILES, "<Item>"},
 	{N_("/Physically Delete Files"), NULL, playlistwin_sub_menu_callback, PLAYLISTWIN_PHYSICALLY_DELETE, "<Item>"},
@@ -108,7 +108,7 @@ static const int playlistwin_sub_menu_entries_num =
 
 void playlistwin_popup_menu_callback(gpointer cb_data, guint action, GtkWidget * w);
 
-GtkUIManagerEntry playlistwin_popup_menu_entries[] =
+GtkActionEntry playlistwin_popup_menu_entries[] =
 {
 	{N_("/View File Info"), NULL, playlistwin_popup_menu_callback, MISC_FILEINFO, "<Item>"},
 	{N_("/-"), NULL, NULL, 0, "<Separator>"},
@@ -479,13 +479,18 @@ static void playlistwin_resize(int width, int height)
 	draw_widget_list(playlistwin_wlist, &dummy, TRUE);
 	clear_widget_list_redraw(playlistwin_wlist);
 	gdk_window_set_back_pixmap(playlistwin->window, playlistwin_bg, 0);
-	gdk_window_clear(playlistwin->window);
+
+	cairo_t *cr = gdk_cairo_create(gtk_widget_get_window(playlistwin));
+	cairo_set_source_rgb(cr, 0, 0, 0); // Set the background color to black
+	cairo_paint(cr); // Clear the window by painting it
+	cairo_destroy(cr);
+
 	gdk_pixmap_unref(oldbg);
 }
 
 void playlistwin_motion(GtkWidget * widget, GdkEventMotion * event, gpointer callback_data)
 {
-	XEvent ev;
+//	XEvent ev;
 
 	if (playlistwin_resizing)
 	{
@@ -510,7 +515,7 @@ void playlistwin_motion(GtkWidget * widget, GdkEventMotion * event, gpointer cal
 		draw_playlist_window(FALSE);
 	}
 	gdk_display_flush(gdk_display_get_default());
-	while (XCheckMaskEvent(GDK_DISPLAY(), ButtonMotionMask, &ev)) ;
+	//while (XCheckMaskEvent(GDK_DISPLAY(), ButtonMotionMask, &ev)) ;
 }
 
 void playlistwin_show_filebrowser(void)
@@ -572,7 +577,8 @@ void playlistwin_show_dirbrowser(void)
 
 	dir_browser = xmms_create_dir_browser(_("Select directory to add:"),
 					      cfg.filesel_path,
-					      GTK_SELECTION_EXTENDED,
+					  //    GTK_SELECTION_EXTENDED,
+						GTK_SELECTION_NONE,
 					      playlistwin_add_dir_handler);
 	gtk_signal_connect(GTK_OBJECT(dir_browser),
 			   "destroy", GTK_SIGNAL_FUNC(gtk_widget_destroyed),

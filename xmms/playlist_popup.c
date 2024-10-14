@@ -37,16 +37,16 @@ static void playlist_popup_draw(PlaylistPopup * popup)
 {
 	gint i;
 
-	skin_draw_pixmap(popup->window->window, popup->gc, SKIN_PLEDIT,
+	skin_draw_pixmap(gtk_widget_get_window(popup->window), popup->gc, SKIN_PLEDIT,
 			 popup->barx, popup->bary, 0, 0, 3, popup->num_items * 18);
 	for (i = 0; i < popup->num_items; i++)
 	{
 		if (i == popup->active)
-			skin_draw_pixmap(popup->window->window, popup->gc,
+			skin_draw_pixmap(gtk_widget_get_window(popup->window), popup->gc,
 					 SKIN_PLEDIT, popup->sx[i], popup->sy[i],
 					 3, i * 18, 22, 18);
 		else
-			skin_draw_pixmap(popup->window->window, popup->gc,
+			skin_draw_pixmap(gtk_widget_get_window(popup->window), popup->gc,
 					 SKIN_PLEDIT, popup->nx[i], popup->ny[i],
 					 3, i * 18, 22, 18);
 	}
@@ -129,16 +129,16 @@ void playlist_popup(gint x, gint y, gint num_items, gint * nx, gint * ny, gint *
 	gtk_widget_realize(popup->window);
 
 	gtk_widget_set_usize(popup->window, 25, num_items * 18);
-	popup->gc = gdk_gc_new(popup->window->window);
+	popup->gc = gdk_gc_new(gtk_widget_get_window(popup->window));
 	gtk_signal_connect(GTK_OBJECT(popup->window), "expose_event", GTK_SIGNAL_FUNC(playlist_popup_expose), NULL);
 	gtk_signal_connect(GTK_OBJECT(popup->window), "motion_notify_event", GTK_SIGNAL_FUNC(playlist_popup_motion), NULL);
 	gtk_signal_connect(GTK_OBJECT(popup->window), "button_release_event", GTK_SIGNAL_FUNC(playlist_popup_release), NULL);
 	util_set_cursor(popup->window);
-	gdk_window_move(popup->window->window, x - 1, y - 1);
+	gdk_window_move(gtk_widget_get_window(popup->window), x - 1, y - 1);
 	gtk_widget_show(popup->window);
-	gdk_window_raise(popup->window->window);
+	gdk_window_raise(gtk_widget_get_window(popup->window));
 	gdk_display_flush(gdk_display_get_default());
 	playlist_popup_draw(popup);
-	gdk_pointer_grab(popup->window->window, FALSE, GDK_BUTTON_MOTION_MASK | GDK_BUTTON_RELEASE_MASK, GDK_NONE, GDK_NONE, GDK_CURRENT_TIME);
+	gdk_pointer_grab(gtk_widget_get_window(popup->window), FALSE, GDK_BUTTON_MOTION_MASK | GDK_BUTTON_RELEASE_MASK, GDK_NONE, GDK_NONE, GDK_CURRENT_TIME);
 	gdk_display_flush(gdk_display_get_default());
 }

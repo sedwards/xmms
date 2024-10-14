@@ -163,41 +163,53 @@ static GtkWidget* generate_credit_list(const char *text[], gboolean sec_space)
 	GtkWidget *clist, *scrollwin;
 	int i = 0;
 
-	clist = gtk_clist_new(2);
+	GtkListStore *store = gtk_list_store_new(2, G_TYPE_STRING, G_TYPE_STRING);
+	clist = gtk_tree_view_new_with_model(GTK_TREE_MODEL(store));
 
 	while (text[i])
 	{
 		gchar *temp[2];
-		guint row;
+		//guint row;
 		
 		temp[0] = gettext(text[i++]);
 		temp[1] = gettext(text[i++]);
-		row = gtk_clist_append(GTK_CLIST(clist), temp);
-		gtk_clist_set_selectable(GTK_CLIST(clist), row, FALSE);
+
+		GtkTreeIter iter;
+		gtk_list_store_append(store, &iter);
+		gtk_list_store_set(store, &iter, 0, temp[0], 1, temp[1], -1);
+
 		temp[0] = "";
 		while (text[i])
 		{
 			temp[1] = gettext(text[i++]);
-			row = gtk_clist_append(GTK_CLIST(clist), temp);
-			gtk_clist_set_selectable(GTK_CLIST(clist), row, FALSE);
+
+			GtkTreeIter iter;
+			gtk_list_store_append(store, &iter);
+			gtk_list_store_set(store, &iter, 0, temp[0], 1, temp[1], -1);
+
 		}
 		i++;
 		if (text[i] && sec_space)
 		{
 			temp[1] = "";
-			row = gtk_clist_append(GTK_CLIST(clist), temp);
-			gtk_clist_set_selectable(GTK_CLIST(clist), row, FALSE);
+                        GtkTreeIter iter;
+                        gtk_list_store_append(store, &iter);
+                        gtk_list_store_set(store, &iter, 0, temp[0], 1, temp[1], -1);
 		}
 	}
-	gtk_clist_columns_autosize(GTK_CLIST(clist));
-	gtk_clist_set_column_justification(GTK_CLIST(clist), 0, GTK_JUSTIFY_RIGHT);
+	gtk_tree_view_columns_autosize(GTK_TREE_VIEW(clist));
+
+	GtkCellRenderer *renderer = gtk_cell_renderer_text_new();
+	g_object_set(renderer, "xalign", 1.0, NULL);  // Right-align text
+	GtkTreeViewColumn *column = gtk_tree_view_column_new_with_attributes("Column Title", renderer, "text", 0, NULL);
+	gtk_tree_view_append_column(GTK_TREE_VIEW(clist), column);
 	
 	scrollwin = gtk_scrolled_window_new(NULL, NULL);
 	gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrollwin),
 				       GTK_POLICY_NEVER, GTK_POLICY_ALWAYS);
 	gtk_container_add(GTK_CONTAINER(scrollwin), clist);
 	gtk_container_set_border_width(GTK_CONTAINER(scrollwin), 10);
-	gtk_widget_set_usize(scrollwin, -1, 120);
+	gtk_widget_set_size_request(scrollwin, -1, 120);
 
 	return scrollwin;
 }
@@ -218,11 +230,11 @@ void show_about_window(void)
 	if (about_window)
 		return;
 	
-	about_window = gtk_window_new(GTK_WINDOW_DIALOG);
+//	about_window = gtk_window_new(GTK_WINDOW_DIALOG);
+	about_window = gtk_window_new(GTK_WINDOW_POPUP);
 	gtk_window_set_title(GTK_WINDOW(about_window), _("About XMMS"));
-	gtk_window_set_policy(GTK_WINDOW(about_window), FALSE, TRUE, FALSE);
 	gtk_container_set_border_width(GTK_CONTAINER(about_window), 10);
-	gtk_signal_connect(GTK_OBJECT(about_window), "destroy",
+	g_signal_connect(GTK_OBJECT(about_window), "destroy",
 			   GTK_SIGNAL_FUNC(gtk_widget_destroyed), &about_window);
 	gtk_widget_realize(about_window);
 	
@@ -231,7 +243,7 @@ void show_about_window(void)
 	
 	if (!xmms_logo_pmap)
 		xmms_logo_pmap =
-			gdk_pixmap_create_from_xpm_d(about_window->window,
+			gdk_pixmap_create_from_xpm_d(gtk_widget_get_window(about_window),
 						     &xmms_logo_mask, NULL,
 						     xmms_logo);
 	
@@ -273,16 +285,19 @@ void show_about_window(void)
 				 gtk_label_new(_("Translators")));
 	bbox = gtk_hbutton_box_new();
 	gtk_button_box_set_layout(GTK_BUTTON_BOX(bbox), GTK_BUTTONBOX_END);
-	gtk_button_box_set_spacing(GTK_BUTTON_BOX(bbox), 5);
+	//gtk_button_box_set_spacing(GTK_BUTTON_BOX(bbox), 5);
 	gtk_box_pack_start(GTK_BOX(about_vbox), bbox, FALSE, FALSE, 0);
 
 	close_btn = gtk_button_new_with_label(_("Close"));
-	gtk_signal_connect_object(GTK_OBJECT(close_btn), "clicked",
-				  GTK_SIGNAL_FUNC(gtk_widget_destroy),
-				  GTK_OBJECT(about_window));
-	GTK_WIDGET_SET_FLAGS(close_btn, GTK_CAN_DEFAULT);
+
+	g_signal_connect_object(G_OBJECT(close_btn), "clicked",
+                        G_CALLBACK(gtk_widget_destroy),
+                        G_OBJECT(about_window), 0);
+
+	//GTK_WIDGET_SET_FLAGS(close_btn, GTK_CAN_DEFAULT);
 	gtk_box_pack_start(GTK_BOX(bbox), close_btn, TRUE, TRUE, 0);
 	gtk_widget_grab_default(close_btn);
 
 	gtk_widget_show_all(about_window);
 }
+

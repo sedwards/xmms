@@ -26,6 +26,8 @@
 #include <fts.h>
 #endif
 
+#include <cairo.h>
+
 static GQuark quark_popup_data;
 
 

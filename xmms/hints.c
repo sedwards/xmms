@@ -17,6 +17,12 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
+
+#include "xmms.h"
+
+#include <gdk/gdk.h>
+
+#if 0
 #include <X11/Xlib.h>
 #include <X11/Xmd.h>
 #include <X11/Xatom.h>
@@ -143,6 +149,7 @@ static void gnome_wm_set_window_always(GtkWidget * window, gboolean always)
 
 static void gnome_wm_set_window_sticky(GtkWidget * window, gboolean sticky)
 {
+#if 0
 	XEvent xev;
 	int prev_error;
 	long state = 0;
@@ -178,16 +185,17 @@ static void gnome_wm_set_window_sticky(GtkWidget * window, gboolean sticky)
 				(unsigned char *) data, 1);
 	}
 	gdk_error_warnings = prev_error;
-
+#endif
 }
 
 static gboolean gnome_wm_found(void)
 {
+	gboolean ret = FALSE;
+#if 0
 	Atom r_type, support_check;
 	int r_format, prev_error, p;
 	unsigned long count, bytes_remain;
 	unsigned char *prop = NULL, *prop2 = NULL;
-	gboolean ret = FALSE;
 
 	prev_error = gdk_error_warnings;
 	gdk_error_warnings = 0;
@@ -216,16 +224,18 @@ static gboolean gnome_wm_found(void)
 	if (prop2)
 		XFree(prop2);
 	gdk_error_warnings = prev_error;
+#endif
 	return ret;
 }
 
 static gboolean net_wm_found(void)
 {
+	gboolean ret = FALSE;
+#if 0
 	Atom r_type, support_check;
 	int r_format, prev_error, p;
 	unsigned long count, bytes_remain;
 	unsigned char *prop = NULL, *prop2 = NULL;
-	gboolean ret = FALSE;
 
 	prev_error = gdk_error_warnings;
 	gdk_error_warnings = 0;
@@ -254,6 +264,7 @@ static gboolean net_wm_found(void)
 	if (prop2)
 		XFree(prop2);
 	gdk_error_warnings = prev_error;
+#endif
 	return ret;
 }
 
@@ -289,18 +300,21 @@ static void net_wm_set_property(GtkWidget * window, char *atom, gboolean state)
 
 }
 
+#endif
+
 static void net_wm_set_window_always(GtkWidget * window, gboolean always)
 {
-	net_wm_set_property(window, XA_NET_STATE_STAYS_ON_TOP, always);
+//	net_wm_set_property(window, XA_NET_STATE_STAYS_ON_TOP, always);
 }
 
 static void net_wm_set_window_sticky(GtkWidget * window, gboolean sticky)
 {
-	net_wm_set_property(window, XA_NET_STATE_STICKY, sticky);
+//	net_wm_set_property(window, XA_NET_STATE_STICKY, sticky);
 }
 
 void check_wm_hints(void)
 {
+#if 0
 	if (gnome_wm_found())
 	{
 		set_sticky_func = gnome_wm_set_window_sticky;
@@ -312,4 +326,5 @@ void check_wm_hints(void)
 		set_sticky_func = net_wm_set_window_sticky;
 		set_always_func = net_wm_set_window_always;
 	}
+#endif
 }

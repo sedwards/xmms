@@ -1258,7 +1258,7 @@ void show_prefs_window(void)
 
 	if (GTK_WIDGET_VISIBLE(prefswin))
 	{
-		gdk_window_raise(prefswin->window);
+		gdk_window_raise(gtk_widget_get_window(prefswin));
 		return;
 	}
 

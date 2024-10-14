@@ -119,7 +119,7 @@ enum
 	MAINWIN_OPT_EQWS, MAINWIN_OPT_DOUBLESIZE, MAINWIN_OPT_EASY_MOVE
 };
 
-GtkUIManagerEntry mainwin_options_menu_entries[] =
+GtkActionEntry mainwin_options_menu_entries[] =
 {
 	{N_("/Preferences"), "<control>P", mainwin_options_menu_callback, MAINWIN_OPT_PREFS, "<Item>"},
 	{N_("/Skin Browser"), "<alt>S", mainwin_options_menu_callback, MAINWIN_OPT_SKIN, "<Item>"},
@@ -152,7 +152,7 @@ enum
 	MAINWIN_SONGNAME_FILEINFO, MAINWIN_SONGNAME_JTF, MAINWIN_SONGNAME_JTT, MAINWIN_SONGNAME_SCROLL
 };
 
-GtkUIManagerEntry mainwin_songname_menu_entries[] =
+GtkActionEntry mainwin_songname_menu_entries[] =
 {
 	{N_("/File Info"), "<control>3", mainwin_songname_menu_callback, MAINWIN_SONGNAME_FILEINFO, "<Item>"},
 	{N_("/Jump To File"), "J", mainwin_songname_menu_callback, MAINWIN_SONGNAME_JTF, "<Item>"},
@@ -179,7 +179,7 @@ enum
 	MAINWIN_VIS_PLUGINS
 };
 
-GtkUIManagerEntry mainwin_vis_menu_entries[] =
+GtkActionEntry mainwin_vis_menu_entries[] =
 {
 	{N_("/Visualization Mode"), NULL, NULL, 0, "<Branch>"},
 	{N_("/Visualization Mode/Analyzer"), NULL, mainwin_vis_menu_callback, MAINWIN_VIS_ANALYZER, "<RadioItem>"},
@@ -262,7 +262,7 @@ enum
 
 void mainwin_general_menu_callback(gpointer cb_data, guint action, GtkWidget * w);
 
-GtkUIManagerEntry mainwin_general_menu_entries[] =
+GtkActionEntry mainwin_general_menu_entries[] =
 {
 	{N_("/About XMMS"), NULL, mainwin_general_menu_callback, MAINWIN_GENERAL_ABOUT, "<Item>"},
 	{N_("/-"), NULL, NULL, 0, "<Separator>"},
@@ -714,12 +714,12 @@ void set_doublesize(gboolean ds)
 	if (cfg.doublesize)
 	{
 		dock_resize(dock_window_list, mainwin, 550, height * 2);
-		gdk_window_set_back_pixmap(mainwin->window, mainwin_bg_dblsize, 0);
+		gdk_window_set_back_pixmap(gdk_window_raise(gtk_widget_get_window(mainwin), mainwin_bg_dblsize, 0);
 	}
 	else
 	{
 		dock_resize(dock_window_list, mainwin, 275, height);		
-		gdk_window_set_back_pixmap(mainwin->window, mainwin_bg, 0);
+		gdk_window_set_back_pixmap(gdk_window_raise(mainwin), mainwin_bg, 0);
 	}
 	draw_main_window(TRUE);
 	vis_set_doublesize(mainwin_vis, ds);
@@ -868,13 +868,13 @@ void mainwin_menubtn_cb(void)
 
 void mainwin_minimize_cb(void)
 {
-	Window xwindow;
+//	Window xwindow;
 
 	if (!mainwin->window)
 		return;
 
-	xwindow = GDK_WINDOW_XWINDOW(mainwin->window);
-	XIconifyWindow(GDK_DISPLAY(), xwindow, DefaultScreen(GDK_DISPLAY()));
+//	xwindow = GDK_WINDOW_XWINDOW(mainwin->window);
+//	XIconifyWindow(GDK_DISPLAY(), xwindow, DefaultScreen(GDK_DISPLAY()));
 }
 
 void mainwin_shade_cb(void)
@@ -964,10 +964,10 @@ void draw_main_window(gboolean force)
 						gdk_draw_image(mainwin_bg_dblsize, mainwin_gc, img2, 0, 0, w->x << 1, w->y << 1, w->width << 1, w->height << 1);
 						gdk_image_destroy(img2);
 						gdk_image_destroy(img);
-						gdk_window_clear_area(mainwin->window, w->x << 1, w->y << 1, w->width << 1, w->height << 1);
+						gdk_window_clear_area(gtk_widget_get_window(mainwin), w->x << 1, w->y << 1, w->width << 1, w->height << 1);
 					}
 					else
-						gdk_window_clear_area(mainwin->window, w->x, w->y, w->width, w->height);
+						gdk_window_clear_area(gtk_widget_get_window(mainwin), w->x, w->y, w->width, w->height);
 					w->redraw = FALSE;
 
 				}
@@ -975,7 +975,12 @@ void draw_main_window(gboolean force)
 			}
 		}
 		if (force)
-			gdk_window_clear(mainwin->window);
+		{
+			cairo_t *cr = gdk_cairo_create(gtk_widget_get_window(mainwin));
+			cairo_set_source_rgb(cr, 0, 0, 0); // Set the background color to black
+			cairo_paint(cr); // Clear the window by painting it
+			cairo_destroy(cr);
+		}
 		gdk_display_flush(gdk_display_get_default());
 	}
 	unlock_widget_list(mainwin_wlist);
@@ -1140,17 +1145,11 @@ void mainwin_release(GtkWidget * widget, GdkEventButton * event, gpointer callba
 
 void mainwin_motion(GtkWidget * widget, GdkEventMotion * event, gpointer callback_data)
 {
-	XEvent ev;
+	//XEvent ev;
 	gint i = 0;
 
-	XSync(GDK_DISPLAY(), False);
+	//XSync(GDK_DISPLAY(), False);
 
-	while (XCheckTypedEvent(GDK_DISPLAY(), MotionNotify, &ev))
-	{
-		event->x = ev.xmotion.x;
-		event->y = ev.xmotion.y;
-		i++;
-	}
 	if (cfg.doublesize)
 	{
 		event->x /= 2;
@@ -1223,7 +1222,7 @@ void mainwin_press(GtkWidget * widget, GdkEventButton * event, gpointer callback
 	    !inside_sensitive_widgets(event->x, event->y) &&
 	    (cfg.easy_move || event->y < 14))
 	{
-		gdk_window_raise(mainwin->window);
+		gdk_window_raise(gtk_widget_get_window(mainwin));
 		equalizerwin_raise();
 		playlistwin_raise();
 		dock_move_press(dock_window_list, mainwin, event, TRUE); 
@@ -1297,7 +1296,7 @@ void mainwin_press(GtkWidget * widget, GdkEventButton * event, gpointer callback
 
 	}
 	if (grab)
-		gdk_pointer_grab(mainwin->window, FALSE,
+		gdk_pointer_grab(gtk_widget_get_window(mainwin), FALSE,
 				 GDK_BUTTON_MOTION_MASK |
 				 GDK_BUTTON_RELEASE_MASK,
 				 GDK_NONE, GDK_NONE, GDK_CURRENT_TIME);
@@ -1335,20 +1334,20 @@ gboolean mainwin_keypress(GtkWidget * w, GdkEventKey * event, gpointer data)
 	
 	switch(event->keyval)
 	{
-	case GDK_Up:
+	case GDK_KEY_Up:
 	case GDK_KP_Up:
 		mainwin_set_volume_diff(2);
 		break;
-	case GDK_Down:
+	case GDK_KEY_Down:
 	case GDK_KP_Down:
 		mainwin_set_volume_diff(-2);
 		break;
-	case GDK_Left:
+	case GDK_KEY_Left:
 	case GDK_KP_Left:
 		if(playlist_get_current_length() != -1)
 			input_seek(CLAMP(input_get_time() - 5000, 0, playlist_get_current_length()) / 1000);
 		break;
-	case GDK_Right:
+	case GDK_KEY_Right:
 	case GDK_KP_Right:
 		if(playlist_get_current_length() != -1)
 			input_seek(CLAMP(input_get_time() + 5000, 0, playlist_get_current_length()) / 1000);
@@ -1813,7 +1812,11 @@ void mainwin_set_back_pixmap(void)
 		gdk_window_set_back_pixmap(mainwin->window, mainwin_bg_dblsize, 0);
 	else
 		gdk_window_set_back_pixmap(mainwin->window, mainwin_bg, 0);
-	gdk_window_clear(mainwin->window);
+
+	cairo_t *cr = gdk_cairo_create(gtk_widget_get_window(mainwin));
+	cairo_set_source_rgb(cr, 0, 0, 0); // Set the background color to black
+	cairo_paint(cr); // Clear the window by painting it
+	cairo_destroy(cr);
 }
 
 gint mainwin_client_event(GtkWidget *w,GdkEventClient *event, gpointer data)
