@@ -71,8 +71,7 @@ static void calc_snap_offset(GList *dlist, GList *wlist, gint x, gint y,gint *of
 	for (dnode = dlist; dnode; dnode = g_list_next(dnode))
 	{
 		dw = dnode->data;
-		//gdk_window_get_size(dw->w->window, &nw, &nh);
-		gdk_window_get_size(gtk_widget_get_window(dw), &nw, &nh);
+		gdk_window_get_size((gtk_widget_get_window(GTK_WIDGET(dw->w))), &nw, &nh);
 
 
 		nx = dw->offset_x + *off_x + x;
@@ -212,7 +211,7 @@ static GList *shade_move_list(GList *list, GtkWidget *widget, gint offset)
 
 		dw = node->data;
 		dock_get_widget_pos(dw->w, &dx, &dy);
-		gdk_window_get_size(gtk_widget_get_window(dw), &dwidth,&dheight);
+		gdk_window_get_size((gtk_widget_get_window(GTK_WIDGET(dw->w))), &dwidth,&dheight);
 		if (is_docked(x, y, w, h, dx, dy, dwidth, dheight) &&
 		    ((dx + dwidth) > x && dx < (x + w)))
 		{
@@ -242,7 +241,7 @@ static GList *find_shade_list(GtkWidget *widget, GList *winlist, GList *shade_li
 	GList *node;
 	
 	dock_get_widget_pos(widget, &x, &y);
-	gdk_window_get_size(gtk_widget_get_window(widget), &w, &h);
+	gdk_window_get_size((gtk_widget_get_window(widget)), &w, &h);
 	for(node = winlist; node; node = g_list_next(node))
 	{
 		DockedWindow *dw = node->data;
@@ -302,7 +301,7 @@ void dock_shade(GList *window_list, GtkWidget *widget, gint new_h)
 			if (dw->w == widget)
 				continue;
 			dock_get_widget_pos(dw->w, &dx, &dy);
-			gdk_window_get_size(dw->w->window, &dwidth, &dheight);
+			gdk_window_get_size((gtk_widget_get_window(dw->w)), &dwidth, &dheight);
 			if ((dy >= y) &&
 			    ((dy + off_y + dheight) > gdk_screen_height()))
 				off_y -= (dy + off_y + dheight) - gdk_screen_height();
@@ -339,7 +338,7 @@ void dock_shade(GList *window_list, GtkWidget *widget, gint new_h)
 			dw = node->data;
 
 			dock_get_widget_pos(dw->w, &dx, &dy);
-			gdk_window_get_size((gtk_widget_get_window(dw)), &dwidth,&dheight);
+			gdk_window_get_size((gtk_widget_get_window(dw->w)), &dwidth,&dheight);
 			/*
 			 * Find windows that are directly docked to this window,
 			 * move it, and any windows docked to that window again
@@ -413,7 +412,7 @@ static GList *resize_calc_offset(GList *list, GtkWidget *widget, gint offset_x, 
 		gint dx, dy, dwidth, dheight;
 		dw = node->data;
 		dock_get_widget_pos(dw->w, &dx, &dy);
-		gdk_window_get_size(dw->w->window, &dwidth,&dheight);
+		gdk_window_get_size((gtk_widget_get_window(GTK_WIDGET(dw->w))), &dwidth,&dheight);
 		if (is_docked(x, y, w, h, dx, dy, dwidth, dheight))
 		{
 			if (dx + offset_x + dwidth > gdk_screen_width())
@@ -463,7 +462,7 @@ void dock_resize(GList *window_list, GtkWidget *widget, gint new_w, gint new_h)
 		if(dw->w != widget)
 		{
 			dock_get_widget_pos(dw->w, &dx, &dy);
-			gdk_window_get_size(gtk_widget_get_window(GTK_WIDGET(dw->w),&dwidth,&dheight));
+			gdk_window_get_size((gtk_widget_get_window(GTK_WIDGET(dw->w))),&dwidth,&dheight);
 			if(is_docked(x, y, w, h, dx, dy, dwidth, dheight))
 				dlist = g_list_append(dlist, dw);
 			else
@@ -476,7 +475,7 @@ void dock_resize(GList *window_list, GtkWidget *widget, gint new_w, gint new_h)
 		gint doff_x, doff_y;
 		dw = node->data;
 		dock_get_widget_pos(dw->w, &dx, &dy);
-		gdk_window_get_size(gtk_widget_get_window((dw),&dwidth,&dheight));
+		gdk_window_get_size((gtk_widget_get_window(dw)),&dwidth,&dheight);
 		if (dx - x - w == 0)
 			doff_x = (x + off_x + new_w) - dx;
 		else
@@ -537,7 +536,7 @@ void dock_move_press(GList *window_list, GtkWidget *w, GdkEventButton *event, gb
 		return;
 
 	gdk_window_raise(gtk_widget_get_window(w));
-	gdk_window_get_pointer(gtk_widget_get_window((w), &mx, &my, NULL));
+	gdk_window_get_pointer((gtk_widget_get_window(w)), &mx, &my, NULL);
 	gtk_object_set_data(G_OBJECT(w), "move_offset_x", GINT_TO_POINTER(mx));
 	gtk_object_set_data(G_OBJECT(w), "move_offset_y", GINT_TO_POINTER(my));
 	if (move_list)
@@ -611,7 +610,7 @@ static gboolean configure_event(GtkWidget *w, GdkEventConfigure *event, gpointer
 	if (!GTK_WIDGET_VISIBLE(w))
 		return FALSE;
 	
-	gdk_window_get_deskrelative_origin(gtk_widget_get_window((w), &x, &y));
+	gdk_window_get_deskrelative_origin((gtk_widget_get_window(w)), &x, &y);
 	gtk_object_set_data(G_OBJECT(w), "window_x", GINT_TO_POINTER(x));
 	gtk_object_set_data(G_OBJECT(w), "window_y", GINT_TO_POINTER(y));
 
