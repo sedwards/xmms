@@ -24,6 +24,9 @@ AM_GNU_GETTEXT([external])
 PKG_CHECK_MODULES([GLIB], [glib-2.0 >= 2.30])
 PKG_CHECK_MODULES([GTK], [gtk+-3.0 >= 3.0])
 
+AC_SUBST([GTK_CFLAGS])
+AC_SUBST([GTK_LIBS])
+
 # Specify the source file for version control
 AC_CONFIG_SRCDIR([libxmms/configfile.c])
 
@@ -60,7 +63,7 @@ AC_C_BIGENDIAN
 AC_C_INLINE
 AC_C_CONST
 
-AM_DISABLE_STATIC
+AC_DISABLE_STATIC([])
 
 # Enable libtool for shared and static library building
 #AC_ENABLE_STATIC([])
@@ -457,7 +460,7 @@ then
     *-*-freebsd*)
 	;;
     *)
-	CFLAGS="$CFLAGS -funroll-all-loops"
+	CFLAGS="$CFLAGS -Wno-incompatible-pointer-types-discards-qualifiers -Wno-invalid-source-encoding -Wno-pointer-sign -Wno-int-to-void-pointer-cast -Wno-deprecated-non-prototype"
 	;;
   esac
 fi
@@ -475,6 +478,9 @@ case "$host" in
 	;;
 	ppc-*-*)
 		arch_type=ppc
+        ;;
+        arm-*-*)
+                arch_type=arm
 	;;
 	*-hpux-*)
 		ARCH_DEFINES="-DHPUX"
@@ -516,5 +522,26 @@ AC_SUBST(VISUALIZATION_PLUGIN_DIR)
 AC_SUBST(pluginsubs)
 
 XMMS_DEFINES="$CFLAGS -DDATA_DIR=\\\"$datadir/xmms\\\" -DPLUGIN_DIR=\\\"$plugindir\\\" -DPLUGINSUBS=$pluginsubs -DLOCALEDIR=\\\"$localedir\\\""
+AC_SUBST([XMMS_DEFINES])
 
-if test "x$enable_user_plugin_dir" = "xno"; then
+ARCH_DEFINES="-DARCH_SPECIFIC_DEFINE"
+AC_SUBST([ARCH_DEFINES])
+
+# Specify program to be built
+AC_PREFIX_PROGRAM([xmms])
+
+# Checks for required programs
+AC_PROG_CC
+AC_PROG_INSTALL
+AC_PROG_LN_S
+AC_PROG_MAKE_SET
+
+# Enable libtool for shared and static library building
+AC_ENABLE_STATIC([])
+AC_ENABLE_SHARED([])
+
+# Output files to be generated
+AC_CONFIG_FILES([Makefile po/Makefile.in xmms/Makefile])
+AC_OUTPUT
+
+

@@ -415,9 +415,7 @@ void cleanup_plugins(void)
 		if (ip && ip->cleanup)
 		{
 			ip->cleanup();
-			GDK_THREADS_LEAVE();
 			while(g_main_iteration(FALSE));
-			GDK_THREADS_ENTER();
 
 		}
 		close_dynamic_lib(ip->handle);
@@ -445,9 +443,7 @@ void cleanup_plugins(void)
 		if (ep && ep->cleanup)
 		{
 			ep->cleanup();
-			GDK_THREADS_LEAVE();
 			while(g_main_iteration(FALSE));
-			GDK_THREADS_ENTER();
 
 		}
 		close_dynamic_lib(ep->handle);
@@ -468,9 +464,7 @@ void cleanup_plugins(void)
 	if (gp_data->enabled_list)
 		g_list_free(gp_data->enabled_list);
 
-	GDK_THREADS_LEAVE();
 	while(g_main_iteration(FALSE));
-	GDK_THREADS_ENTER();
 	
 	node = get_general_list();
 	while (node)
@@ -493,9 +487,7 @@ void cleanup_plugins(void)
 	if (vp_data->enabled_list)
 		g_list_free(vp_data->enabled_list);
 	
-	GDK_THREADS_LEAVE();
 	while(g_main_iteration(FALSE));
-	GDK_THREADS_ENTER();
 	
 	node = get_vis_list();
 	while (node)

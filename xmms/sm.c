@@ -30,10 +30,8 @@ static char *session_id;
 static void sm_save_yourself(SmcConn c, SmPointer p, int save_type, Bool shutdown,
 			     int interact_style, Bool fast)
 {
-	GDK_THREADS_ENTER();
 	save_config();
 	SmcSaveYourselfDone(c, TRUE);
-	GDK_THREADS_LEAVE();
 }
 
 static void sm_shutdown_cancelled(SmcConn c, SmPointer a)
@@ -46,9 +44,7 @@ void sm_save_complete(SmcConn c, SmPointer a)
 
 static void sm_die(SmcConn c, SmPointer arg)
 {
-	GDK_THREADS_ENTER();
 	mainwin_quit_cb();
-	GDK_THREADS_LEAVE();
 }
 
 static void ice_handler(gpointer data, gint source, GdkInputCondition condition)

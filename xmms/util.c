@@ -165,22 +165,26 @@ void del_directory(const char *dirname)
 #endif /* !HAVE_FTS_H */
 }
 
-GdkImage *create_dblsize_image(GdkImage * img)
+cairo_surface_t *create_dblsize_image(cairo_surface_t * img)
 {
-	GdkImage *dblimg;
+	cairo_surface_t *dblimg;
 	register guint x, y;
 
 	/*
 	 * This needs to be optimized
 	 */
 
-	dblimg = gdk_image_new(GDK_IMAGE_NORMAL, gdk_visual_get_best(), img->width << 1, img->height << 1);
-	if (dblimg->bpp == 1)
+	dblimg = cairo_image_surface_create(CAIRO_FORMAT_RGB24, img->width << 1, img->height << 1);
+
+        if (cairo_image_surface_get_format(dblimg) == CAIRO_FORMAT_A1)
 	{
 		register guint8 *srcptr, *ptr, *ptr2, pix;
 
-		srcptr = GDK_IMAGE_XIMAGE(img)->data;
-		ptr = GDK_IMAGE_XIMAGE(dblimg)->data;
+		unsigned char *srcptr = cairo_image_surface_get_data(img);
+		unsigned char *ptr = cairo_image_surface_get_data(dblimg);
+		cairo_surface_flush(img);
+		cairo_surface_flush(dblimg);
+
 		ptr2 = ptr + dblimg->bpl;
 
 		for (y = 0; y < img->height; y++)
@@ -197,13 +201,16 @@ GdkImage *create_dblsize_image(GdkImage * img)
 			ptr += (dblimg->bpl << 1) - dblimg->width;
 			ptr2 += (dblimg->bpl << 1) - dblimg->width;
 		}
+		cairo_surface_mark_dirty(img);
+		cairo_surface_mark_dirty(dblimg);
 	}
 	if (dblimg->bpp == 2)
 	{
 		guint16 *srcptr, *ptr, *ptr2, pix;
-
-		srcptr = (guint16 *) GDK_IMAGE_XIMAGE(img)->data;
-		ptr = (guint16 *) GDK_IMAGE_XIMAGE(dblimg)->data;
+                unsigned char *srcptr = cairo_image_surface_get_data(img);
+                unsigned char *ptr = cairo_image_surface_get_data(dblimg);
+                cairo_surface_flush(img);
+                cairo_surface_flush(dblimg);
 		ptr2 = ptr + (dblimg->bpl >> 1);
 
 		for (y = 0; y < img->height; y++)
@@ -220,6 +227,8 @@ GdkImage *create_dblsize_image(GdkImage * img)
 			ptr += (dblimg->bpl) - dblimg->width;
 			ptr2 += (dblimg->bpl) - dblimg->width;
 		}
+                cairo_surface_mark_dirty(img);
+                cairo_surface_mark_dirty(dblimg);
 	}
 	if (dblimg->bpp == 3)
 	{
@@ -261,6 +270,26 @@ GdkImage *create_dblsize_image(GdkImage * img)
 
 		srcptr = (guint32 *) GDK_IMAGE_XIMAGE(img)->data;
 		ptr = (guint32 *) GDK_IMAGE_XIMAGE(dblimg)->data;
+
+/*
+// Old code
+srcptr = GDK_IMAGE_XIMAGE(img)->data;
+ptr = GDK_IMAGE_XIMAGE(dblimg)->data;
+
+// New code using Cairo
+unsigned char *srcptr = cairo_image_surface_get_data(img);
+unsigned char *ptr = cairo_image_surface_get_data(dblimg);
+
+// Ensure surfaces are flushed before manipulating the data
+cairo_surface_flush(img);
+cairo_surface_flush(dblimg);
+
+// Perform your data manipulations here...
+
+// Mark surfaces as dirty after modifications
+cairo_surface_mark_dirty(img);
+cairo_surface_mark_dirty(dblimg);
+*/
 		ptr2 = ptr + (dblimg->bpl >> 2);
 
 		for (y = 0; y < img->height; y++)
@@ -448,10 +477,12 @@ static void util_menu_position(GtkMenu *menu, gint *x, gint *y, gpointer data)
 	gint screen_width;
 	gint screen_height;
 	struct MenuPos *pos = data;
+	GdkScreen *screen;
 
+	screen = gdk_screen_get_default();
 	gtk_widget_size_request(GTK_WIDGET(menu), &requisition);
       
-	screen_width = gdk_screen_width();
+	screen_width = gdk_screen_get_width(screen);
 	screen_height = gdk_screen_height();
 	  
 	*x = CLAMP(pos->x - 2, 0, MAX(0, screen_width - requisition.width));
@@ -459,7 +490,7 @@ static void util_menu_position(GtkMenu *menu, gint *x, gint *y, gpointer data)
 }
 
 static void util_menu_delete_popup_data(GtkObject *object,
-					GtkItemFactory *ifactory)
+					GtkUIManager *ifactory)
 {
 	gtk_signal_disconnect_by_func(object,
 				      GTK_SIGNAL_FUNC(util_menu_delete_popup_data),
@@ -476,8 +507,8 @@ static void util_menu_delete_popup_data(GtkObject *object,
  * screen.  This means it does not neccesarily pop up at (x,y).
  */
 
-void util_item_factory_popup_with_data(GtkItemFactory * ifactory,
-				       gpointer data, GtkDestroyNotify destroy,
+void util_item_factory_popup_with_data(GtkUIManager * ifactory,
+				       gpointer data, GDestroyNotify destroy,
 				       guint x, guint y,
 				       guint mouse_button, guint32 time)
 {
@@ -490,7 +521,7 @@ void util_item_factory_popup_with_data(GtkItemFactory * ifactory,
 
 	if (!quark_popup_data)
 		quark_popup_data =
-			g_quark_from_static_string("GtkItemFactory-popup-data");
+			g_quark_from_static_string("GtkUIManager-popup-data");
 
 	pos = gtk_object_get_data_by_id(GTK_OBJECT(ifactory),
 					quark_user_menu_pos);
@@ -520,7 +551,7 @@ void util_item_factory_popup_with_data(GtkItemFactory * ifactory,
 		       pos, mouse_button, time);
 }
 
-void util_item_factory_popup(GtkItemFactory * ifactory, guint x, guint y,
+void util_item_factory_popup(GtkUIManager * ifactory, guint x, guint y,
 			     guint mouse_button, guint32 time)
 {
 	util_item_factory_popup_with_data(ifactory, NULL, NULL, x, y,
@@ -550,7 +581,7 @@ static void util_add_url_callback(GtkWidget *w, GtkWidget *entry)
 	}
 }
 
-GtkWidget* util_create_add_url_window(gchar *caption, GtkSignalFunc ok_func, GtkSignalFunc enqueue_func)
+GtkWidget* util_create_add_url_window(gchar *caption, GCallback ok_func, GCallback enqueue_func)
 {
 	GtkWidget *win, *vbox, *bbox, *ok, *enqueue, *cancel, *combo;
 	
@@ -620,7 +651,7 @@ static int int_compare_func(gconstpointer a, gconstpointer b)
 		return 0;
 }
 
-static void filebrowser_changed(GtkWidget * w, GtkFileSelection * filesel)
+static void filebrowser_changed(GtkWidget * w, GtkFileChooserDialog * filesel)
 {
 	gchar *current = "./", *parent = "../";
 	gchar *text = gtk_entry_get_text(GTK_ENTRY(w));
@@ -651,7 +682,7 @@ static void filebrowser_changed(GtkWidget * w, GtkFileSelection * filesel)
 	}
 }
 
-gboolean util_filebrowser_is_dir(GtkFileSelection * filesel)
+gboolean util_filebrowser_is_dir(GtkFileChooserDialog * filesel)
 {
 	char *text;
 	struct stat buf;
@@ -686,7 +717,7 @@ gboolean util_filebrowser_is_dir(GtkFileSelection * filesel)
 	return retv;
 }
 
-static void filebrowser_add_files(GtkFileSelection * filesel)
+static void filebrowser_add_files(GtkFileChooserDialog * filesel)
 {
 	GList *sel_list = NULL, *node;
 	gchar *text, *text2, *ptr;
@@ -772,7 +803,7 @@ static void filebrowser_ok(GtkWidget * w, GtkWidget * filesel)
 
 static void filebrowser_add_selected_files(GtkWidget * w, gpointer data)
 {
-	GtkFileSelection *filesel = GTK_FILE_SELECTION(data);
+	GtkFileChooserDialog *filesel = GTK_FILE_SELECTION(data);
 	
 	filebrowser_add_files(filesel);
 	gtk_clist_unselect_all(GTK_CLIST(filesel->file_list));
@@ -783,7 +814,7 @@ static void filebrowser_add_selected_files(GtkWidget * w, gpointer data)
 
 static void filebrowser_add_all_files(GtkWidget * w, gpointer data)
 {
-	GtkFileSelection *filesel = GTK_FILE_SELECTION(data);
+	GtkFileChooserDialog *filesel = GTK_FILE_SELECTION(data);
 
 	gtk_clist_freeze(GTK_CLIST(filesel->file_list));
 	gtk_clist_select_all(GTK_CLIST(filesel->file_list));
@@ -802,7 +833,7 @@ static void filebrowser_add_all_files(GtkWidget * w, gpointer data)
 GtkWidget * util_create_filebrowser(gboolean clear_pl_on_ok)
 {
 	GtkWidget *filebrowser, *bbox, *add_selected, *add_all, *label;
-	GtkFileSelection *fb;
+	GtkFileChooserDialog *fb;
 	gboolean *ptr;
 
 	filebrowser = gtk_file_selection_new(_("Load file(s)"));
@@ -856,9 +887,9 @@ GtkWidget * util_create_filebrowser(gboolean clear_pl_on_ok)
 	return filebrowser;
 }
 
-GdkFont *util_font_load(gchar *name)
+PangoFontDescription *util_font_load(gchar *name)
 {
-	GdkFont *font;
+	PangoFontDescription *font;
 
 	/* First try the prefered way, then just try to get some font */
 

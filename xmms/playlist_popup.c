@@ -21,7 +21,7 @@
 typedef struct
 {
 	GtkWidget *window;
-	GdkGC *gc;
+	cairo_t *gc;
 	gint num_items;
 	gint *nx, *ny;
 	gint *sx, *sy;
@@ -51,7 +51,7 @@ static void playlist_popup_draw(PlaylistPopup * popup)
 					 3, i * 18, 22, 18);
 	}
 	/* FIXME: What is this flush doing here? */
-	gdk_flush();
+	gdk_display_flush(gdk_display_get_default());
 }
 
 void playlist_popup_destroy(void)
@@ -59,7 +59,7 @@ void playlist_popup_destroy(void)
 	if (popup)
 	{
 		gdk_pointer_ungrab(GDK_CURRENT_TIME);
-		gdk_flush();
+		gdk_display_flush(gdk_display_get_default());
 		gtk_widget_destroy(popup->window);
 		gdk_gc_unref(popup->gc);
 		g_free(popup->nx);
@@ -137,8 +137,8 @@ void playlist_popup(gint x, gint y, gint num_items, gint * nx, gint * ny, gint *
 	gdk_window_move(popup->window->window, x - 1, y - 1);
 	gtk_widget_show(popup->window);
 	gdk_window_raise(popup->window->window);
-	gdk_flush();
+	gdk_display_flush(gdk_display_get_default());
 	playlist_popup_draw(popup);
 	gdk_pointer_grab(popup->window->window, FALSE, GDK_BUTTON_MOTION_MASK | GDK_BUTTON_RELEASE_MASK, GDK_NONE, GDK_NONE, GDK_CURRENT_TIME);
-	gdk_flush();
+	gdk_display_flush(gdk_display_get_default());
 }

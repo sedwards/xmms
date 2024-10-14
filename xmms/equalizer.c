@@ -31,8 +31,8 @@ static GtkWidget *equalizerwin_configure_window = NULL;
 
 static GtkWidget *eqconfwin_options_eqdf_entry, *eqconfwin_options_eqef_entry;
 
-GdkPixmap *equalizerwin_bg, *equalizerwin_bg_dblsize;
-GdkGC *equalizerwin_gc;
+cairo_surface_t *equalizerwin_bg, *equalizerwin_bg_dblsize;
+cairo_t *equalizerwin_gc;
 
 GList *equalizerwin_wlist = NULL;
 
@@ -46,7 +46,7 @@ static EqGraph *equalizerwin_graph;
 static EqSlider *equalizerwin_preamp, *equalizerwin_bands[10];
 static HSlider *equalizerwin_volume, *equalizerwin_balance;
 
-static GtkItemFactory *equalizerwin_presets_menu;
+static GtkUIManager *equalizerwin_presets_menu;
 
 gboolean equalizerwin_focus = FALSE;
 
@@ -74,7 +74,7 @@ enum
 	EQUALIZER_PRESETS_DELETE_AUTOPRESET, EQUALIZER_PRESETS_CONFIGURE
 };
 
-GtkItemFactoryEntry equalizerwin_presets_menu_entries[] =
+GtkUIManagerEntry equalizerwin_presets_menu_entries[] =
 {
 	{N_("/Load"), NULL, NULL, 0, "<Branch>"},
 	{N_("/Load/Preset"), NULL, equalizerwin_presets_menu_cb, EQUALIZER_PRESETS_LOAD_PRESET, "<Item>"},
@@ -210,7 +210,7 @@ void equalizerwin_auto_pushed(gboolean toggled)
 
 void draw_equalizer_window(gboolean force)
 {
-	GdkImage *img, *img2;
+	cairo_surface_t *img, *img2;
 	GList *wl;
 	Widget *w;
 	gboolean redraw;
@@ -701,8 +701,8 @@ void equalizerwin_create(void)
 	equalizer_presets = equalizerwin_read_presets("eq.preset");
 	equalizer_auto_presets = equalizerwin_read_presets("eq.auto_preset");
 
-	equalizerwin_bg = gdk_pixmap_new(NULL, 275, 116, gdk_rgb_get_visual()->depth);
-	equalizerwin_bg_dblsize = gdk_pixmap_new(NULL, 550, 232, gdk_rgb_get_visual()->depth);
+	equalizerwin_bg = cairo_image_surface_create(NULL, 275, 116, gdk_rgb_get_visual()->depth);
+	equalizerwin_bg_dblsize = cairo_image_surface_create(NULL, 550, 232, gdk_rgb_get_visual()->depth);
 	equalizerwin_create_gtk();
 	equalizerwin_gc = gdk_gc_new(equalizerwin->window);
 	equalizerwin_create_widgets();
@@ -1055,7 +1055,7 @@ static void equalizerwin_delete_auto_delete(GtkWidget * widget, gpointer data)
 	gtk_clist_thaw(clist);
 }
 
-static void equalizerwin_load_filesel_ok(GtkWidget * w, GtkFileSelection * filesel)
+static void equalizerwin_load_filesel_ok(GtkWidget * w, GtkFileChooserDialog * filesel)
 {
 	gchar *filename;
 	ConfigFile *cfgfile;
@@ -1073,7 +1073,7 @@ static void equalizerwin_load_filesel_ok(GtkWidget * w, GtkFileSelection * files
 	gtk_widget_destroy(GTK_WIDGET(filesel));
 }
 
-static void equalizerwin_import_winamp_filesel_ok(GtkWidget * w, GtkFileSelection * filesel)
+static void equalizerwin_import_winamp_filesel_ok(GtkWidget * w, GtkFileChooserDialog * filesel)
 {
 	gchar *filename;
 	FILE *file;
@@ -1093,7 +1093,7 @@ static void equalizerwin_import_winamp_filesel_ok(GtkWidget * w, GtkFileSelectio
 	gtk_widget_destroy(GTK_WIDGET(filesel));
 }
 
-static void equalizerwin_load_winamp_filesel_ok(GtkWidget * w, GtkFileSelection * filesel)
+static void equalizerwin_load_winamp_filesel_ok(GtkWidget * w, GtkFileChooserDialog * filesel)
 {
 	gchar *filename;
 	FILE *file;
@@ -1109,7 +1109,7 @@ static void equalizerwin_load_winamp_filesel_ok(GtkWidget * w, GtkFileSelection 
 	gtk_widget_destroy(GTK_WIDGET(filesel));
 }
 
-static void equalizerwin_save_filesel_ok(GtkWidget * w, GtkFileSelection * filesel)
+static void equalizerwin_save_filesel_ok(GtkWidget * w, GtkFileChooserDialog * filesel)
 {
 	gchar *filename;
 	ConfigFile *cfgfile;
@@ -1134,7 +1134,7 @@ static void equalizerwin_save_filesel_ok(GtkWidget * w, GtkFileSelection * files
 	gtk_widget_destroy(GTK_WIDGET(filesel));
 }
 
-static void equalizerwin_save_winamp_filesel_ok(GtkWidget * w, GtkFileSelection * filesel)
+static void equalizerwin_save_winamp_filesel_ok(GtkWidget * w, GtkFileChooserDialog * filesel)
 {
 	gchar *filename, name[257];
 	FILE *file;
@@ -1177,8 +1177,8 @@ static GtkWidget *equalizerwin_create_list_window(GList * preset_list,
 						  GtkWidget ** entry,
 						  gchar * btn1_caption,
 						  gchar * btn2_caption,
-						  GtkSignalFunc btn1_func,
-						  GtkSignalFunc select_row_func)
+						  GCallback btn1_func,
+						  GCallback select_row_func)
 {
 	GtkWidget *vbox, *scrolled_window, *bbox, *btn1, *btn2, *clist;
 	char *preset_text[1];

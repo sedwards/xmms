@@ -26,7 +26,7 @@ typedef struct
 }
 MonoStereo;
 
-MonoStereo *create_monostereo(GList ** wlist, GdkPixmap * parent, GdkGC * gc, gint x, gint y, SkinIndex si);
+MonoStereo *create_monostereo(GList ** wlist, cairo_surface_t * parent, cairo_t * gc, gint x, gint y, SkinIndex si);
 void monostereo_set_num_channels(MonoStereo * ms, gint nch);
 
 #endif

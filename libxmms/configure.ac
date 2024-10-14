@@ -17,9 +17,6 @@ m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 # Enable maintainer mode for developers
 m4_ifdef([AM_MAINTAINER_MODE], [AM_MAINTAINER_MODE])
 
-# Initialize gettext for translations
-AM_GNU_GETTEXT([external])
-
 # Check for required libraries
 PKG_CHECK_MODULES([GLIB], [glib-2.0 >= 2.30])
 PKG_CHECK_MODULES([GTK], [gtk+-3.0 >= 3.0])
@@ -68,6 +65,5 @@ fi
 AC_CHECK_HEADERS([sched.h sys/sched.h unistd.h sys/time.h])
 
 # Output files to be generated
-AC_CONFIG_FILES([Makefile po/Makefile.in])
 AC_OUTPUT
 

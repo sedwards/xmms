@@ -389,9 +389,9 @@ on `(hostname || uname -n) 2>/dev/null | sed 1q`
 "
 
 # Files that config.status was made for.
-config_files=" Makefile xmms.1 wmxmms.1 gnomexmms.1 xmms.spec xmms-config xmms/Makefile xmms/defskin/Makefile Output/Makefile Output/OSS/Makefile Output/esd/Makefile Output/disk_writer/Makefile Output/solaris/Makefile Input/Makefile Input/wav/Makefile Input/mpg123/Makefile Input/mikmod/Makefile Input/cdaudio/Makefile Input/idcin/Makefile Input/tonegen/Makefile Input/vorbis/Makefile Effect/Makefile Effect/voice/Makefile Effect/echo_plugin/Makefile Effect/stereo_plugin/Makefile General/Makefile General/ir/Makefile General/joystick/Makefile General/song_change/Makefile Visualization/Makefile Visualization/blur_scope/Makefile Visualization/sanalyzer/Makefile Visualization/opengl_spectrum/Makefile wmxmms/Makefile gnomexmms/Makefile po/Makefile.in intl/Makefile"
+config_files=" Makefile po/Makefile.in xmms/Makefile"
 config_headers=" config.h"
-config_commands=" libtool po-directories depfiles default"
+config_commands=" libtool po-directories depfiles"
 
 ac_cs_usage="\
 '$as_me' instantiates files and other configuration actions
@@ -597,7 +597,7 @@ old_postuninstall_cmds=''
 old_archive_cmds='$AR $AR_FLAGS $oldlib$oldobjs~$RANLIB $tool_oldlib'
 lock_old_archive_extraction='yes'
 CC='gcc'
-CFLAGS='-g -O2  -Wall -Wpointer-arith -finline-functions -ffast-math -funroll-all-loops'
+CFLAGS='-g -O2  -Wall -Wpointer-arith -finline-functions -ffast-math -Wno-incompatible-pointer-types-discards-qualifiers -Wno-invalid-source-encoding -Wno-pointer-sign -Wno-int-to-void-pointer-cast -Wno-deprecated-non-prototype'
 compiler='gcc'
 GCC='yes'
 lt_cv_sys_global_symbol_pipe='/opt/homebrew/bin/gsed -n -e '\''s/^.*[	 ]\([ABCDGIRSTW][ABCDGIRSTW]*\)[	 ][	 ]*_\([_A-Za-z][_A-Za-z0-9]*\)$/\1 _\2 \2/p'\'' | /opt/homebrew/bin/gsed '\''/ __gnu_lto/d'\'''
@@ -752,43 +752,8 @@ do
     "config.h") CONFIG_HEADERS="$CONFIG_HEADERS config.h" ;;
     "depfiles") CONFIG_COMMANDS="$CONFIG_COMMANDS depfiles" ;;
     "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
-    "xmms.1") CONFIG_FILES="$CONFIG_FILES xmms.1" ;;
-    "wmxmms.1") CONFIG_FILES="$CONFIG_FILES wmxmms.1" ;;
-    "gnomexmms.1") CONFIG_FILES="$CONFIG_FILES gnomexmms.1" ;;
-    "xmms.spec") CONFIG_FILES="$CONFIG_FILES xmms.spec" ;;
-    "xmms-config") CONFIG_FILES="$CONFIG_FILES xmms-config" ;;
-    "xmms/Makefile") CONFIG_FILES="$CONFIG_FILES xmms/Makefile" ;;
-    "xmms/defskin/Makefile") CONFIG_FILES="$CONFIG_FILES xmms/defskin/Makefile" ;;
-    "Output/Makefile") CONFIG_FILES="$CONFIG_FILES Output/Makefile" ;;
-    "Output/OSS/Makefile") CONFIG_FILES="$CONFIG_FILES Output/OSS/Makefile" ;;
-    "Output/esd/Makefile") CONFIG_FILES="$CONFIG_FILES Output/esd/Makefile" ;;
-    "Output/disk_writer/Makefile") CONFIG_FILES="$CONFIG_FILES Output/disk_writer/Makefile" ;;
-    "Output/solaris/Makefile") CONFIG_FILES="$CONFIG_FILES Output/solaris/Makefile" ;;
-    "Input/Makefile") CONFIG_FILES="$CONFIG_FILES Input/Makefile" ;;
-    "Input/wav/Makefile") CONFIG_FILES="$CONFIG_FILES Input/wav/Makefile" ;;
-    "Input/mpg123/Makefile") CONFIG_FILES="$CONFIG_FILES Input/mpg123/Makefile" ;;
-    "Input/mikmod/Makefile") CONFIG_FILES="$CONFIG_FILES Input/mikmod/Makefile" ;;
-    "Input/cdaudio/Makefile") CONFIG_FILES="$CONFIG_FILES Input/cdaudio/Makefile" ;;
-    "Input/idcin/Makefile") CONFIG_FILES="$CONFIG_FILES Input/idcin/Makefile" ;;
-    "Input/tonegen/Makefile") CONFIG_FILES="$CONFIG_FILES Input/tonegen/Makefile" ;;
-    "Input/vorbis/Makefile") CONFIG_FILES="$CONFIG_FILES Input/vorbis/Makefile" ;;
-    "Effect/Makefile") CONFIG_FILES="$CONFIG_FILES Effect/Makefile" ;;
-    "Effect/voice/Makefile") CONFIG_FILES="$CONFIG_FILES Effect/voice/Makefile" ;;
-    "Effect/echo_plugin/Makefile") CONFIG_FILES="$CONFIG_FILES Effect/echo_plugin/Makefile" ;;
-    "Effect/stereo_plugin/Makefile") CONFIG_FILES="$CONFIG_FILES Effect/stereo_plugin/Makefile" ;;
-    "General/Makefile") CONFIG_FILES="$CONFIG_FILES General/Makefile" ;;
-    "General/ir/Makefile") CONFIG_FILES="$CONFIG_FILES General/ir/Makefile" ;;
-    "General/joystick/Makefile") CONFIG_FILES="$CONFIG_FILES General/joystick/Makefile" ;;
-    "General/song_change/Makefile") CONFIG_FILES="$CONFIG_FILES General/song_change/Makefile" ;;
-    "Visualization/Makefile") CONFIG_FILES="$CONFIG_FILES Visualization/Makefile" ;;
-    "Visualization/blur_scope/Makefile") CONFIG_FILES="$CONFIG_FILES Visualization/blur_scope/Makefile" ;;
-    "Visualization/sanalyzer/Makefile") CONFIG_FILES="$CONFIG_FILES Visualization/sanalyzer/Makefile" ;;
-    "Visualization/opengl_spectrum/Makefile") CONFIG_FILES="$CONFIG_FILES Visualization/opengl_spectrum/Makefile" ;;
-    "wmxmms/Makefile") CONFIG_FILES="$CONFIG_FILES wmxmms/Makefile" ;;
-    "gnomexmms/Makefile") CONFIG_FILES="$CONFIG_FILES gnomexmms/Makefile" ;;
     "po/Makefile.in") CONFIG_FILES="$CONFIG_FILES po/Makefile.in" ;;
-    "intl/Makefile") CONFIG_FILES="$CONFIG_FILES intl/Makefile" ;;
-    "default") CONFIG_COMMANDS="$CONFIG_COMMANDS default" ;;
+    "xmms/Makefile") CONFIG_FILES="$CONFIG_FILES xmms/Makefile" ;;
 
   *) as_fn_error $? "invalid argument: '$ac_config_target'" "$LINENO" 5;;
   esac
@@ -858,11 +823,9 @@ S["am__EXEEXT_FALSE"]=""
 S["am__EXEEXT_TRUE"]="#"
 S["LTLIBOBJS"]=""
 S["LIBOBJS"]=""
-S["xmmsdir"]=""
-S["subdirs"]=" libxmms"
-S["PLUGIN_LDFLAGS"]="-module -avoid-version -export-symbols-regex \"get_.plugin_info\""
-S["XMMS_DEFINES"]="-g -O2  -Wall -Wpointer-arith -finline-functions -ffast-math -funroll-all-loops -DDATA_DIR=\\\"${datarootdir}/xmms\\\" -DPLUGIN_DIR=\\\"${exec_prefix}/lib"\
-"/xmms\\\" -DPLUGINSUBS=\\\"Output\\\",\\\"Input\\\",\\\"Effect\\\",\\\"General\\\",\\\"Visualization\\\" -DLOCALEDIR=\\\"${datarootdir}/locale\\\""
+S["XMMS_DEFINES"]="-g -O2  -Wall -Wpointer-arith -finline-functions -ffast-math -Wno-incompatible-pointer-types-discards-qualifiers -Wno-invalid-source-encoding -Wno-p"\
+"ointer-sign -Wno-int-to-void-pointer-cast -Wno-deprecated-non-prototype -DDATA_DIR=\\\"${datarootdir}/xmms\\\" -DPLUGIN_DIR=\\\"${exec_prefix}/lib/xmms\\\" "\
+"-DPLUGINSUBS=\\\"Output\\\",\\\"Input\\\",\\\"Effect\\\",\\\"General\\\",\\\"Visualization\\\" -DLOCALEDIR=\\\"${datarootdir}/locale\\\""
 S["pluginsubs"]="\\\"Output\\\",\\\"Input\\\",\\\"Effect\\\",\\\"General\\\",\\\"Visualization\\\""
 S["VISUALIZATION_PLUGIN_DIR"]="Visualization"
 S["GENERAL_PLUGIN_DIR"]="General"
@@ -876,7 +839,7 @@ S["ARCH_PPC_FALSE"]=""
 S["ARCH_PPC_TRUE"]="#"
 S["ARCH_X86_FALSE"]=""
 S["ARCH_X86_TRUE"]="#"
-S["ARCH_DEFINES"]=""
+S["ARCH_DEFINES"]="-DARCH_SPECIFIC_DEFINE"
 S["HAVE_LINUX_JOYSTICK_FALSE"]=""
 S["HAVE_LINUX_JOYSTICK_TRUE"]="#"
 S["HAVE_CDROM_FALSE"]=""
@@ -977,7 +940,6 @@ S["localedir_c"]="\"/usr/local/share/locale\""
 S["POSUB"]=""
 S["LTLIBINTL"]=""
 S["LIBINTL"]=""
-S["LIBINTL"]=""
 S["LTLIBICONV"]="-liconv"
 S["LIBICONV"]="-liconv"
 S["INTL_MACOSX_LIBS"]="-Wl,-framework -Wl,CoreFoundation -Wl,-framework -Wl,CoreServices"
@@ -1040,7 +1002,8 @@ S["EXEEXT"]=""
 S["ac_ct_CC"]="gcc"
 S["CPPFLAGS"]="-I/opt/homebrew/opt/ruby/include"
 S["LDFLAGS"]="-L/opt/homebrew/opt/ruby/lib"
-S["CFLAGS"]="-g -O2  -Wall -Wpointer-arith -finline-functions -ffast-math -funroll-all-loops"
+S["CFLAGS"]="-g -O2  -Wall -Wpointer-arith -finline-functions -ffast-math -Wno-incompatible-pointer-types-discards-qualifiers -Wno-invalid-source-encoding -Wno-p"\
+"ointer-sign -Wno-int-to-void-pointer-cast -Wno-deprecated-non-prototype"
 S["CC"]="gcc"
 S["ac_ct_AR"]="ar"
 S["AR"]="ar"
@@ -2244,12 +2207,6 @@ See 'config.log' for more details" "$LINENO" 5; }
   rm -f conftest-deps.mk
 }
  ;;
-    "default":C) sed -e '/POTFILES =/{r po/POTFILES
-a\
-\
-export OLD_PO_FILE_INPUT = yes
-}' po/Makefile.in > po/Makefile
-chmod +x xmms-config ;;
 
   esac
 done # for ac_tag

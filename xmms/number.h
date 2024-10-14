@@ -28,6 +28,6 @@ typedef struct
 Number;
 
 void number_set_number(Number * nu, int number);
-Number *create_number(GList ** wlist, GdkPixmap * parent, GdkGC * gc, gint x, gint y, SkinIndex si);
+Number *create_number(GList ** wlist, cairo_surface_t * parent, cairo_t * gc, gint x, gint y, SkinIndex si);
 
 #endif

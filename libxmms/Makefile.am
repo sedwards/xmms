@@ -13,4 +13,3 @@ libxmms_la_SOURCES = configfile.c configfile.h xmmsctrl.c xmmsctrl.h dirbrowser.
 
 xmmsinclude_HEADERS = configfile.h xmmsctrl.h dirbrowser.h util.h formatter.h titlestring.h
 
-SUBDIRS = po

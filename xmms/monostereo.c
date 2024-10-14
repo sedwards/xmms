@@ -21,7 +21,7 @@
 void monostereo_draw(Widget * w)
 {
 	MonoStereo *ms = (MonoStereo *) w;
-	GdkPixmap *obj;
+	cairo_surface_t *obj;
 
 	obj = ms->ms_widget.parent;
 
@@ -60,7 +60,7 @@ void monostereo_set_num_channels(MonoStereo * ms, gint nch)
 	draw_widget(ms);
 }
 
-MonoStereo *create_monostereo(GList ** wlist, GdkPixmap * parent, GdkGC * gc, gint x, gint y, SkinIndex si)
+MonoStereo *create_monostereo(GList ** wlist, cairo_surface_t * parent, cairo_t * gc, gint x, gint y, SkinIndex si)
 {
 	MonoStereo *ms;
 

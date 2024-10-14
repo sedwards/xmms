@@ -21,7 +21,7 @@ void menurow_draw(Widget * w)
 {
 	MenuRow *mr = (MenuRow *) w;
 
-	GdkPixmap *obj = mr->mr_widget.parent;
+	cairo_surface_t *obj = mr->mr_widget.parent;
 
 	if (mr->mr_selected == MENUROW_NONE)
 	{
@@ -128,7 +128,7 @@ void menurow_button_release(GtkWidget * w, GdkEventButton * event, gpointer data
 	}
 }
 
-MenuRow *create_menurow(GList ** wlist, GdkPixmap * parent, GdkGC * gc, gint x, gint y, gint nx, gint ny, gint sx, gint sy, void (*ccb) (MenuRowItem), void (*rcb) (MenuRowItem), SkinIndex si)
+MenuRow *create_menurow(GList ** wlist, cairo_surface_t * parent, cairo_t * gc, gint x, gint y, gint nx, gint ny, gint sx, gint sy, void (*ccb) (MenuRowItem), void (*rcb) (MenuRowItem), SkinIndex si)
 {
 	MenuRow *mr;
 

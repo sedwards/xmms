@@ -101,7 +101,6 @@ void svis_draw(Widget * w)
 	guint32 colors[24];
 	GdkRgbCmap *cmap;
 
-	GDK_THREADS_ENTER();
 
 	get_skin_viscolor(svis_color);
 	for (y = 0; y < 24; y++)
@@ -214,7 +213,6 @@ void svis_draw(Widget * w)
 		gdk_draw_indexed_image(mainwin->window, mainwin_gc, svis->vs_widget.x << 1, svis->vs_widget.y << 1, svis->vs_widget.width << 1, svis->vs_widget.height << 1, GDK_RGB_DITHER_NONE, (guchar *) rgb_data, 76, cmap);
 	}
 	gdk_rgb_cmap_free(cmap);
-	GDK_THREADS_LEAVE();
 }
 
 void svis_clear_data(SVis * svis)
@@ -235,7 +233,7 @@ void svis_clear(SVis * svis)
 		gdk_window_clear_area(mainwin->window, svis->vs_widget.x << 1, svis->vs_widget.y << 1, svis->vs_widget.width << 1, svis->vs_widget.height << 1);
 }
 
-SVis *create_svis(GList ** wlist, GdkPixmap * parent, GdkGC * gc, gint x, gint y)
+SVis *create_svis(GList ** wlist, cairo_surface_t * parent, cairo_t * gc, gint x, gint y)
 {
 	SVis *svis;
 

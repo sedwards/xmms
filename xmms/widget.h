@@ -20,8 +20,8 @@
 
 typedef struct _Widget
 {
-	GdkPixmap *parent;
-	GdkGC *gc;
+	cairo_surface_t *parent;
+	cairo_t *gc;
 	gint x, y, width, height, visible;
 	void (*button_press_cb) (GtkWidget *, GdkEventButton *, gpointer);
 	void (*button_release_cb) (GtkWidget *, GdkEventButton *, gpointer);
@@ -43,7 +43,7 @@ void handle_press_cb(GList * wlist, GtkWidget * widget, GdkEventButton * event);
 void handle_release_cb(GList * wlist, GtkWidget * widget, GdkEventButton * event);
 void handle_motion_cb(GList * wlist, GtkWidget * widget, GdkEventMotion * event);
 void draw_widget_list(GList * wlist, gboolean * redraw, gboolean force);
-void widget_list_change_pixmap(GList * wlist, GdkPixmap * pixmap);
+void widget_list_change_pixmap(GList * wlist, cairo_surface_t * pixmap);
 void clear_widget_list_redraw(GList * wlist);
 void lock_widget(void *w);
 void unlock_widget(void *w);

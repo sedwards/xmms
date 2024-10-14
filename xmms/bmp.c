@@ -31,7 +31,7 @@ RGBQuad;
 #define BI_RLE4       2L
 #define BI_BITFIELDS  3L
 
-static GdkGC *bmp_gc = NULL;
+static cairo_t *bmp_gc = NULL;
 
 int read_le_short(FILE * file, guint16 * ret)
 {
@@ -64,7 +64,7 @@ static void read_16b_rgb(guint8 *input, gint input_size, guint8 *output, guint32
 static void read_24b_rgb(guint8 *input, gint input_size, guint8 *output, guint32 w, guint32 h);
 
 
-GdkPixmap *read_bmp(gchar * filename)
+cairo_surface_t *read_bmp(gchar * filename)
 {
 	FILE *file;
 	gchar type[2];
@@ -74,7 +74,7 @@ GdkPixmap *read_bmp(gchar * filename)
 	struct stat statbuf;
 
 	RGBQuad rgb_quads[256];
-	GdkPixmap *ret;
+	cairo_surface_t *ret;
 
 	if (stat(filename, &statbuf) == -1)
 		return NULL;
@@ -183,12 +183,17 @@ GdkPixmap *read_bmp(gchar * filename)
 	else
 		g_warning("read_bmp(): Unsupported bitdepth: %d", bitcount);
 
-	ret = gdk_pixmap_new(mainwin->window, w, h, gdk_rgb_get_visual()->depth);
+	ret = cairo_image_surface_create(CAIRO_FORMAT_RGB24, w, h);
 
 	if (!bmp_gc)
-		bmp_gc = gdk_gc_new(mainwin->window);
+		bmp_gc = cairo_create(ret);
 
-	gdk_draw_rgb_image(ret, bmp_gc, 0, 0, w, h, GDK_RGB_DITHER_MAX, data, w * 3);
+	cairo_surface_t *image_surface = cairo_image_surface_create_for_data(data, CAIRO_FORMAT_RGB24, w, h, w * 3);
+	cairo_set_source_surface(bmp_gc, image_surface, 0, 0);
+	cairo_paint(bmp_gc);
+
+	/* Don't forget to clean up */
+	cairo_surface_destroy(image_surface);
 
 	g_free(data);
 	g_free(buffer);

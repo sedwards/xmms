@@ -20,7 +20,7 @@
 void pbutton_draw(Widget * w)
 {
 	PButton *button = (PButton *) w;
-	GdkPixmap *obj;
+	cairo_surface_t *obj;
 
 	if (button->pb_allow_draw)
 	{
@@ -116,7 +116,7 @@ void pbutton_set_button_data(PButton *b, gint nx, gint ny, gint px, gint py)
 }
 	
 
-PButton *create_pbutton_ex(GList ** wlist, GdkPixmap * parent, GdkGC * gc, gint x, gint y, gint w, gint h, gint nx, gint ny, gint px, gint py, void (*cb) (void), SkinIndex si1, SkinIndex si2)
+PButton *create_pbutton_ex(GList ** wlist, cairo_surface_t * parent, cairo_t * gc, gint x, gint y, gint w, gint h, gint nx, gint ny, gint px, gint py, void (*cb) (void), SkinIndex si1, SkinIndex si2)
 {
 	PButton *b;
 
@@ -144,7 +144,7 @@ PButton *create_pbutton_ex(GList ** wlist, GdkPixmap * parent, GdkGC * gc, gint 
 	return b;
 }
 
-PButton *create_pbutton(GList ** wlist, GdkPixmap * parent, GdkGC * gc, gint x, gint y, gint w, gint h, gint nx, gint ny, gint px, gint py, void (*cb) (void), SkinIndex si)
+PButton *create_pbutton(GList ** wlist, cairo_surface_t * parent, cairo_t * gc, gint x, gint y, gint w, gint h, gint nx, gint ny, gint px, gint py, void (*cb) (void), SkinIndex si)
 {
 	return create_pbutton_ex(wlist, parent, gc, x, y, w, h, nx, ny, px, py, cb, si, si);
 }

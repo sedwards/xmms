@@ -19,6 +19,6 @@
 #ifndef BMP_H
 #define BMP_H
 
-GdkPixmap *read_bmp(char *file);
+cairo_surface_t *read_bmp(char *file);
 
 #endif

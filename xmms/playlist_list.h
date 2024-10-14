@@ -30,7 +30,7 @@ typedef struct
 }
 PlayList_List;
 
-PlayList_List *create_playlist_list(GList ** wlist, GdkPixmap * parent, GdkGC * gc, gint x, gint y, gint w, gint h);
+PlayList_List *create_playlist_list(GList ** wlist, cairo_surface_t * parent, cairo_t * gc, gint x, gint y, gint w, gint h);
 void playlist_list_move_up(PlayList_List *pl);
 void playlist_list_move_down(PlayList_List *pl);
 int playlist_list_get_playlist_position(PlayList_List *pl, int x, int y);

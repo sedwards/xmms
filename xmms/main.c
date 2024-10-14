@@ -19,7 +19,6 @@
  */
 #include "xmms.h"
 
-#include <gdk/gdkx.h>
 #include <gdk/gdk.h>
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
@@ -39,10 +38,10 @@
 
 GtkWidget *mainwin, *mainwin_url_window = NULL, *mainwin_dir_browser = NULL;
 GtkWidget *mainwin_jtt = NULL, *mainwin_jtf = NULL;
-GtkItemFactory *mainwin_options_menu, *mainwin_songname_menu, *mainwin_vis_menu;
-GtkItemFactory *mainwin_general_menu;
-GdkPixmap *mainwin_bg = NULL, *mainwin_bg_dblsize;
-GdkGC *mainwin_gc;
+GtkUIManager *mainwin_options_menu, *mainwin_songname_menu, *mainwin_vis_menu;
+GtkUIManager *mainwin_general_menu;
+cairo_surface_t *mainwin_bg = NULL, *mainwin_bg_dblsize;
+cairo_t *mainwin_gc;
 
 GtkAccelGroup *mainwin_accel;
 
@@ -87,7 +86,7 @@ static gint restart_argc;
 #endif
 
 Vis *active_vis;
-static GdkBitmap *nullmask;
+static cairo_surface_t *nullmask;
 static gint balance;
 gboolean pposition_broken = FALSE;
 
@@ -120,7 +119,7 @@ enum
 	MAINWIN_OPT_EQWS, MAINWIN_OPT_DOUBLESIZE, MAINWIN_OPT_EASY_MOVE
 };
 
-GtkItemFactoryEntry mainwin_options_menu_entries[] =
+GtkUIManagerEntry mainwin_options_menu_entries[] =
 {
 	{N_("/Preferences"), "<control>P", mainwin_options_menu_callback, MAINWIN_OPT_PREFS, "<Item>"},
 	{N_("/Skin Browser"), "<alt>S", mainwin_options_menu_callback, MAINWIN_OPT_SKIN, "<Item>"},
@@ -153,7 +152,7 @@ enum
 	MAINWIN_SONGNAME_FILEINFO, MAINWIN_SONGNAME_JTF, MAINWIN_SONGNAME_JTT, MAINWIN_SONGNAME_SCROLL
 };
 
-GtkItemFactoryEntry mainwin_songname_menu_entries[] =
+GtkUIManagerEntry mainwin_songname_menu_entries[] =
 {
 	{N_("/File Info"), "<control>3", mainwin_songname_menu_callback, MAINWIN_SONGNAME_FILEINFO, "<Item>"},
 	{N_("/Jump To File"), "J", mainwin_songname_menu_callback, MAINWIN_SONGNAME_JTF, "<Item>"},
@@ -180,7 +179,7 @@ enum
 	MAINWIN_VIS_PLUGINS
 };
 
-GtkItemFactoryEntry mainwin_vis_menu_entries[] =
+GtkUIManagerEntry mainwin_vis_menu_entries[] =
 {
 	{N_("/Visualization Mode"), NULL, NULL, 0, "<Branch>"},
 	{N_("/Visualization Mode/Analyzer"), NULL, mainwin_vis_menu_callback, MAINWIN_VIS_ANALYZER, "<RadioItem>"},
@@ -263,7 +262,7 @@ enum
 
 void mainwin_general_menu_callback(gpointer cb_data, guint action, GtkWidget * w);
 
-GtkItemFactoryEntry mainwin_general_menu_entries[] =
+GtkUIManagerEntry mainwin_general_menu_entries[] =
 {
 	{N_("/About XMMS"), NULL, mainwin_general_menu_callback, MAINWIN_GENERAL_ABOUT, "<Item>"},
 	{N_("/-"), NULL, NULL, 0, "<Separator>"},
@@ -534,12 +533,12 @@ void save_config(void)
 	if (disabled_iplugins && (g_list_length(disabled_iplugins) > 0))
 	{
 		d_iplist = disabled_iplugins;
-		cfg.disabled_iplugins = g_strdup(g_basename(((InputPlugin *) d_iplist->data)->filename));
+		cfg.disabled_iplugins = g_strdup(g_path_get_basename(((InputPlugin *) d_iplist->data)->filename));
 		d_iplist = d_iplist->next;
 		while (d_iplist != NULL)
 		{
 			temp = cfg.disabled_iplugins;
-			cfg.disabled_iplugins = g_strconcat(temp, ",", g_basename(((InputPlugin *) d_iplist->data)->filename), NULL);
+			cfg.disabled_iplugins = g_strconcat(temp, ",", g_path_get_basename(((InputPlugin *) d_iplist->data)->filename), NULL);
 			g_free(temp);
 			d_iplist = d_iplist->next;
 		}
@@ -888,7 +887,7 @@ void mainwin_quit_cb(void)
 	gtk_widget_hide(equalizerwin);
 	gtk_widget_hide(playlistwin);
 	gtk_widget_hide(mainwin);
-	gdk_flush();
+	gdk_display_flush(gdk_display_get_default());
 	util_dump_menu_rc();
 	gtk_timeout_remove(mainwin_timeout_tag);
 	util_set_cursor(NULL);
@@ -918,7 +917,7 @@ void draw_mainwin_titlebar(int focus)
 
 void draw_main_window(gboolean force)
 {
-	GdkImage *img, *img2;
+	cairo_surface_t *img, *img2;
 	GList *wl;
 	Widget *w;
 	gboolean redraw;
@@ -977,7 +976,7 @@ void draw_main_window(gboolean force)
 		}
 		if (force)
 			gdk_window_clear(mainwin->window);
-		gdk_flush();
+		gdk_display_flush(gdk_display_get_default());
 	}
 	unlock_widget_list(mainwin_wlist);
 }
@@ -1122,7 +1121,7 @@ void mainwin_release(GtkWidget * widget, GdkEventButton * event, gpointer callba
 	 *
 	 */
 
-	gdk_flush();
+	gdk_display_flush(gdk_display_get_default());
 
 	if (dock_is_moving(mainwin))
 	{
@@ -1166,7 +1165,7 @@ void mainwin_motion(GtkWidget * widget, GdkEventMotion * event, gpointer callbac
 		handle_motion_cb(mainwin_wlist, widget, event);
 		draw_main_window(FALSE);
 	}
-	gdk_flush();
+	gdk_display_flush(gdk_display_get_default());
 
 }
 
@@ -2194,7 +2193,7 @@ void mainwin_real_show(void)
 
 void mainwin_real_hide(void)
 {
-	GdkGC *gc;
+	cairo_t *gc;
 	GdkColor pattern;
 
 /*  	if (!cfg.player_visible) */
@@ -2209,12 +2208,12 @@ void mainwin_real_hide(void)
 		gtk_widget_hide(mainwin);
 	else
 	{
-		nullmask = gdk_pixmap_new(mainwin->window, 20, 20, 1);
-		gc = gdk_gc_new(nullmask);
+		nullmask = cairo_image_surface_create(mainwin->window, 20, 20, 1);
+		cairo_t *gc = cairo_create(nullmask);
 		pattern.pixel = 0;
 		gdk_gc_set_foreground(gc, &pattern);
 		gdk_draw_rectangle(nullmask, gc, TRUE, 0, 0, 20, 20);
-		gdk_gc_destroy(gc);
+		cairo_destroy(gc);
 		gtk_widget_shape_combine_mask(mainwin, nullmask, 0, 0);
 
 		gdk_window_set_hints(mainwin->window, 0, 0, 0, 0, 0, 0, GDK_HINT_MIN_SIZE | GDK_HINT_MAX_SIZE);
@@ -2295,7 +2294,7 @@ void mainwin_options_menu_callback(gpointer cb_data, guint action, GtkWidget * w
 		mainwin_menurow->mr_doublesize_selected = GTK_CHECK_MENU_ITEM(gtk_item_factory_get_widget(mainwin_options_menu, "/DoubleSize"))->active;
 		draw_widget(mainwin_menurow);
 		set_doublesize(mainwin_menurow->mr_doublesize_selected);
-		gdk_flush();
+		gdk_display_flush(gdk_display_get_default());
 		break;
 	case MAINWIN_OPT_EASY_MOVE:
 		cfg.easy_move = GTK_CHECK_MENU_ITEM(gtk_item_factory_get_widget(mainwin_options_menu, "/Easy Move"))->active;
@@ -2693,8 +2692,8 @@ void create_popups(void)
 
 static void mainwin_set_icon (GtkWidget *win)
 {
-	static GdkPixmap *icon;
-	static GdkBitmap *mask;
+	static cairo_surface_t *icon;
+	static cairo_surface_t *mask;
 	Atom icon_atom;
 	glong data[2];
 
@@ -2846,8 +2845,8 @@ static void mainwin_create_gtk(void)
 
 void mainwin_create(void)
 {
-	mainwin_bg = gdk_pixmap_new(NULL, 275, 116, gdk_rgb_get_visual()->depth);
-	mainwin_bg_dblsize = gdk_pixmap_new(NULL, 550, 232, gdk_rgb_get_visual()->depth);
+	mainwin_bg = cairo_image_surface_create(NULL, 275, 116, gdk_rgb_get_visual()->depth);
+	mainwin_bg_dblsize = cairo_image_surface_create(NULL, 550, 232, gdk_rgb_get_visual()->depth);
 	mainwin_create_gtk();
 	mainwin_create_widgets();
 }
@@ -2892,9 +2891,7 @@ gint idle_func(gpointer data)
 
 	if (get_input_playing())
 	{
-		GDK_THREADS_ENTER();
 		vis_playback_start();
-		GDK_THREADS_LEAVE();
 		time = input_get_time();
 		if (time == -1)
 		{
@@ -2932,16 +2929,13 @@ gint idle_func(gpointer data)
 			   g_timer_elapsed(pause_timer,NULL) >=
 			   cfg.pause_between_songs_time)
 			{
-				GDK_THREADS_ENTER();
 				playlist_eof_reached();
-				GDK_THREADS_LEAVE();
 				waiting = FALSE;
 			}
 		}
 		else if (time == -2)
 		{
 			static GtkWidget *infobox;
-			GDK_THREADS_ENTER();
 			if (!infobox)
 			{
 				infobox = xmms_show_message(
@@ -2958,7 +2952,6 @@ gint idle_func(gpointer data)
 			else
 				gdk_window_raise(infobox->window);
 			mainwin_stop_pushed();
-			GDK_THREADS_LEAVE();
 		}
 		else
 		{
@@ -3038,13 +3031,10 @@ gint idle_func(gpointer data)
 	}
 	else
 	{
-		GDK_THREADS_ENTER();
 		vis_playback_stop();
-		GDK_THREADS_LEAVE();
 	}
 
 
-	GDK_THREADS_ENTER();
 	check_ctrlsocket();
 
 	draw_main_window(mainwin_force_redraw);
@@ -3066,7 +3056,6 @@ gint idle_func(gpointer data)
 		mainwin_title_text = NULL;
 	}
 
-	GDK_THREADS_LEAVE();
 
 	return TRUE;
 
@@ -3263,8 +3252,8 @@ static gboolean pposition_configure(GtkWidget *w, GdkEventConfigure *event, gpoi
 void check_pposition(void)
 {	
 	GtkWidget *window;
-	GdkBitmap *mask;
-	GdkGC *gc;
+	cairo_surface_t *mask;
+	cairo_t *gc;
 	GdkColor pattern;
 
 	window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
@@ -3277,12 +3266,12 @@ void check_pposition(void)
 	gtk_widget_set_usize(window, 1, 1);
 	gdk_window_set_decorations(window->window, 0);
 	
-	mask = gdk_pixmap_new(window->window, 1, 1, 1);
-	gc = gdk_gc_new(mask);
+	mask = cairo_image_surface_create(window->window, 1, 1, 1);
+	cairo_t *gc = cairo_create(mask);
 	pattern.pixel = 0;
 	gdk_gc_set_foreground(gc, &pattern);
 	gdk_draw_rectangle(mask, gc, TRUE, 0, 0, 1, 1);
-	gdk_gc_destroy(gc);
+	cairo_destroy(gc);
 	gtk_widget_shape_combine_mask(window, mask, 0, 0);	
 
 	gtk_widget_show(window);
@@ -3450,7 +3439,6 @@ int main(int argc, char **argv)
 	init_plugins();
 
 	/* Plugins might start threads that can call gtk */
-	GDK_THREADS_ENTER();
 
 	playlistwin_create();
 	equalizerwin_create();
@@ -3466,10 +3454,8 @@ int main(int argc, char **argv)
 	g_free(filename);
 	if (cfg.save_playlist_position)
 		playlist_set_position(cfg.playlist_position);
-	GDK_THREADS_LEAVE();
 	start_ctrlsocket();
 	handle_cmd_line_options(&options, FALSE); 
-	GDK_THREADS_ENTER();
 	mainwin_set_info_text();
 
 	gtk_widget_show(mainwin);
@@ -3492,7 +3478,6 @@ int main(int argc, char **argv)
 
 	/* enable_x11r5_session_management(argc, argv); */
 	sm_init(argc, argv);
-	GDK_THREADS_LEAVE();
 	gtk_main();
 
 	return 0;

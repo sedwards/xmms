@@ -343,15 +343,11 @@ void *ctrlsocket_func(void *arg)
 				ctrl_ack_packet(pkt);
 				break;
 			case CMD_PLAYLIST_DELETE:
-				GDK_THREADS_ENTER();
 				playlist_delete_index(*((guint32 *)pkt->data));
-				GDK_THREADS_LEAVE();
 				ctrl_ack_packet(pkt);
 				break;
 			case CMD_PLAYLIST_CLEAR:
-				GDK_THREADS_ENTER();
 				playlist_clear();
-				GDK_THREADS_LEAVE();
 				ctrl_ack_packet(pkt);
 				break;
 			case CMD_IS_MAIN_WIN:

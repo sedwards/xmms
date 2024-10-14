@@ -37,7 +37,7 @@ gfloat eqslider_get_position(EqSlider * es)
 void eqslider_draw(Widget * w)
 {
 	EqSlider *es = (EqSlider *) w;
-	GdkPixmap *obj;
+	cairo_surface_t *obj;
 	SkinIndex src;
 	gint frame;
 
@@ -152,7 +152,7 @@ void eqslider_button_release_cb(GtkWidget * w, GdkEventButton * event, gpointer 
 	}
 }
 
-EqSlider *create_eqslider(GList ** wlist, GdkPixmap * parent, GdkGC * gc, gint x, gint y)
+EqSlider *create_eqslider(GList ** wlist, cairo_surface_t * parent, cairo_t * gc, gint x, gint y)
 {
 	EqSlider *es;
 

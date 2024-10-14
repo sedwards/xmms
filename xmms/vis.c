@@ -121,7 +121,6 @@ void vis_draw(Widget * w)
 	if (!vis->vs_widget.visible)
 		return;
 
-	GDK_THREADS_ENTER();
 
 	get_skin_viscolor(vis_color);
 	for (y = 0; y < 24; y++)
@@ -384,8 +383,6 @@ void vis_draw(Widget * w)
 
 		gdk_draw_indexed_image(vis->vs_window, vis->vs_widget.gc, vis->vs_widget.x << 1, vis->vs_widget.y << 1, vis->vs_widget.width << 1, vis->vs_widget.height << 1, GDK_RGB_DITHER_NONE, (guchar *) rgb_data, 152, cmap);
 	}
-	gdk_rgb_cmap_free(cmap);
-	GDK_THREADS_LEAVE();
 
 }
 
@@ -408,9 +405,22 @@ void vis_set_doublesize(Vis * vis, gboolean doublesize)
 void vis_clear(Vis * vis)
 {
 	if (!vis->vs_doublesize)
-		gdk_window_clear_area(vis->vs_window, vis->vs_widget.x, vis->vs_widget.y, vis->vs_widget.width, vis->vs_widget.height);
+	{
+		cairo_t *cr = gdk_cairo_create(vis->vs_window);
+		cairo_set_source_rgb(cr, 0, 0, 0); // Set the color to black or any background color
+		cairo_rectangle(cr, vis->vs_widget.x, vis->vs_widget.y, vis->vs_widget.width, vis->vs_widget.height);
+		cairo_fill(cr);
+		cairo_destroy(cr);
+	}
 	else
+	{
 		gdk_window_clear_area(vis->vs_window, vis->vs_widget.x << 1, vis->vs_widget.y << 1, vis->vs_widget.width << 1, vis->vs_widget.height << 1);
+		cairo_t *cr = gdk_cairo_create(vis->vs_window);
+		cairo_set_source_rgb(cr, 0, 0, 0); // Set the color to black or any background color
+		cairo_rectangle(cr, vis->vs_widget.x << 1, vis->vs_widget.y << 1, vis->vs_widget.width << 1, vis->vs_widget.height << 1);
+		cairo_fill(cr);
+		cairo_destroy(cr);
+	}
 }
 
 void vis_set_window(Vis * vis, GdkWindow * window)
@@ -418,7 +428,7 @@ void vis_set_window(Vis * vis, GdkWindow * window)
 	vis->vs_window = window;
 }
 
-Vis *create_vis(GList ** wlist, GdkPixmap * parent, GdkWindow * window, GdkGC * gc, gint x, gint y, gint width, gboolean doublesize)
+Vis *create_vis(GList ** wlist, cairo_surface_t * parent, GdkWindow * window, cairo_t * gc, gint x, gint y, gint width, gboolean doublesize)
 {
 	Vis *vis;
 

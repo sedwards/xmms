@@ -66,7 +66,7 @@ float eval_spline(gfloat xa[], gfloat ya[], gfloat y2a[], gint n, gfloat x)
 void eqgraph_draw(Widget * w)
 {
 	EqGraph *eg = (EqGraph *) w;
-	GdkPixmap *obj;
+	cairo_surface_t *obj;
 	GdkColor col;
 	guint32 cols[19];
 	gint i, y, ymin, ymax, py = 0;
@@ -121,7 +121,7 @@ void eqgraph_draw(Widget * w)
 	}
 }
 
-EqGraph *create_eqgraph(GList ** wlist, GdkPixmap * parent, GdkGC * gc, gint x, gint y)
+EqGraph *create_eqgraph(GList ** wlist, cairo_surface_t * parent, cairo_t * gc, gint x, gint y)
 {
 	EqGraph *eg;
 

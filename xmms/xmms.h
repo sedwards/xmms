@@ -19,9 +19,8 @@
 #define XMMS_H
 
 #include <gtk/gtk.h>
-#include <gdk/gdkx.h>
 #include <gdk/gdkkeysyms.h>
-#include <X11/Xlib.h>
+//#include <X11/Xlib.h>
 
 #include <sys/time.h>
 #include <sys/types.h>

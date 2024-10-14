@@ -27,8 +27,8 @@ static void textbox_draw(Widget * w)
 {
 	TextBox *tb = (TextBox *) w;
 	gint cw;
-	GdkPixmap *obj;
-	GdkPixmap *src;
+	cairo_surface_t *obj;
+	cairo_surface_t *src;
 
 	if (tb->tb_text &&
 	    (!tb->tb_pixmap_text ||
@@ -163,16 +163,16 @@ void textbox_set_text(TextBox * tb, gchar * text)
 static void textbox_generate_xfont_pixmap(TextBox * tb, gchar *pixmaptext)
 {
 	gint length, i;
-	GdkGC *gc, *maskgc;
+	cairo_t *gc, *maskgc;
 	GdkColor *c, pattern;
-	GdkBitmap *mask;
+	cairo_surface_t *mask;
 
 	length = strlen(pixmaptext);
 
 	tb->tb_pixmap_width = gdk_text_width(tb->tb_font, pixmaptext, length);
 	if (tb->tb_pixmap_width < tb->tb_widget.width)
 		tb->tb_pixmap_width = tb->tb_widget.width;
-	tb->tb_pixmap = gdk_pixmap_new(mainwin->window, tb->tb_pixmap_width,
+	tb->tb_pixmap = cairo_image_surface_create(mainwin->window, tb->tb_pixmap_width,
 				       tb->tb_widget.height,
 				       gdk_rgb_get_visual()->depth);
 	gc = tb->tb_widget.gc;
@@ -183,7 +183,7 @@ static void textbox_generate_xfont_pixmap(TextBox * tb, gchar *pixmaptext)
 		gdk_draw_line(tb->tb_pixmap, gc, 0, i, tb->tb_pixmap_width, i);
 	}
 
-	mask = gdk_pixmap_new(mainwin->window, tb->tb_pixmap_width,
+	mask = cairo_image_surface_create(mainwin->window, tb->tb_pixmap_width,
 			      tb->tb_widget.height, 1);
 	maskgc = gdk_gc_new(mask);
 	pattern.pixel = 0;
@@ -332,7 +332,7 @@ static void textbox_generate_pixmap(TextBox * tb)
 {
 	gint length, i, x, y, wl;
 	gchar *pixmaptext;
-	GdkGC *gc;
+	cairo_t *gc;
 
 	if (tb->tb_pixmap)
 		gdk_pixmap_unref(tb->tb_pixmap);
@@ -415,7 +415,7 @@ static void textbox_generate_pixmap(TextBox * tb)
 	}
 
 	tb->tb_pixmap_width = length * 5;
-	tb->tb_pixmap = gdk_pixmap_new(mainwin->window,
+	tb->tb_pixmap = cairo_image_surface_create(mainwin->window,
 				       tb->tb_pixmap_width, 6,
 				       gdk_rgb_get_visual()->depth);
 	gc = tb->tb_widget.gc;
@@ -495,7 +495,7 @@ void textbox_set_xfont(TextBox *tb, gboolean use_xfont, gchar *fontname)
 		tb->tb_widget.height = tb->tb_nominal_height;
 }
 
-TextBox *create_textbox(GList ** wlist, GdkPixmap * parent, GdkGC * gc, gint x, gint y, gint w, gboolean allow_scroll, SkinIndex si)
+TextBox *create_textbox(GList ** wlist, cairo_surface_t * parent, cairo_t * gc, gint x, gint y, gint w, gboolean allow_scroll, SkinIndex si)
 {
 	TextBox *tb;
 

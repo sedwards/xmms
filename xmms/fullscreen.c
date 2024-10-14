@@ -289,7 +289,7 @@ gboolean xmms_fullscreen_enter(GtkWidget * win, gint * w, gint * h)
 			 * is done.  I don't know what at this time, only
 			 * that it's not XMMS, and that it's very very evil.
 			 */
-			gdk_flush();
+			gdk_display_flush(gdk_display_get_default());
 			xmms_usleep(50000);
 
 			/* Steal the keyboard/mouse */

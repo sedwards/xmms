@@ -68,12 +68,12 @@ Config;
 extern Config cfg;
 
 extern GtkWidget *mainwin;
-extern GdkGC *mainwin_gc;
+extern cairo_t *mainwin_gc;
 extern gboolean mainwin_moving;
 extern GList *disabled_iplugins;
 extern GtkWidget *equalizerwin;
 extern GtkWidget *playlistwin;
-extern GtkItemFactory *mainwin_vis_menu, *mainwin_general_menu, *mainwin_options_menu;
+extern GtkUIManager *mainwin_vis_menu, *mainwin_general_menu, *mainwin_options_menu;
 extern GList *dock_window_list;
 extern gboolean pposition_broken;
 

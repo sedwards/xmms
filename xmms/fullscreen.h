@@ -26,7 +26,6 @@
 #define _XMMS_FULLSCREEN_H 1
 
 #include <gtk/gtk.h>
-#include <gdk/gdkx.h>
 
 typedef struct {
 	gint width, height;
@@ -36,7 +35,7 @@ typedef struct {
 extern "C" {
 #endif
 
-gboolean xmms_fullscreen_available(Display *dpy);
+gboolean xmms_fullscreen_available(GdkDisplay *dpy);
 gboolean xmms_fullscreen_init(GtkWidget *win);
 
 gboolean xmms_fullscreen_enter(GtkWidget *win, gint *w, gint *h);

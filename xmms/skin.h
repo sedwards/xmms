@@ -40,7 +40,7 @@ typedef enum
 
 typedef struct
 {
-	GdkPixmap *pixmap, *def_pixmap;
+	cairo_surface_t *pixmap, *def_pixmap;
 	/* The real size of the pixmap */
 	gint width, height;
 	/* The size of the pixmap from the current skin,
@@ -73,12 +73,12 @@ typedef struct
 	GdkColor *pledit_normalbg, def_pledit_normalbg;
 	GdkColor *pledit_selectedbg, def_pledit_selectedbg;
 	guchar vis_color[24][3];
-	GdkBitmap *def_mask, *def_mask_ds;
-	GdkBitmap *def_mask_shade, *def_mask_shade_ds;
-	GdkBitmap *mask_main, *mask_main_ds;
-	GdkBitmap *mask_shade, *mask_shade_ds;
-	GdkBitmap *mask_eq, *mask_eq_ds;
-	GdkBitmap *mask_eq_shade, *mask_eq_shade_ds;
+cairo_surface_t *def_mask, *def_mask_ds;
+cairo_surface_t *def_mask_shade, *def_mask_shade_ds;
+cairo_surface_t *mask_main, *mask_main_ds;
+cairo_surface_t *mask_shade, *mask_shade_ds;
+cairo_surface_t *mask_eq, *mask_eq_ds;
+cairo_surface_t *mask_eq_shade, *mask_eq_shade_ds;
 }
 Skin;
 
@@ -88,11 +88,11 @@ void init_skins(void);
 void load_skin(const gchar * path);
 void reload_skin(void);
 void cleanup_skins(void);
-GdkBitmap *skin_get_mask(MaskIndex mi, gboolean doublesize, gboolean shaded);
+cairo_surface_t *skin_get_mask(MaskIndex mi, gboolean doublesize, gboolean shaded);
 GdkColor *get_skin_color(SkinColorIndex si);
 void get_skin_viscolor(guchar vis_color[24][3]);
 int skin_get_id(void);
-void skin_draw_pixmap(GdkDrawable *drawable, GdkGC *gc, SkinIndex si,
+void skin_draw_pixmap(cairo_surface_t *drawable, cairo_t *gc, SkinIndex si,
 		      gint xsrc, gint ysrc, gint xdest, gint ydest,
 		      gint width, gint height);
 void skin_get_eq_spline_colors(guint32 (*colors)[19]);

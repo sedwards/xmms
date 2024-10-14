@@ -101,7 +101,13 @@ am__aclocal_m4_deps = $(top_srcdir)/autoconf-m4/build-to-host.m4 \
 	$(top_srcdir)/autoconf-m4/lib-ld.m4 \
 	$(top_srcdir)/autoconf-m4/lib-link.m4 \
 	$(top_srcdir)/autoconf-m4/lib-prefix.m4 \
+	$(top_srcdir)/autoconf-m4/libtool.m4 \
+	$(top_srcdir)/autoconf-m4/ltoptions.m4 \
+	$(top_srcdir)/autoconf-m4/ltsugar.m4 \
+	$(top_srcdir)/autoconf-m4/ltversion.m4 \
+	$(top_srcdir)/autoconf-m4/lt~obsolete.m4 \
 	$(top_srcdir)/autoconf-m4/nls.m4 \
+	$(top_srcdir)/autoconf-m4/pkg.m4 \
 	$(top_srcdir)/autoconf-m4/po.m4 \
 	$(top_srcdir)/autoconf-m4/progtest.m4 \
 	$(top_srcdir)/acinclude.m4 $(top_srcdir)/configure.ac
@@ -112,9 +118,8 @@ DIST_COMMON = $(srcdir)/Makefile.am $(top_srcdir)/configure \
 am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
  configure.lineno config.status.lineno
 mkinstalldirs = $(install_sh) -d
-CONFIG_HEADER = config.h $(top_builddir)/xmms/i18n.h
-CONFIG_CLEAN_FILES = xmms.1 wmxmms.1 gnomexmms.1 xmms.spec xmms-config \
-	intl/Makefile
+CONFIG_HEADER = config.h
+CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
 am__vpath_adj = case $$p in \
@@ -204,19 +209,15 @@ am__define_uniq_tagged_files = \
   done | $(am__uniquify_input)`
 DIST_SUBDIRS = $(SUBDIRS)
 am__DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/config.h.in \
-	$(srcdir)/gnomexmms.1.in $(srcdir)/wmxmms.1.in \
-	$(srcdir)/xmms-config.in $(srcdir)/xmms.1.in \
-	$(srcdir)/xmms.spec.in $(top_srcdir)/autoconf/ar-lib \
-	$(top_srcdir)/autoconf/compile \
+	$(top_srcdir)/autoconf/ar-lib $(top_srcdir)/autoconf/compile \
 	$(top_srcdir)/autoconf/config.guess \
 	$(top_srcdir)/autoconf/config.rpath \
 	$(top_srcdir)/autoconf/config.sub \
 	$(top_srcdir)/autoconf/install-sh \
 	$(top_srcdir)/autoconf/ltmain.sh \
-	$(top_srcdir)/autoconf/missing $(top_srcdir)/intl/Makefile.in \
-	ABOUT-NLS AUTHORS COPYING ChangeLog INSTALL NEWS README TODO \
-	acconfig.h autoconf/ar-lib autoconf/compile \
-	autoconf/config.guess autoconf/config.rpath \
+	$(top_srcdir)/autoconf/missing ABOUT-NLS AUTHORS COPYING \
+	ChangeLog INSTALL NEWS README TODO acconfig.h autoconf/ar-lib \
+	autoconf/compile autoconf/config.guess autoconf/config.rpath \
 	autoconf/config.sub autoconf/depcomp autoconf/install-sh \
 	autoconf/ltmain.sh autoconf/missing compile config.guess \
 	config.sub depcomp install-sh ltmain.sh missing mkinstalldirs
@@ -270,17 +271,14 @@ ACLOCAL = ${SHELL} '/Users/sedwards/source/xmms/autoconf/missing' aclocal-1.17
 AMTAR = $${TAR-tar}
 AM_DEFAULT_VERBOSITY = 0
 AR = ar
-ARCH_DEFINES = 
+ARCH_DEFINES = -DARCH_SPECIFIC_DEFINE
 AUTOCONF = ${SHELL} '/Users/sedwards/source/xmms/autoconf/missing' autoconf
 AUTOHEADER = ${SHELL} '/Users/sedwards/source/xmms/autoconf/missing' autoheader
 AUTOMAKE = ${SHELL} '/Users/sedwards/source/xmms/autoconf/missing' automake-1.17
 AWK = gawk
 CC = gcc
-CCAS = @CCAS@
-CCASDEPMODE = @CCASDEPMODE@
-CCASFLAGS = @CCASFLAGS@
 CCDEPMODE = depmode=gcc3
-CFLAGS = -g -O2  -Wall -Wpointer-arith -finline-functions -ffast-math -funroll-all-loops
+CFLAGS = -g -O2  -Wall -Wpointer-arith -finline-functions -ffast-math -Wno-incompatible-pointer-types-discards-qualifiers -Wno-invalid-source-encoding -Wno-pointer-sign -Wno-int-to-void-pointer-cast -Wno-deprecated-non-prototype
 CPP = gcc -E
 CPPFLAGS = -I/opt/homebrew/opt/ruby/include
 CSCOPE = cscope
@@ -288,22 +286,32 @@ CTAGS = ctags
 CYGPATH_W = echo
 DEFS = -DHAVE_CONFIG_H
 DEPDIR = .deps
-ECHO = @ECHO@
+DLLTOOL = dlltool
+DSYMUTIL = dsymutil
+DUMPBIN = 
 ECHO_C = \c
 ECHO_N = 
 ECHO_T = 
 EFFECT_PLUGINS = $(ALL_PLUGINS)
 EFFECT_PLUGIN_DIR = Effect
+EGREP = /usr/bin/grep -E
 ESD_CFLAGS = 
 ESD_CONFIG = no
 ESD_LIBS = 
 ETAGS = etags
 EXEEXT = 
+FGREP = /usr/bin/grep -F
+FILECMD = file
 GENERAL_PLUGINS = $(ALL_PLUGINS)
 GENERAL_PLUGIN_DIR = General
 GETTEXT_MACRO_VERSION = 0.20
+GLIB_CFLAGS = -I/opt/homebrew/Cellar/glib/2.82.1/include/glib-2.0 -I/opt/homebrew/Cellar/glib/2.82.1/lib/glib-2.0/include -I/opt/homebrew/opt/gettext/include -I/opt/homebrew/Cellar/pcre2/10.44/include
+GLIB_LIBS = -L/opt/homebrew/Cellar/glib/2.82.1/lib -L/opt/homebrew/opt/gettext/lib -lglib-2.0 -lintl
 GMSGFMT = /opt/local/bin/msgfmt
 GMSGFMT_015 = /opt/local/bin/msgfmt
+GREP = /usr/bin/grep
+GTK_CFLAGS = -I/opt/homebrew/Cellar/gtk+3/3.24.43/include/gtk-3.0 -I/opt/homebrew/Cellar/glib/2.82.1/include/gio-unix-2.0 -I/opt/homebrew/Cellar/cairo/1.18.2/include -I/opt/homebrew/Cellar/libepoxy/1.5.10/include -I/opt/homebrew/Cellar/pango/1.54.0/include/pango-1.0 -I/opt/homebrew/Cellar/harfbuzz/10.0.1_1/include/harfbuzz -I/opt/homebrew/Cellar/pango/1.54.0/include/pango-1.0 -I/opt/homebrew/Cellar/fribidi/1.0.16/include/fribidi -I/opt/homebrew/Cellar/harfbuzz/10.0.1_1/include/harfbuzz -I/opt/homebrew/Cellar/graphite2/1.3.14/include -I/opt/homebrew/Cellar/at-spi2-core/2.54.0/include/atk-1.0 -I/opt/homebrew/Cellar/cairo/1.18.2/include/cairo -I/opt/homebrew/Cellar/fontconfig/2.15.0/include -I/opt/homebrew/opt/freetype/include/freetype2 -I/opt/homebrew/Cellar/libxext/1.3.6/include -I/opt/homebrew/Cellar/libxrender/0.9.11/include -I/opt/homebrew/Cellar/libx11/1.8.10/include -I/opt/homebrew/Cellar/libxcb/1.17.0/include -I/opt/homebrew/Cellar/libxau/1.0.11/include -I/opt/homebrew/Cellar/libxdmcp/1.1.5/include -I/opt/homebrew/Cellar/pixman/0.42.2/include/pixman-1 -I/opt/homebrew/Cellar/gdk-pixbuf/2.42.12/include/gdk-pixbuf-2.0 -I/opt/homebrew/opt/libpng/include/libpng16 -I/opt/homebrew/Cellar/libtiff/4.7.0/include -I/opt/homebrew/opt/zstd/include -I/opt/homebrew/Cellar/xz/5.6.3/include -I/opt/homebrew/Cellar/jpeg-turbo/3.0.4/include -I/opt/homebrew/Cellar/glib/2.82.1/include -I/opt/homebrew/Cellar/glib/2.82.1/include/glib-2.0 -I/opt/homebrew/Cellar/glib/2.82.1/lib/glib-2.0/include -I/opt/homebrew/opt/gettext/include -I/opt/homebrew/Cellar/pcre2/10.44/include -I/opt/homebrew/Cellar/xorgproto/2024.1/include -I/Library/Developer/CommandLineTools/SDKs/MacOSX14.sdk/usr/include/ffi
+GTK_LIBS = -L/opt/homebrew/Cellar/gtk+3/3.24.43/lib -L/opt/homebrew/Cellar/pango/1.54.0/lib -L/opt/homebrew/Cellar/harfbuzz/10.0.1_1/lib -L/opt/homebrew/Cellar/at-spi2-core/2.54.0/lib -L/opt/homebrew/Cellar/cairo/1.18.2/lib -L/opt/homebrew/Cellar/gdk-pixbuf/2.42.12/lib -L/opt/homebrew/Cellar/glib/2.82.1/lib -L/opt/homebrew/opt/gettext/lib -lgtk-3 -lgdk-3 -Wl,-framework,Cocoa -Wl,-framework,Carbon -Wl,-framework,CoreGraphics -lpangocairo-1.0 -lpango-1.0 -lharfbuzz -latk-1.0 -lcairo-gobject -lcairo -lgdk_pixbuf-2.0 -lgio-2.0 -lgobject-2.0 -lglib-2.0 -lintl
 HAVEXML = /opt/homebrew/opt/e2fsprogs/sbin:/opt/homebrew/opt/e2fsprogs/bin:/opt/local/bin:/opt/local/sbin:/Library/Frameworks/Python.framework/Versions/3.12/bin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/opt/X11/bin:/Library/Apple/usr/bin:/usr/local/go/bin:/opt/homebrew/bin
 INPUT_PLUGINS = $(ALL_PLUGINS)
 INPUT_PLUGIN_DIR = Input
@@ -312,33 +320,40 @@ INSTALL_DATA = ${INSTALL} -m 644
 INSTALL_PROGRAM = ${INSTALL}
 INSTALL_SCRIPT = ${INSTALL}
 INSTALL_STRIP_PROGRAM = $(install_sh) -c -s
-LIBINTL = 
 INTL_MACOSX_LIBS = -Wl,-framework -Wl,CoreFoundation -Wl,-framework -Wl,CoreServices
+LD = /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ld
 LDFLAGS = -L/opt/homebrew/opt/ruby/lib
 LIBICONV = -liconv
 LIBINTL = 
-LIBMIKMOD_CFLAGS = @LIBMIKMOD_CFLAGS@
-LIBMIKMOD_CONFIG = @LIBMIKMOD_CONFIG@
-LIBMIKMOD_LDADD = @LIBMIKMOD_LDADD@
-LIBMIKMOD_LIBS = @LIBMIKMOD_LIBS@
 LIBOBJS = 
 LIBS =   -L/lib -lxml  
 LIBTOOL = $(SHELL) $(top_builddir)/libtool
+LIBXMMS_MAJOR_VERSION = 3
+LIBXMMS_MICRO_VERSION = 2
+LIBXMMS_MINOR_VERSION = 0
+LIPO = lipo
 LN_S = ln -s
 LTLIBICONV = -liconv
 LTLIBINTL = 
 LTLIBOBJS = 
+LT_SYS_LIBRARY_PATH = 
 MAINT = #
 MAKEINFO = ${SHELL} '/Users/sedwards/source/xmms/autoconf/missing' makeinfo
+MANIFEST_TOOL = :
 MKDIR_P = /opt/homebrew/bin/gmkdir -p
 MSGFMT = /opt/local/bin/msgfmt
 MSGMERGE = /opt/local/bin/msgmerge
 MSGMERGE_FOR_MSGFMT_OPTION = --for-msgfmt
+NM = /usr/bin/nm -B
+NMEDIT = nmedit
+OBJDUMP = objdump
 OBJEXT = o
 OGG_CFLAGS = 
 OGG_LIBS = 
 OPENGL_LIBS = error
 OSS_CFLAGS = 
+OTOOL = otool
+OTOOL64 = :
 OUTPUT_PLUGINS = $(ALL_PLUGINS)
 OUTPUT_PLUGIN_DIR = Output
 PACKAGE = xmms
@@ -349,10 +364,11 @@ PACKAGE_TARNAME = xmms
 PACKAGE_URL = 
 PACKAGE_VERSION = 0.0.1
 PATH_SEPARATOR = :
-PLUGIN_LDFLAGS = -module -avoid-version -export-symbols-regex "get_.plugin_info"
+PKG_CONFIG = /opt/homebrew/bin/pkg-config
+PKG_CONFIG_LIBDIR = 
+PKG_CONFIG_PATH = 
 POSIX_LIBS = 
 POSUB = 
-PTHREAD_LIBS = @PTHREAD_LIBS@
 RANLIB = ranlib
 SED = /opt/homebrew/bin/gsed
 SET_MAKE = 
@@ -370,7 +386,7 @@ XGETTEXT = /opt/local/bin/xgettext
 XGETTEXT_015 = /opt/local/bin/xgettext
 XGETTEXT_EXTRA_OPTIONS = 
 XMKMF = 
-XMMS_DEFINES = -g -O2  -Wall -Wpointer-arith -finline-functions -ffast-math -funroll-all-loops -DDATA_DIR=\"${datarootdir}/xmms\" -DPLUGIN_DIR=\"${exec_prefix}/lib/xmms\" -DPLUGINSUBS=\"Output\",\"Input\",\"Effect\",\"General\",\"Visualization\" -DLOCALEDIR=\"${datarootdir}/locale\"
+XMMS_DEFINES = -g -O2  -Wall -Wpointer-arith -finline-functions -ffast-math -Wno-incompatible-pointer-types-discards-qualifiers -Wno-invalid-source-encoding -Wno-pointer-sign -Wno-int-to-void-pointer-cast -Wno-deprecated-non-prototype -DDATA_DIR=\"${datarootdir}/xmms\" -DPLUGIN_DIR=\"${exec_prefix}/lib/xmms\" -DPLUGINSUBS=\"Output\",\"Input\",\"Effect\",\"General\",\"Visualization\" -DLOCALEDIR=\"${datarootdir}/locale\"
 XMMS_GTK = 
 XMMS_PATH = no
 Z_LIBS = -lz
@@ -380,6 +396,7 @@ abs_top_builddir = /Users/sedwards/source/xmms
 abs_top_srcdir = /Users/sedwards/source/xmms
 ac_ct_AR = ar
 ac_ct_CC = gcc
+ac_ct_DUMPBIN = 
 ac_prefix_program = 
 am__include = include
 am__leading_dot = .
@@ -428,14 +445,13 @@ runstatedir = ${localstatedir}/run
 sbindir = ${exec_prefix}/sbin
 sharedstatedir = ${prefix}/com
 srcdir = .
-subdirs =  libxmms
 sysconfdir = ${prefix}/etc
 target_alias = 
 top_build_prefix = 
 top_builddir = .
 top_srcdir = .
-xmmsdir = 
-SUBDIRS = intl libxmms xmms Output Input Effect General Visualization wmxmms gnomexmms po
+ACLOCAL_AMFLAGS = -I autoconf-m4
+SUBDIRS = libxmms xmms Output Input Effect General Visualization wmxmms gnomexmms po
 bin_SCRIPTS = xmms-config
 EXTRA_DIST = xmms.spec xmms.spec.in FAQ xmms.m4
 m4datadir = $(datadir)/aclocal
@@ -451,15 +467,15 @@ $(srcdir)/Makefile.in: # $(srcdir)/Makefile.am  $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
 	    *$$dep*) \
-	      echo ' cd $(srcdir) && $(AUTOMAKE) --gnu'; \
-	      $(am__cd) $(srcdir) && $(AUTOMAKE) --gnu \
+	      echo ' cd $(srcdir) && $(AUTOMAKE) --foreign'; \
+	      $(am__cd) $(srcdir) && $(AUTOMAKE) --foreign \
 		&& exit 0; \
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --gnu Makefile
+	  $(AUTOMAKE) --foreign Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
 	  *config.status*) \
@@ -493,18 +509,6 @@ $(srcdir)/config.h.in: # $(am__configure_deps) $(top_srcdir)/acconfig.h
 
 distclean-hdr:
 	-rm -f config.h stamp-h1
-xmms.1: $(top_builddir)/config.status $(srcdir)/xmms.1.in
-	cd $(top_builddir) && $(SHELL) ./config.status $@
-wmxmms.1: $(top_builddir)/config.status $(srcdir)/wmxmms.1.in
-	cd $(top_builddir) && $(SHELL) ./config.status $@
-gnomexmms.1: $(top_builddir)/config.status $(srcdir)/gnomexmms.1.in
-	cd $(top_builddir) && $(SHELL) ./config.status $@
-xmms.spec: $(top_builddir)/config.status $(srcdir)/xmms.spec.in
-	cd $(top_builddir) && $(SHELL) ./config.status $@
-xmms-config: $(top_builddir)/config.status $(srcdir)/xmms-config.in
-	cd $(top_builddir) && $(SHELL) ./config.status $@
-intl/Makefile: $(top_builddir)/config.status $(top_srcdir)/intl/Makefile.in
-	cd $(top_builddir) && $(SHELL) ./config.status $@
 install-binSCRIPTS: $(bin_SCRIPTS)
 	@$(NORMAL_INSTALL)
 	@list='$(bin_SCRIPTS)'; test -n "$(bindir)" || list=; \

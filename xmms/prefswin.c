@@ -1279,9 +1279,7 @@ void show_prefs_window(void)
  	gtk_widget_show_all(prefswin);
 	gtk_widget_grab_default(prefswin_ok);
 
-	GDK_THREADS_LEAVE();
 	while(g_main_iteration(FALSE));
-	GDK_THREADS_ENTER();
 
 	is_opening = FALSE;
 }

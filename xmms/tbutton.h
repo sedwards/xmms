@@ -28,7 +28,7 @@ typedef struct
 }
 TButton;
 
-TButton *create_tbutton(GList ** wlist, GdkPixmap * parent, GdkGC * gc, gint x, gint y, gint w, gint h,
+TButton *create_tbutton(GList ** wlist, cairo_surface_t * parent, cairo_t * gc, gint x, gint y, gint w, gint h,
 			gint nux, gint nuy, gint pux, gint puy, gint nsx, gint nsy, gint psx, gint psy,
 			void (*cb) (gboolean), SkinIndex si);
 void tbutton_set_toggled(TButton * tb, gboolean toggled);

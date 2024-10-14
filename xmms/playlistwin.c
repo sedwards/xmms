@@ -23,11 +23,11 @@
 
 GtkWidget *playlistwin;
 static GtkWidget *playlistwin_url_window = NULL;
-GtkItemFactory *playlistwin_sort_menu, *playlistwin_sub_menu, *playlistwin_popup_menu;
+GtkUIManager *playlistwin_sort_menu, *playlistwin_sub_menu, *playlistwin_popup_menu;
 
-GdkPixmap *playlistwin_bg;
-GdkBitmap *playlistwin_mask = NULL;
-GdkGC *playlistwin_gc;
+cairo_surface_t *playlistwin_bg;
+cairo_surface_t *playlistwin_mask = NULL;
+cairo_t *playlistwin_gc;
 gboolean playlistwin_focus = FALSE, playlistwin_resizing = FALSE;
 gint playlistwin_resize_x, playlistwin_resize_y, playlistwin_move_x, playlistwin_move_y;
 
@@ -70,7 +70,7 @@ enum
 	PLAYLISTWIN_SORT_RANDOMIZE, PLAYLISTWIN_SORT_REVERSE
 };
 
-GtkItemFactoryEntry playlistwin_sort_menu_entries[] =
+GtkUIManagerEntry playlistwin_sort_menu_entries[] =
 {
 	{N_("/Sort List"), NULL, NULL, 0, "<Branch>"},
 	{N_("/Sort List/By Title"), NULL, playlistwin_sort_menu_callback, PLAYLISTWIN_SORT_BYTITLE, "<Item>"},
@@ -96,7 +96,7 @@ enum
 	PLAYLISTWIN_REMOVE_DEAD_FILES, PLAYLISTWIN_PHYSICALLY_DELETE
 };
 
-GtkItemFactoryEntry playlistwin_sub_menu_entries[] =
+GtkUIManagerEntry playlistwin_sub_menu_entries[] =
 {
 	{N_("/Remove Dead Files"), NULL, playlistwin_sub_menu_callback, PLAYLISTWIN_REMOVE_DEAD_FILES, "<Item>"},
 	{N_("/Physically Delete Files"), NULL, playlistwin_sub_menu_callback, PLAYLISTWIN_PHYSICALLY_DELETE, "<Item>"},
@@ -108,7 +108,7 @@ static const int playlistwin_sub_menu_entries_num =
 
 void playlistwin_popup_menu_callback(gpointer cb_data, guint action, GtkWidget * w);
 
-GtkItemFactoryEntry playlistwin_popup_menu_entries[] =
+GtkUIManagerEntry playlistwin_popup_menu_entries[] =
 {
 	{N_("/View File Info"), NULL, playlistwin_popup_menu_callback, MISC_FILEINFO, "<Item>"},
 	{N_("/-"), NULL, NULL, 0, "<Separator>"},
@@ -281,24 +281,24 @@ void playlistwin_update_list(void)
 
 void playlistwin_create_mask(void)
 {
-	GdkBitmap *tmp;
-	GdkGC *gc;
+	cairo_surface_t *tmp;
+	cairo_t *gc;
 	GdkColor pattern;
 
 	if (cfg.show_wm_decorations)
 		return;
 
 	tmp = playlistwin_mask;
-	playlistwin_mask = gdk_pixmap_new(playlistwin->window, cfg.playlist_width, PLAYLIST_HEIGHT, 1);
+	playlistwin_mask = cairo_image_surface_create(playlistwin->window, cfg.playlist_width, PLAYLIST_HEIGHT, 1);
 	gc = gdk_gc_new(playlistwin_mask);
 	pattern.pixel = 1;
 	gdk_gc_set_foreground(gc, &pattern);
 	gdk_draw_rectangle(playlistwin_mask, gc, TRUE, 0, 0, cfg.playlist_width, PLAYLIST_HEIGHT);
-	gdk_gc_destroy(gc);
+	cairo_destroy(gc);
 	gtk_widget_shape_combine_mask(playlistwin, playlistwin_mask, 0, 0);
 
 	if (tmp)
-		gdk_bitmap_unref(tmp);
+		cairo_surface_destroy(tmp);
 }
 
 void playlistwin_set_shade(gboolean shaded)
@@ -352,7 +352,7 @@ void playlistwin_release(GtkWidget * widget, GdkEventButton * event, gpointer ca
 		return;
 
 	gdk_pointer_ungrab(GDK_CURRENT_TIME);
-	gdk_flush();
+	gdk_display_flush(gdk_display_get_default());
 	if (playlistwin_resizing)
 	{
 		playlistwin_resizing = FALSE;
@@ -419,7 +419,7 @@ void playlistwin_inverse_selection(void)
 static void playlistwin_resize(int width, int height)
 {
 	gint bx, by, nw, nh;
-	GdkPixmap *oldbg;
+	cairo_surface_t *oldbg;
 	gboolean dummy;
 
 	bx = (width - 275) / 25;
@@ -470,7 +470,7 @@ static void playlistwin_resize(int width, int height)
 		hide_widget(playlistwin_vis);
 
 	oldbg = playlistwin_bg;
-	playlistwin_bg = gdk_pixmap_new(playlistwin->window, cfg.playlist_width, cfg.playlist_height,
+	playlistwin_bg = cairo_image_surface_create(playlistwin->window, cfg.playlist_width, cfg.playlist_height,
 					gdk_rgb_get_visual()->depth);
 	widget_list_change_pixmap(playlistwin_wlist, playlistwin_bg);
 	playlistwin_create_mask();
@@ -509,7 +509,7 @@ void playlistwin_motion(GtkWidget * widget, GdkEventMotion * event, gpointer cal
 		handle_motion_cb(playlistwin_wlist, widget, event);
 		draw_playlist_window(FALSE);
 	}
-	gdk_flush();
+	gdk_display_flush(gdk_display_get_default());
 	while (XCheckMaskEvent(GDK_DISPLAY(), ButtonMotionMask, &ev)) ;
 }
 
@@ -781,7 +781,7 @@ void playlistwin_popup_handler(gint item)
 		/* Misc button */
 		case MISC_SORT: {
 			gint x, y;
-			GtkItemFactory *f;
+			GtkUIManager *f;
 			playlistwin_set_sensitive_sortmenu();
 			gdk_window_get_pointer(NULL, &x, &y, NULL);
 			f = GTK_ITEM_FACTORY(playlistwin_sort_menu);
@@ -1455,7 +1455,7 @@ void draw_playlist_window(gboolean force)
 				wl = wl->next;
 			}
 		}
-		gdk_flush();
+		gdk_display_flush(gdk_display_get_default());
 	}
 	unlock_widget_list(playlistwin_wlist);
 }
@@ -1696,7 +1696,7 @@ void playlistwin_create(void)
 	gtk_item_factory_create_items(GTK_ITEM_FACTORY(playlistwin_sub_menu),
 				      playlistwin_sub_menu_entries_num,
 				      playlistwin_sub_menu_entries, NULL);
-	playlistwin_bg = gdk_pixmap_new(NULL, cfg.playlist_width,
+	playlistwin_bg = cairo_image_surface_create(NULL, cfg.playlist_width,
 					cfg.playlist_height,
 					gdk_rgb_get_visual()->depth);
 
@@ -1750,7 +1750,7 @@ void playlistwin_real_show(void)
 	if (pposition_broken && cfg.playlist_x != -1 && cfg.save_window_position)
 		dock_set_uposition(playlistwin, cfg.playlist_x, cfg.playlist_y);
 	gtk_widget_set_usize(playlistwin, cfg.playlist_width, PLAYLIST_HEIGHT);
-	gdk_flush();
+	gdk_display_flush(gdk_display_get_default());
 	draw_playlist_window(TRUE);
 	tbutton_set_toggled(mainwin_pl, TRUE);
 	cfg.playlist_visible = TRUE;
