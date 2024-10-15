@@ -144,7 +144,6 @@ static void skin_get_textcolors(cairo_surface_t *text, GdkColor *bgc, GdkColor *
 	
 	/* Get the first line of text */
 	gi = gdk_image_get(text, 0, 0, 155, 6);
-	visual = gdk_window_get_colormap(gtk_widget_get_window(playlistwin));
 	for (i = 0; i < 6; i ++)
 	{
 		GdkColor c;
@@ -196,19 +195,15 @@ void init_skins(void)
 	skin->def_pledit_normal.red = 0x2400;
 	skin->def_pledit_normal.green = 0x9900;
 	skin->def_pledit_normal.blue = 0xffff;
-	gdk_color_alloc(gdk_window_get_colormap(gtk_widget_get_window(playlistwin)), &skin->def_pledit_normal);
 	skin->def_pledit_current.red = 0xffff;
 	skin->def_pledit_current.green = 0xee00;
 	skin->def_pledit_current.blue = 0xffff;
-	gdk_color_alloc(gdk_window_get_colormap(gtk_widget_get_window(playlistwin)), &skin->def_pledit_current);
 	skin->def_pledit_normalbg.red = 0x0A00;
 	skin->def_pledit_normalbg.green = 0x1200;
 	skin->def_pledit_normalbg.blue = 0x0A00;
-	gdk_color_alloc(gdk_window_get_colormap(gtk_widget_get_window(playlistwin)), &skin->def_pledit_normalbg);
 	skin->def_pledit_selectedbg.red = 0x0A00;
 	skin->def_pledit_selectedbg.green = 0x1200;
 	skin->def_pledit_selectedbg.blue = 0x4A00;
-	gdk_color_alloc(gdk_window_get_colormap(gtk_widget_get_window(playlistwin)), &skin->def_pledit_selectedbg);
 	for (i = 0; i < 24; i++)
 	{
 		skin->vis_color[i][0] = skin_default_viscolor[i][0];
@@ -280,7 +275,6 @@ GdkColor *load_skin_color(const gchar * path, const gchar * file, const gchar * 
 							       *(ptr + 1));
 				
 
-			gdk_color_alloc(gdk_window_get_colormap(gtk_widget_get_window(playlistwin)), color);
 			g_free(value);
 		}
 		g_free(filename);

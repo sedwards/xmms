@@ -43,7 +43,7 @@ GtkWidget *xmms_show_message(gchar * title, gchar * text, gchar * button_text, g
 
 	vbox = gtk_vbox_new(FALSE, 0);
 	gtk_container_set_border_width(GTK_CONTAINER(vbox), 15);
-	gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dialog)->vbox), vbox, TRUE, TRUE, 0);
+//	gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dialog)->vbox), vbox, TRUE, TRUE, 0);
 
 	label = gtk_label_new(text);
 	gtk_box_pack_start(GTK_BOX(vbox), label, TRUE, TRUE, 0);
@@ -52,15 +52,15 @@ GtkWidget *xmms_show_message(gchar * title, gchar * text, gchar * button_text, g
 
 	bbox = gtk_hbutton_box_new();
 	gtk_button_box_set_layout(GTK_BUTTON_BOX(bbox), GTK_BUTTONBOX_SPREAD);
-	gtk_button_box_set_spacing(GTK_BUTTON_BOX(bbox), 5);
-	gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dialog)->action_area), bbox, FALSE, FALSE, 0);
+	//gtk_button_box_set_spacing(GTK_BUTTON_BOX(bbox), 5);
+	//gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dialog)->action_area), bbox, FALSE, FALSE, 0);
 
 	button = gtk_button_new_with_label(button_text);
 	if (button_action)
 		g_signal_connect(button, "clicked", button_action, action_data);
-	g_signal_connect_object(button, "clicked", GTK_SIGNAL_FUNC(gtk_widget_destroy), dialog);
+	//g_signal_connect_object(button, "clicked", GTK_SIGNAL_FUNC(gtk_widget_destroy), dialog);
 	gtk_box_pack_start(GTK_BOX(bbox), button, FALSE, FALSE, 0);
-	GTK_WIDGET_SET_FLAGS(button, GTK_CAN_DEFAULT);
+	//GTK_WIDGET_SET_FLAGS(button, GTK_CAN_DEFAULT);
 	gtk_widget_grab_default(button);
 	gtk_widget_show(button);
 

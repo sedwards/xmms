@@ -144,7 +144,7 @@ am__v_lt_ = $(am__v_lt_$(AM_DEFAULT_VERBOSITY))
 am__v_lt_0 = --silent
 am__v_lt_1 = 
 xmms_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(OBJECTS) -L/opt/homebrew/Cellar/gtk+3/3.24.43/lib -L/opt/homebrew/Cellar/pango/1.54.0/lib -L/opt/homebrew/Cellar/harfbuzz/10.0.1/lib -L/opt/homebrew/Cellar/at-spi2-core/2.54.0/lib -L/opt/homebrew/Cellar/cairo/1.18.2/lib -L/opt/homebrew/Cellar/gdk-pixbuf/2.42.12/lib -L/opt/homebrew/Cellar/glib/2.82.1/lib -L/opt/homebrew/opt/gettext/lib -lgtk-3 -lgdk-3 -Wl,-framework,Cocoa -Wl,-framework,Carbon -Wl,-framework,CoreGraphics -lpangocairo-1.0 -lpango-1.0 -lharfbuzz -latk-1.0 -lcairo-gobject -lcairo -lgdk_pixbuf-2.0 -lgio-2.0 -lgobject-2.0 -lglib-2.0 -lintl  -L../libxmms -lxmms  -lgtk-3 -lgdk-3 \
 	$(xmms_LDFLAGS) $(LDFLAGS) -o $@
 AM_V_P = $(am__v_P_$(V))
 am__v_P_ = $(am__v_P_$(AM_DEFAULT_VERBOSITY))
@@ -307,7 +307,7 @@ AUTOMAKE = ${SHELL} '/Users/sedwards/source/xmms/autoconf/missing' automake-1.17
 AWK = gawk
 CC = gcc
 CCDEPMODE = depmode=gcc3
-CFLAGS = -g -O2  -Wall -Wpointer-arith -finline-functions -ffast-math -Wno-incompatible-pointer-types-discards-qualifiers -Wno-invalid-source-encoding -Wno-pointer-sign -Wno-int-to-void-pointer-cast -Wno-deprecated-non-prototype -Wno-int-conversion -Wno-implicit-function-declaration -Wno-deprecated-declarations -Wno-unused-value -Wno-incompatible-pointer-types
+CFLAGS = -g -O2  -Wall -Wpointer-arith -finline-functions -ffast-math -Wno-incompatible-pointer-types-discards-qualifiers -Wno-invalid-source-encoding -Wno-pointer-sign -Wno-int-to-void-pointer-cast -Wno-deprecated-non-prototype -Wno-int-conversion -Wno-implicit-function-declaration -Wno-deprecated-declarations -Wno-unused-value -Wno-incompatible-pointer-types -Wno-non-literal-null-conversion
 CPP = gcc -E
 CPPFLAGS = -I/opt/homebrew/opt/ruby/include
 CSCOPE = cscope
@@ -355,7 +355,7 @@ LDFLAGS = -L/opt/homebrew/opt/ruby/lib
 LIBICONV = -liconv
 LIBINTL = 
 LIBOBJS = 
-LIBS =   -L/lib -lxml  
+LIBS =  
 LIBTOOL = $(SHELL) $(top_builddir)/libtool
 LIBXMMS_MAJOR_VERSION = 3
 LIBXMMS_MICRO_VERSION = 2
@@ -415,7 +415,7 @@ XGETTEXT = /opt/local/bin/xgettext
 XGETTEXT_015 = /opt/local/bin/xgettext
 XGETTEXT_EXTRA_OPTIONS = 
 XMKMF = 
-XMMS_DEFINES = -g -O2  -Wall -Wpointer-arith -finline-functions -ffast-math -Wno-incompatible-pointer-types-discards-qualifiers -Wno-invalid-source-encoding -Wno-pointer-sign -Wno-int-to-void-pointer-cast -Wno-deprecated-non-prototype -Wno-int-conversion -Wno-implicit-function-declaration -Wno-deprecated-declarations -Wno-unused-value -Wno-incompatible-pointer-types -DDATA_DIR=\"${datarootdir}/xmms\" -DPLUGIN_DIR=\"${exec_prefix}/lib/xmms\" -DPLUGINSUBS=\"Output\",\"Input\",\"Effect\",\"General\",\"Visualization\" -DLOCALEDIR=\"${datarootdir}/locale\"
+XMMS_DEFINES = -g -O2  -Wall -Wpointer-arith -finline-functions -ffast-math -Wno-incompatible-pointer-types-discards-qualifiers -Wno-invalid-source-encoding -Wno-pointer-sign -Wno-int-to-void-pointer-cast -Wno-deprecated-non-prototype -Wno-int-conversion -Wno-implicit-function-declaration -Wno-deprecated-declarations -Wno-unused-value -Wno-incompatible-pointer-types -Wno-non-literal-null-conversion -DDATA_DIR=\"${datarootdir}/xmms\" -DPLUGIN_DIR=\"${exec_prefix}/lib/xmms\" -DPLUGINSUBS=\"Output\",\"Input\",\"Effect\",\"General\",\"Visualization\" -DLOCALEDIR=\"${datarootdir}/locale\"
 XMMS_GTK = 
 XMMS_PATH = no
 Z_LIBS = -lz
@@ -482,7 +482,7 @@ top_srcdir = ..
 SUBDIRS = defskin
 xmmsincludedir = $(includedir)/xmms
 xmms_LDFLAGS = -export-dynamic 
-INCLUDES = -I/opt/homebrew/Cellar/gtk+3/3.24.43/include/gtk-3.0 -I/opt/homebrew/Cellar/glib/2.82.1/include/gio-unix-2.0 -I/opt/homebrew/Cellar/cairo/1.18.2/include -I/opt/homebrew/Cellar/libepoxy/1.5.10/include -I/opt/homebrew/Cellar/pango/1.54.0/include/pango-1.0 -I/opt/homebrew/Cellar/harfbuzz/10.0.1_1/include/harfbuzz -I/opt/homebrew/Cellar/pango/1.54.0/include/pango-1.0 -I/opt/homebrew/Cellar/fribidi/1.0.16/include/fribidi -I/opt/homebrew/Cellar/harfbuzz/10.0.1_1/include/harfbuzz -I/opt/homebrew/Cellar/graphite2/1.3.14/include -I/opt/homebrew/Cellar/at-spi2-core/2.54.0/include/atk-1.0 -I/opt/homebrew/Cellar/cairo/1.18.2/include/cairo -I/opt/homebrew/Cellar/fontconfig/2.15.0/include -I/opt/homebrew/opt/freetype/include/freetype2 -I/opt/homebrew/Cellar/libxext/1.3.6/include -I/opt/homebrew/Cellar/libxrender/0.9.11/include -I/opt/homebrew/Cellar/libx11/1.8.10/include -I/opt/homebrew/Cellar/libxcb/1.17.0/include -I/opt/homebrew/Cellar/libxau/1.0.11/include -I/opt/homebrew/Cellar/libxdmcp/1.1.5/include -I/opt/homebrew/Cellar/pixman/0.42.2/include/pixman-1 -I/opt/homebrew/Cellar/gdk-pixbuf/2.42.12/include/gdk-pixbuf-2.0 -I/opt/homebrew/opt/libpng/include/libpng16 -I/opt/homebrew/Cellar/libtiff/4.7.0/include -I/opt/homebrew/opt/zstd/include -I/opt/homebrew/Cellar/xz/5.6.3/include -I/opt/homebrew/Cellar/jpeg-turbo/3.0.4/include -I/opt/homebrew/Cellar/glib/2.82.1/include -I/opt/homebrew/Cellar/glib/2.82.1/include/glib-2.0 -I/opt/homebrew/Cellar/glib/2.82.1/lib/glib-2.0/include -I/opt/homebrew/opt/gettext/include -I/opt/homebrew/Cellar/pcre2/10.44/include -I/opt/homebrew/Cellar/xorgproto/2024.1/include -I/Library/Developer/CommandLineTools/SDKs/MacOSX14.sdk/usr/include/ffi -g -O2  -Wall -Wpointer-arith -finline-functions -ffast-math -Wno-incompatible-pointer-types-discards-qualifiers -Wno-invalid-source-encoding -Wno-pointer-sign -Wno-int-to-void-pointer-cast -Wno-deprecated-non-prototype -Wno-int-conversion -Wno-implicit-function-declaration -Wno-deprecated-declarations -Wno-unused-value -Wno-incompatible-pointer-types -DDATA_DIR=\"${datarootdir}/xmms\" -DPLUGIN_DIR=\"${exec_prefix}/lib/xmms\" -DPLUGINSUBS=\"Output\",\"Input\",\"Effect\",\"General\",\"Visualization\" -DLOCALEDIR=\"${datarootdir}/locale\" -DARCH_SPECIFIC_DEFINE -I$(top_builddir)/intl
+INCLUDES = -I/opt/homebrew/Cellar/gtk+3/3.24.43/include/gtk-3.0 -I/opt/homebrew/Cellar/glib/2.82.1/include/gio-unix-2.0 -I/opt/homebrew/Cellar/cairo/1.18.2/include -I/opt/homebrew/Cellar/libepoxy/1.5.10/include -I/opt/homebrew/Cellar/pango/1.54.0/include/pango-1.0 -I/opt/homebrew/Cellar/harfbuzz/10.0.1_1/include/harfbuzz -I/opt/homebrew/Cellar/pango/1.54.0/include/pango-1.0 -I/opt/homebrew/Cellar/fribidi/1.0.16/include/fribidi -I/opt/homebrew/Cellar/harfbuzz/10.0.1_1/include/harfbuzz -I/opt/homebrew/Cellar/graphite2/1.3.14/include -I/opt/homebrew/Cellar/at-spi2-core/2.54.0/include/atk-1.0 -I/opt/homebrew/Cellar/cairo/1.18.2/include/cairo -I/opt/homebrew/Cellar/fontconfig/2.15.0/include -I/opt/homebrew/opt/freetype/include/freetype2 -I/opt/homebrew/Cellar/libxext/1.3.6/include -I/opt/homebrew/Cellar/libxrender/0.9.11/include -I/opt/homebrew/Cellar/libx11/1.8.10/include -I/opt/homebrew/Cellar/libxcb/1.17.0/include -I/opt/homebrew/Cellar/libxau/1.0.11/include -I/opt/homebrew/Cellar/libxdmcp/1.1.5/include -I/opt/homebrew/Cellar/pixman/0.42.2/include/pixman-1 -I/opt/homebrew/Cellar/gdk-pixbuf/2.42.12/include/gdk-pixbuf-2.0 -I/opt/homebrew/opt/libpng/include/libpng16 -I/opt/homebrew/Cellar/libtiff/4.7.0/include -I/opt/homebrew/opt/zstd/include -I/opt/homebrew/Cellar/xz/5.6.3/include -I/opt/homebrew/Cellar/jpeg-turbo/3.0.4/include -I/opt/homebrew/Cellar/glib/2.82.1/include -I/opt/homebrew/Cellar/glib/2.82.1/include/glib-2.0 -I/opt/homebrew/Cellar/glib/2.82.1/lib/glib-2.0/include -I/opt/homebrew/opt/gettext/include -I/opt/homebrew/Cellar/pcre2/10.44/include -I/opt/homebrew/Cellar/xorgproto/2024.1/include -I/Library/Developer/CommandLineTools/SDKs/MacOSX14.sdk/usr/include/ffi -g -O2  -Wall -Wpointer-arith -finline-functions -ffast-math -Wno-incompatible-pointer-types-discards-qualifiers -Wno-invalid-source-encoding -Wno-pointer-sign -Wno-int-to-void-pointer-cast -Wno-deprecated-non-prototype -Wno-int-conversion -Wno-implicit-function-declaration -Wno-deprecated-declarations -Wno-unused-value -Wno-incompatible-pointer-types -Wno-non-literal-null-conversion -DDATA_DIR=\"${datarootdir}/xmms\" -DPLUGIN_DIR=\"${exec_prefix}/lib/xmms\" -DPLUGINSUBS=\"Output\",\"Input\",\"Effect\",\"General\",\"Visualization\" -DLOCALEDIR=\"${datarootdir}/locale\" -DARCH_SPECIFIC_DEFINE -I$(top_builddir)/intl
 xmms_SOURCES = bmp.c bmp.h \
 skin.c skin.h \
 util.c util.h \

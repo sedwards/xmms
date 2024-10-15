@@ -2246,10 +2246,10 @@ void mainwin_real_show(void)
 		return;
 	gdk_pixmap_unref(nullmask);
 	nullmask = NULL;
-	gdk_window_set_hints(gtk_widget_get_window(mainwin), 0, 0,
-			     PLAYER_WIDTH, PLAYER_HEIGHT,
-			     PLAYER_WIDTH, PLAYER_HEIGHT,
-			     GDK_HINT_MIN_SIZE | GDK_HINT_MAX_SIZE);
+//	gdk_window_set_geometry_hints(gtk_widget_get_window(mainwin), 0, 0,
+//			     PLAYER_WIDTH, PLAYER_HEIGHT,
+//			     PLAYER_WIDTH, PLAYER_HEIGHT,
+//			     GDK_HINT_MIN_SIZE | GDK_HINT_MAX_SIZE);
 	gdk_window_resize(gtk_widget_get_window(mainwin), PLAYER_WIDTH, PLAYER_HEIGHT);
 	draw_main_window(TRUE);
 	gdk_window_raise(gtk_widget_get_window(mainwin));
@@ -2281,7 +2281,7 @@ void mainwin_real_hide(void)
 		cairo_destroy(gc);
 		gtk_widget_shape_combine_mask(mainwin, nullmask, 0, 0);
 
-		gdk_window_set_hints(gtk_widget_get_window(mainwin), 0, 0, 0, 0, 0, 0, GDK_HINT_MIN_SIZE | GDK_HINT_MAX_SIZE);
+		//gdk_window_set_geometry_hints(gtk_widget_get_window(mainwin), 0, 0, 0, 0, 0, 0, GDK_HINT_MIN_SIZE | GDK_HINT_MAX_SIZE);
 		gdk_window_resize(gtk_widget_get_window(mainwin), 0, 0);
 
 	}

@@ -597,7 +597,7 @@ old_postuninstall_cmds=''
 old_archive_cmds='$AR $AR_FLAGS $oldlib$oldobjs~$RANLIB $tool_oldlib'
 lock_old_archive_extraction='yes'
 CC='gcc'
-CFLAGS='-g -O2  -Wall -Wpointer-arith -finline-functions -ffast-math -Wno-incompatible-pointer-types-discards-qualifiers -Wno-invalid-source-encoding -Wno-pointer-sign -Wno-int-to-void-pointer-cast -Wno-deprecated-non-prototype -Wno-int-conversion -Wno-implicit-function-declaration -Wno-deprecated-declarations -Wno-unused-value -Wno-incompatible-pointer-types'
+CFLAGS='-g -O2  -Wall -Wpointer-arith -finline-functions -ffast-math -Wno-incompatible-pointer-types-discards-qualifiers -Wno-invalid-source-encoding -Wno-pointer-sign -Wno-int-to-void-pointer-cast -Wno-deprecated-non-prototype -Wno-int-conversion -Wno-implicit-function-declaration -Wno-deprecated-declarations -Wno-unused-value -Wno-incompatible-pointer-types -Wno-non-literal-null-conversion'
 compiler='gcc'
 GCC='yes'
 lt_cv_sys_global_symbol_pipe='/opt/homebrew/bin/gsed -n -e '\''s/^.*[	 ]\([ABCDGIRSTW][ABCDGIRSTW]*\)[	 ][	 ]*_\([_A-Za-z][_A-Za-z0-9]*\)$/\1 _\2 \2/p'\'' | /opt/homebrew/bin/gsed '\''/ __gnu_lto/d'\'''
@@ -825,8 +825,8 @@ S["LTLIBOBJS"]=""
 S["LIBOBJS"]=""
 S["XMMS_DEFINES"]="-g -O2  -Wall -Wpointer-arith -finline-functions -ffast-math -Wno-incompatible-pointer-types-discards-qualifiers -Wno-invalid-source-encoding -Wno-p"\
 "ointer-sign -Wno-int-to-void-pointer-cast -Wno-deprecated-non-prototype -Wno-int-conversion -Wno-implicit-function-declaration -Wno-deprecated-decla"\
-"rations -Wno-unused-value -Wno-incompatible-pointer-types -DDATA_DIR=\\\"${datarootdir}/xmms\\\" -DPLUGIN_DIR=\\\"${exec_prefix}/lib/xmms\\\" -DPLUGINSUBS=\\"\
-"\"Output\\\",\\\"Input\\\",\\\"Effect\\\",\\\"General\\\",\\\"Visualization\\\" -DLOCALEDIR=\\\"${datarootdir}/locale\\\""
+"rations -Wno-unused-value -Wno-incompatible-pointer-types -Wno-non-literal-null-conversion -DDATA_DIR=\\\"${datarootdir}/xmms\\\" -DPLUGIN_DIR=\\\"${exec_"\
+"prefix}/lib/xmms\\\" -DPLUGINSUBS=\\\"Output\\\",\\\"Input\\\",\\\"Effect\\\",\\\"General\\\",\\\"Visualization\\\" -DLOCALEDIR=\\\"${datarootdir}/locale\\\""
 S["pluginsubs"]="\\\"Output\\\",\\\"Input\\\",\\\"Effect\\\",\\\"General\\\",\\\"Visualization\\\""
 S["VISUALIZATION_PLUGIN_DIR"]="Visualization"
 S["GENERAL_PLUGIN_DIR"]="General"
@@ -1005,7 +1005,7 @@ S["CPPFLAGS"]="-I/opt/homebrew/opt/ruby/include"
 S["LDFLAGS"]="-L/opt/homebrew/opt/ruby/lib"
 S["CFLAGS"]="-g -O2  -Wall -Wpointer-arith -finline-functions -ffast-math -Wno-incompatible-pointer-types-discards-qualifiers -Wno-invalid-source-encoding -Wno-p"\
 "ointer-sign -Wno-int-to-void-pointer-cast -Wno-deprecated-non-prototype -Wno-int-conversion -Wno-implicit-function-declaration -Wno-deprecated-decla"\
-"rations -Wno-unused-value -Wno-incompatible-pointer-types"
+"rations -Wno-unused-value -Wno-incompatible-pointer-types -Wno-non-literal-null-conversion"
 S["CC"]="gcc"
 S["ac_ct_AR"]="ar"
 S["AR"]="ar"

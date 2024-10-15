@@ -501,10 +501,10 @@ void playlistwin_motion(GtkWidget * widget, GdkEventMotion * event, gpointer cal
 	{
 		playlistwin_resize(event->x + playlistwin_resize_x,
 				   event->y + playlistwin_resize_y);
-		gdk_window_set_hints(gtk_widget_get_window(playlistwin), 0, 0,
-				     cfg.playlist_width, PLAYLIST_HEIGHT,
-				     cfg.playlist_width, PLAYLIST_HEIGHT,
-				     GDK_HINT_MIN_SIZE | GDK_HINT_MAX_SIZE);
+//		gdk_window_set_geometry_hints(gtk_widget_get_window(playlistwin), 0, 0,
+//				     cfg.playlist_width, PLAYLIST_HEIGHT,
+//				     cfg.playlist_width, PLAYLIST_HEIGHT,
+//				     GDK_HINT_MIN_SIZE | GDK_HINT_MAX_SIZE);
 		gdk_window_resize(gtk_widget_get_window(playlistwin),
 				  cfg.playlist_width, PLAYLIST_HEIGHT);
 		gtk_widget_set_size_request(playlistwin,

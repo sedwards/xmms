@@ -263,12 +263,12 @@ static GList *find_shade_list(GtkWidget *widget, GList *winlist, GList *shade_li
 
 static void dock_window_resize(GtkWidget *widget, int new_w, int new_h, int w, int h)
 {
-	gdk_window_set_hints(gtk_widget_get_window(widget), 0, 0, MIN(w, new_w), MIN(h, new_h),
-			     MAX(w, new_w), MAX (h, new_h),
-			     GDK_HINT_MIN_SIZE | GDK_HINT_MAX_SIZE);
-	gdk_window_resize(gtk_widget_get_window(widget), new_w, new_h);
-	gdk_window_set_hints(gtk_widget_get_window(widget), 0, 0, new_w, new_h, new_w, new_h,
-			     GDK_HINT_MIN_SIZE | GDK_HINT_MAX_SIZE);
+//	gdk_window_set_geometry_hints(gtk_widget_get_window(widget), 0, 0, MIN(w, new_w), MIN(h, new_h),
+//			     MAX(w, new_w), MAX (h, new_h),
+//			     GDK_HINT_MIN_SIZE | GDK_HINT_MAX_SIZE);
+//	gdk_window_resize(gtk_widget_get_window(widget), new_w, new_h);
+//	gdk_window_set_geometry_hints(gtk_widget_get_window(widget), 0, 0, new_w, new_h, new_w, new_h,
+//			     GDK_HINT_MIN_SIZE | GDK_HINT_MAX_SIZE);
 }
 
 void dock_shade(GList *window_list, GtkWidget *widget, gint new_h)

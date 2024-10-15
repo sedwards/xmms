@@ -20,6 +20,8 @@
 #include "config.h"
 #endif
 
+#if gtk3_gtk4
+
 #include "../xmms/i18n.h"
 
 #include <sys/types.h>
@@ -343,3 +345,6 @@ GtkWidget *xmms_create_dir_browser(gchar * title, gchar * current_path, GtkSelec
 
 	return window;
 }
+
+#endif
+

@@ -366,3 +366,4 @@ static ConfigLine *xmms_cfg_find_string(ConfigSection * section, gchar * key)
 	}
 	return NULL;
 }
+
