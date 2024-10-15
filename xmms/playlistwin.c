@@ -507,7 +507,7 @@ void playlistwin_motion(GtkWidget * widget, GdkEventMotion * event, gpointer cal
 				     GDK_HINT_MIN_SIZE | GDK_HINT_MAX_SIZE);
 		gdk_window_resize(gtk_widget_get_window(playlistwin),
 				  cfg.playlist_width, PLAYLIST_HEIGHT);
-		gtk_widget_set_usize(playlistwin,
+		gtk_widget_set_size_request(playlistwin,
 				     cfg.playlist_width, PLAYLIST_HEIGHT);
 	}
 	else if (dock_is_moving(playlistwin))
@@ -1239,8 +1239,8 @@ void playlistwin_physically_delete(void)
 	ok = gtk_button_new_with_label(_("Ok"));
 	cancel = gtk_button_new_with_label(_("Cancel"));
 	g_signal_connect(G_OBJECT(ok), "clicked", playlistwin_physically_delete_cb, selected_list);
-	g_signal_connect_object(G_OBJECT(ok), "clicked", GTK_SIGNAL_FUNC(gtk_widget_destroy), G_OBJECT(dialog));
-	g_signal_connect_object(G_OBJECT(cancel), "clicked", GTK_SIGNAL_FUNC(gtk_widget_destroy), G_OBJECT(dialog));
+	g_signal_connect_object(ok, "clicked", GTK_SIGNAL_FUNC(gtk_widget_destroy), dialog, 0);
+	g_signal_connect_object(cancel, "clicked", GTK_SIGNAL_FUNC(gtk_widget_destroy), dialog, 0);
 	gtk_box_pack_start(GTK_BOX(bbox), ok, FALSE, FALSE, 0);
 	gtk_widget_set_can_default(ok,TRUE);
 	gtk_box_pack_start(GTK_BOX(bbox), cancel, FALSE, FALSE, 0);
@@ -1677,7 +1677,7 @@ static void playlistwin_create_gtk(void)
 	gtk_window_set_transient_for(GTK_WINDOW(playlistwin), GTK_WINDOW(mainwin));
 	if (cfg.playlist_x != -1 && cfg.save_window_position)
 		dock_set_uposition(playlistwin, cfg.playlist_x, cfg.playlist_y);
-	gtk_widget_set_usize(playlistwin, cfg.playlist_width, cfg.playlist_shaded ? 14 : cfg.playlist_height);
+	gtk_widget_set_size_request(playlistwin, cfg.playlist_width, cfg.playlist_shaded ? 14 : cfg.playlist_height);
 	gtk_widget_set_events(playlistwin, GDK_FOCUS_CHANGE_MASK | GDK_BUTTON_MOTION_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK);
 	gtk_widget_realize(playlistwin);
 	hint_set_skip_winlist(playlistwin);
@@ -1774,7 +1774,7 @@ void playlistwin_real_show(void)
 	gtk_widget_show(playlistwin);
 	if (pposition_broken && cfg.playlist_x != -1 && cfg.save_window_position)
 		dock_set_uposition(playlistwin, cfg.playlist_x, cfg.playlist_y);
-	gtk_widget_set_usize(playlistwin, cfg.playlist_width, PLAYLIST_HEIGHT);
+	gtk_widget_set_size_request(playlistwin, cfg.playlist_width, PLAYLIST_HEIGHT);
 	gdk_display_flush(gdk_display_get_default());
 	draw_playlist_window(TRUE);
 	tbutton_set_toggled(mainwin_pl, TRUE);

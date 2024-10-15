@@ -653,9 +653,9 @@ static void equalizerwin_create_gtk(void)
 	if (cfg.equalizer_x != -1 && cfg.save_window_position)
 		dock_set_uposition(equalizerwin, cfg.equalizer_x, cfg.equalizer_y);
 	if (cfg.doublesize && cfg.eq_doublesize_linked)
-		gtk_widget_set_usize(equalizerwin, 550, (cfg.equalizer_shaded ? 28 : 232));
+		gtk_widget_set_size_request(equalizerwin, 550, (cfg.equalizer_shaded ? 28 : 232));
 	else
-		gtk_widget_set_usize(equalizerwin, 275, (cfg.equalizer_shaded ? 14 : 116));
+		gtk_widget_set_size_request(equalizerwin, 275, (cfg.equalizer_shaded ? 14 : 116));
 
 	gtk_widget_set_events(equalizerwin, GDK_FOCUS_CHANGE_MASK | GDK_BUTTON_MOTION_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK);
 	gtk_widget_realize(equalizerwin);
@@ -736,9 +736,9 @@ void equalizerwin_real_show(void)
 	if (pposition_broken && cfg.equalizer_x != -1 && cfg.save_window_position)
 		dock_set_uposition(equalizerwin, cfg.equalizer_x, cfg.equalizer_y);
 	if (cfg.doublesize && cfg.eq_doublesize_linked)
-		gtk_widget_set_usize(equalizerwin, 550, (cfg.equalizer_shaded ? 28 : 232));
+		gtk_widget_set_size_request(equalizerwin, 550, (cfg.equalizer_shaded ? 28 : 232));
 	else
-		gtk_widget_set_usize(equalizerwin, 275, (cfg.equalizer_shaded ? 14 : 116));
+		gtk_widget_set_size_request(equalizerwin, 275, (cfg.equalizer_shaded ? 14 : 116));
 	gdk_flush();
 	draw_equalizer_window(TRUE);
 	cfg.equalizer_visible = TRUE;
@@ -1192,7 +1192,7 @@ static GtkWidget *equalizerwin_create_list_window(GList * preset_list,
 	gtk_window_set_position(GTK_WINDOW(*window), GTK_WIN_POS_MOUSE);
 	gtk_window_set_title(GTK_WINDOW(*window), title);
 	
-	gtk_widget_set_usize(*window, 350, 300);
+	gtk_widget_set_size_request(*window, 350, 300);
 	gtk_container_set_border_width(GTK_CONTAINER(*window), 10);
 
 	vbox = gtk_vbox_new(FALSE, 10);
@@ -1562,7 +1562,7 @@ GtkWidget * equalizerwin_create_conf_window(void)
 	options_eqdf = gtk_label_new(_("Directory preset file:"));
 	gtk_box_pack_start(GTK_BOX(options_eqdf_box), options_eqdf, FALSE, FALSE, 0);
 	eqconfwin_options_eqdf_entry = gtk_entry_new_with_max_length(40);
-	gtk_widget_set_usize(eqconfwin_options_eqdf_entry, 115, -1);
+	gtk_widget_set_size_request(eqconfwin_options_eqdf_entry, 115, -1);
 	gtk_box_pack_start(GTK_BOX(options_eqdf_box), eqconfwin_options_eqdf_entry, FALSE, FALSE, 0);
 	gtk_table_attach_defaults(GTK_TABLE(options_table), options_eqdf_box, 0, 1, 0, 1);
 	
@@ -1570,7 +1570,7 @@ GtkWidget * equalizerwin_create_conf_window(void)
 	options_eqe = gtk_label_new(_("File preset extension:"));
 	gtk_box_pack_start(GTK_BOX(options_eqe_box), options_eqe, FALSE, FALSE, 0);
 	eqconfwin_options_eqef_entry = gtk_entry_new_with_max_length(20);
-	gtk_widget_set_usize(eqconfwin_options_eqef_entry, 55, -1);
+	gtk_widget_set_size_request(eqconfwin_options_eqef_entry, 55, -1);
 	gtk_box_pack_start(GTK_BOX(options_eqe_box), eqconfwin_options_eqef_entry, FALSE, FALSE, 0);
 	gtk_table_attach_defaults(GTK_TABLE(options_table), options_eqe_box, 1, 2, 0, 1);
 	instructions =

@@ -642,7 +642,7 @@ void create_prefs_window(void)
 
 	titles[0] = _("Input plugins");
 	prefswin_audio_ilist = gtk_clist_new_with_titles(1, titles);
-	gtk_widget_set_usize(prefswin_audio_ilist, -1, 80);
+	gtk_widget_set_size_request(prefswin_audio_ilist, -1, 80);
 	gtk_clist_column_titles_passive(GTK_CLIST(prefswin_audio_ilist));
 	gtk_clist_set_selection_mode(GTK_CLIST(prefswin_audio_ilist), GTK_SELECTION_SINGLE);
 	g_signal_connect(G_OBJECT(prefswin_audio_ilist), "select_row", GTK_SIGNAL_FUNC(prefswin_ilist_clicked), NULL);
@@ -878,7 +878,7 @@ void create_prefs_window(void)
 	options_pbs_label = gtk_label_new(_("Pause between songs for"));
 	gtk_box_pack_start(GTK_BOX(options_pbs_box), options_pbs_label, FALSE, FALSE, 0);
 	prefswin_options_pbs_entry = gtk_entry_new_with_max_length(3);
-	gtk_widget_set_usize(prefswin_options_pbs_entry, 30, -1);
+	gtk_widget_set_size_request(prefswin_options_pbs_entry, 30, -1);
 	gtk_box_pack_start(GTK_BOX(options_pbs_box), prefswin_options_pbs_entry, FALSE, FALSE, 0);
 	/* I18N: s = seconds */
 	options_pbs_label2 = gtk_label_new(_("s"));
@@ -890,7 +890,7 @@ void create_prefs_window(void)
 	options_sw_label = gtk_label_new(_("Snap windows at"));
 	gtk_box_pack_start(GTK_BOX(options_sw_box), options_sw_label, FALSE, FALSE, 0);
 	prefswin_options_sd_entry = gtk_entry_new_with_max_length(3);
-	gtk_widget_set_usize(prefswin_options_sd_entry, 30, -1);
+	gtk_widget_set_size_request(prefswin_options_sd_entry, 30, -1);
 	gtk_box_pack_start(GTK_BOX(options_sw_box), prefswin_options_sd_entry, FALSE, FALSE, 0);
 	options_sd_label = gtk_label_new(_("pixels"));
 	gtk_box_pack_start(GTK_BOX(options_sw_box), options_sd_label, FALSE, FALSE, 0);
@@ -908,7 +908,7 @@ void create_prefs_window(void)
 	gtk_box_pack_start(GTK_BOX(options_mouse_box), options_mouse_label, FALSE, FALSE, 0);
 	options_mouse_adj = gtk_adjustment_new(cfg.mouse_change, 1, 100, 1, 1, 1);
 	prefswin_options_mouse_spin = gtk_spin_button_new(GTK_ADJUSTMENT(options_mouse_adj), 1, 0);
-        gtk_widget_set_usize(prefswin_options_mouse_spin, 45, -1);
+        gtk_widget_set_size_request(prefswin_options_mouse_spin, 45, -1);
 	gtk_box_pack_start(GTK_BOX(options_mouse_box), prefswin_options_mouse_spin, FALSE, FALSE, 0);
 	gtk_table_attach_defaults(GTK_TABLE(options_table), options_mouse_box, 0, 1, 9, 10);
 	
@@ -941,7 +941,7 @@ void create_prefs_window(void)
 	gtk_box_pack_start(GTK_BOX(options_font_hbox), prefswin_options_font_entry, TRUE, TRUE, 0);
 	prefswin_options_font_browse = gtk_button_new_with_label(_("Browse"));
 	g_signal_connect(G_OBJECT(prefswin_options_font_browse), "clicked", GTK_SIGNAL_FUNC(prefswin_font_browse_cb), NULL);
-	gtk_widget_set_usize(prefswin_options_font_browse, 85, 17);
+	gtk_widget_set_size_request(prefswin_options_font_browse, 85, 17);
 	gtk_box_pack_start(GTK_BOX(options_font_hbox), prefswin_options_font_browse, FALSE, TRUE, 0);
 
 
@@ -961,7 +961,7 @@ void create_prefs_window(void)
 	gtk_box_pack_start(GTK_BOX(prefswin_mainwin_font_hbox), prefswin_mainwin_font_entry, TRUE, TRUE, 0);
 	prefswin_mainwin_font_browse = gtk_button_new_with_label(_("Browse"));
 	g_signal_connect(G_OBJECT(prefswin_mainwin_font_browse), "clicked", GTK_SIGNAL_FUNC(prefswin_mainwin_font_browse_cb), NULL);
-	gtk_widget_set_usize(prefswin_mainwin_font_browse, 85, 17);
+	gtk_widget_set_size_request(prefswin_mainwin_font_browse, 85, 17);
 	gtk_box_pack_start(GTK_BOX(prefswin_mainwin_font_hbox), prefswin_mainwin_font_browse, FALSE, TRUE, 0);
 
 	gtk_notebook_append_page(GTK_NOTEBOOK(prefswin_notebook), prefswin_fonts_vbox, gtk_label_new(_("Fonts")));

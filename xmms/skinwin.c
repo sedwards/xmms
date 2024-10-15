@@ -60,7 +60,7 @@ void create_skin_window(void)
 	gtk_clist_column_titles_passive(GTK_CLIST(skinwin_list));
 	gtk_clist_set_selection_mode(GTK_CLIST(skinwin_list), GTK_SELECTION_SINGLE);
 	g_signal_connect(G_OBJECT(skinwin_list), "select_row", GTK_SIGNAL_FUNC(change_skin_event), NULL);
-	gtk_widget_set_usize(skinwin_list, 250, 200);
+	gtk_widget_set_size_request(skinwin_list, 250, 200);
 	scrolled_win = gtk_scrolled_window_new(NULL, NULL);
 	gtk_container_add(GTK_CONTAINER(scrolled_win), skinwin_list);
 	gtk_container_border_width(GTK_CONTAINER(scrolled_win), 5);

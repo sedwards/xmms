@@ -1437,7 +1437,7 @@ void mainwin_jump_to_time()
 	gtk_widget_show(vbox);
 	frame = gtk_frame_new(_("Jump to:"));
 	gtk_box_pack_start(GTK_BOX(vbox), frame, TRUE, TRUE, 0);
-	gtk_widget_set_usize(frame, 250, -1);
+	gtk_widget_set_size_request(frame, 250, -1);
 	gtk_widget_show(frame);
 	vbox_inside = gtk_vbox_new(FALSE, 0);
 	gtk_container_add(GTK_CONTAINER(frame), vbox_inside);
@@ -1450,7 +1450,7 @@ void mainwin_jump_to_time()
 	gtk_box_pack_start(GTK_BOX(hbox_new), time_entry, FALSE, FALSE, 5);
 	g_signal_connect(G_OBJECT(time_entry), "activate", GTK_SIGNAL_FUNC(mainwin_jump_to_time_cb), time_entry);
 	gtk_widget_show(time_entry);
-	gtk_widget_set_usize(time_entry, 70, -1);
+	gtk_widget_set_size_request(time_entry, 70, -1);
 	label = gtk_label_new(_("minutes:seconds"));
 	gtk_box_pack_start(GTK_BOX(hbox_new), label, FALSE, FALSE, 5);
 	gtk_widget_show(label);
@@ -1480,7 +1480,7 @@ void mainwin_jump_to_time()
 	cancel = gtk_button_new_with_label(_("Cancel"));
 	gtk_widget_set_can_default(cancel, TRUE);
 	gtk_container_add(GTK_CONTAINER(bbox), cancel);
-	g_signal_connect_object(G_OBJECT(cancel), "clicked", GTK_SIGNAL_FUNC(gtk_widget_destroy), G_OBJECT(mainwin_jtt));
+	g_signal_connect_object(cancel, "clicked", GTK_SIGNAL_FUNC(gtk_widget_destroy), G_OBJECT(mainwin_jtt), 0);
 	gtk_widget_show(cancel);
 
 	tindex = input_get_time() / 1000;
@@ -1788,7 +1788,7 @@ static void mainwin_jump_to_file(void)
 	gtk_container_add(GTK_CONTAINER(scrollwin), cllist);
 	gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrollwin), GTK_POLICY_AUTOMATIC, GTK_POLICY_ALWAYS);
 	gtk_box_pack_start(GTK_BOX(vbox), scrollwin, TRUE, TRUE, 0);
-	gtk_widget_set_usize(scrollwin, 330, 200);
+	gtk_widget_set_size_request(scrollwin, 330, 200);
 	gtk_widget_show(cllist);
 	gtk_widget_show(scrollwin);
 
@@ -2886,9 +2886,9 @@ static void mainwin_create_gtk(void)
 	util_set_cursor(mainwin);
 	
 	if (cfg.doublesize)
-		gtk_widget_set_usize(mainwin, 550, cfg.player_shaded ? 28 : 232);
+		gtk_widget_set_size_request(mainwin, 550, cfg.player_shaded ? 28 : 232);
 	else
-		gtk_widget_set_usize(mainwin, 275, cfg.player_shaded ? 14 : 116);
+		gtk_widget_set_size_request(mainwin, 275, cfg.player_shaded ? 14 : 116);
 	if (!cfg.show_wm_decorations)
 		gdk_window_set_decorations(gtk_widget_get_window(mainwin), 0);
 	gtk_window_add_accel_group(GTK_WINDOW(mainwin), mainwin_accel);
@@ -3331,7 +3331,7 @@ void check_pposition(void)
 	gtk_widget_set_uposition(window, 0, 0);
 	gtk_widget_realize(window);
 	
-	gtk_widget_set_usize(window, 1, 1);
+	gtk_widget_set_size_request(window, 1, 1);
 	gdk_window_set_decorations(gtk_widget_get_window(window), 0);
 	
 	mask = cairo_image_surface_create(gtk_widget_get_window(window), 1, 1);

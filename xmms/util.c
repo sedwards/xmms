@@ -549,7 +549,7 @@ GtkWidget* util_create_add_url_window(gchar *caption, GCallback ok_func, GCallba
 	}
 	
 	cancel = gtk_button_new_with_label(_("Cancel"));
-	g_signal_connect_object(G_OBJECT(cancel), "clicked", GTK_SIGNAL_FUNC(gtk_widget_destroy), G_OBJECT(win));
+	g_signal_connect_object(G_OBJECT(cancel), "clicked", GTK_SIGNAL_FUNC(gtk_widget_destroy), G_OBJECT(win), 0);
 	gtk_widget_set_can_default(cancel, TRUE);
 	gtk_box_pack_start(GTK_BOX(bbox), cancel, FALSE, FALSE, 0);
 	gtk_widget_show(cancel);
@@ -775,7 +775,7 @@ GtkWidget * util_create_filebrowser(gboolean clear_pl_on_ok)
 //			   GTK_SIGNAL_FUNC(filebrowser_ok), filebrowser);
 //	g_signal_connect_object(G_OBJECT(fb->cancel_button), "clicked",
 //				  GTK_SIGNAL_FUNC(gtk_widget_destroy),
-//				  G_OBJECT(filebrowser));
+//				  G_OBJECT(filebrowser, 0));
 
 	if (cfg.filesel_path)
 		gtk_file_selection_set_filename(fb, cfg.filesel_path);
