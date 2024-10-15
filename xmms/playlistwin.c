@@ -418,6 +418,7 @@ void playlistwin_inverse_selection(void)
 
 static void playlistwin_resize(int width, int height)
 {
+#if 0
 	gint bx, by, nw, nh;
 	cairo_surface_t *oldbg;
 	gboolean dummy;
@@ -489,6 +490,7 @@ static void playlistwin_resize(int width, int height)
 	cairo_destroy(cr);
 
 	gdk_pixmap_unref(oldbg);
+#endif
 }
 
 void playlistwin_motion(GtkWidget * widget, GdkEventMotion * event, gpointer callback_data)
@@ -528,7 +530,7 @@ void playlistwin_show_filebrowser(void)
 		return;
 
 	filebrowser = util_create_filebrowser(FALSE);
-	gtk_signal_connect(G_OBJECT(filebrowser), "destroy",
+	g_signal_connect(G_OBJECT(filebrowser), "destroy",
 			   GTK_SIGNAL_FUNC(gtk_widget_destroyed), &filebrowser);
 }
 
@@ -558,7 +560,7 @@ void playlistwin_show_add_url_window(void)
 	{
 		playlistwin_url_window = util_create_add_url_window(_("Enter URL to add:"), GTK_SIGNAL_FUNC(playlistwin_url_ok_clicked), NULL);
 		gtk_window_set_transient_for(GTK_WINDOW(playlistwin_url_window), GTK_WINDOW(playlistwin));
-		gtk_signal_connect(G_OBJECT(playlistwin_url_window), "destroy", GTK_SIGNAL_FUNC(gtk_widget_destroyed), &playlistwin_url_window);
+		g_signal_connect(G_OBJECT(playlistwin_url_window), "destroy", GTK_SIGNAL_FUNC(gtk_widget_destroyed), &playlistwin_url_window);
 		gtk_widget_show(playlistwin_url_window);
 	}
 
@@ -583,7 +585,7 @@ void playlistwin_show_dirbrowser(void)
 					  //    GTK_SELECTION_EXTENDED,
 						GTK_SELECTION_NONE,
 					      playlistwin_add_dir_handler);
-	gtk_signal_connect(G_OBJECT(dir_browser),
+	g_signal_connect(G_OBJECT(dir_browser),
 			   "destroy", GTK_SIGNAL_FUNC(gtk_widget_destroyed),
 			   &dir_browser);
 	gtk_window_set_transient_for(GTK_WINDOW(dir_browser),
@@ -634,12 +636,13 @@ void playlistwin_save_filesel_ok(GtkWidget * w, GtkWidget * filesel)
 {
 	gchar *filename, *text, *tmp;
 
+#if todo_gtk3_gtk4
 	if (util_filebrowser_is_dir(GTK_FILE_SELECTION(filesel)))
 		return;
 	
 	filename = g_strdup(gtk_file_selection_get_filename(GTK_FILE_SELECTION(filesel)));
 	text = g_strdup(filename);
-
+#endif
 	if ((tmp = strrchr(text, '/')) != NULL)
 		*(tmp + 1) = '\0';
 	g_free(cfg.playlist_path);
@@ -654,11 +657,12 @@ void playlistwin_save_filesel_ok(GtkWidget * w, GtkWidget * filesel)
 void playlistwin_load_filesel_ok(GtkWidget * w, GtkWidget * filesel)
 {
 	gchar *filename, *text, *tmp;
-
+#if todo_gtk3_gtk4
 	if (util_filebrowser_is_dir(GTK_FILE_SELECTION(filesel)))
 		return;
 	
 	filename = g_strdup(gtk_file_selection_get_filename(GTK_FILE_SELECTION(filesel)));
+#endif
 	text = g_strdup(filename);
 
 	if ((tmp = strrchr(text, '/')) != NULL)
@@ -703,19 +707,21 @@ static void playlistwin_show_load_filesel(void)
 		return;
 	load_filesel = gtk_file_selection_new(_("Load playlist"));
 
+#if todo_gtk3_gtk4
 	if (cfg.playlist_path)
 		gtk_file_selection_set_filename(GTK_FILE_SELECTION(load_filesel),
 						cfg.playlist_path);
 	object = G_OBJECT(GTK_FILE_SELECTION(load_filesel)->ok_button);
-	gtk_signal_connect(object, "clicked",
+	g_signal_connect(object, "clicked",
 			   GTK_SIGNAL_FUNC(playlistwin_load_filesel_ok),
 			   load_filesel);
 	object = G_OBJECT(GTK_FILE_SELECTION(load_filesel)->cancel_button);
-	gtk_signal_connect_object(object, "clicked",
+	g_signal_connect_object(object, "clicked",
 				  GTK_SIGNAL_FUNC(gtk_widget_destroy),
 				  G_OBJECT(load_filesel));
-	gtk_signal_connect(G_OBJECT(load_filesel), "destroy",
+	g_signal_connect(G_OBJECT(load_filesel), "destroy",
 			   GTK_SIGNAL_FUNC(gtk_widget_destroyed), &load_filesel);
+#endif
 	gtk_widget_show(load_filesel);
 }
 
@@ -728,20 +734,23 @@ static void playlistwin_show_save_filesel(void)
 		return;
 
 	save_filesel = gtk_file_selection_new(_("Save playlist"));
+
+#if todo_gtk3_gtk4
 	if (cfg.playlist_path)
 		gtk_file_selection_set_filename(GTK_FILE_SELECTION(save_filesel),
 						cfg.playlist_path);
 	object = G_OBJECT(GTK_FILE_SELECTION(save_filesel)->ok_button);
-	gtk_signal_connect(object, "clicked",
+	g_signal_connect(object, "clicked",
 			   GTK_SIGNAL_FUNC(playlistwin_save_filesel_ok),
 			   save_filesel);
 	object = G_OBJECT(GTK_FILE_SELECTION(save_filesel)->cancel_button);
-	gtk_signal_connect_object(object, "clicked",
+	g_signal_connect_object(object, "clicked",
 				  GTK_SIGNAL_FUNC(gtk_widget_destroy),
 				  G_OBJECT(save_filesel));
-	gtk_signal_connect(G_OBJECT(save_filesel), "destroy",
+	g_signal_connect(G_OBJECT(save_filesel), "destroy",
 			   GTK_SIGNAL_FUNC(gtk_widget_destroyed),
 			   &save_filesel);
+#endif
 	gtk_widget_show(save_filesel);
 }
 
@@ -1080,6 +1089,7 @@ void playlistwin_set_back_pixmap()
 	gdk_window_clear(gtk_widget_get_window(playlistwin));
 }
 
+#if todo_gtk3_gtk4
 gint playlistwin_client_event(GtkWidget *w,GdkEventClient *event, gpointer data)
 {
 	static GdkAtom atom_rcfiles = GDK_NONE;
@@ -1096,6 +1106,7 @@ gint playlistwin_client_event(GtkWidget *w,GdkEventClient *event, gpointer data)
 	}
 	return FALSE;
 }
+#endif
 
 gint playlistwin_delete(GtkWidget * w, gpointer data)
 {
@@ -1207,7 +1218,7 @@ void playlistwin_physically_delete(void)
 
 	vbox = gtk_vbox_new(FALSE, 0);
 	gtk_container_set_border_width(GTK_CONTAINER(vbox), 15);
-	gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dialog)->vbox), vbox, TRUE, TRUE, 0);
+//	gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dialog)->vbox), vbox, TRUE, TRUE, 0);
 
 	length = g_list_length(selected_list);
 	if (length > 1)
@@ -1222,17 +1233,18 @@ void playlistwin_physically_delete(void)
 	bbox = gtk_hbutton_box_new();
 	gtk_button_box_set_layout(GTK_BUTTON_BOX(bbox), GTK_BUTTONBOX_SPREAD);
 	gtk_button_box_set_spacing(GTK_BUTTON_BOX(bbox), 5);
-	gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dialog)->action_area), bbox, FALSE, FALSE, 0);
+//	gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dialog)->action_area), bbox, FALSE, FALSE, 0);
+//	gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dialog)->action_area), bbox, FALSE, FALSE, 0);
 
 	ok = gtk_button_new_with_label(_("Ok"));
 	cancel = gtk_button_new_with_label(_("Cancel"));
-	gtk_signal_connect(G_OBJECT(ok), "clicked", playlistwin_physically_delete_cb, selected_list);
-	gtk_signal_connect_object(G_OBJECT(ok), "clicked", GTK_SIGNAL_FUNC(gtk_widget_destroy), G_OBJECT(dialog));
-	gtk_signal_connect_object(G_OBJECT(cancel), "clicked", GTK_SIGNAL_FUNC(gtk_widget_destroy), G_OBJECT(dialog));
+	g_signal_connect(G_OBJECT(ok), "clicked", playlistwin_physically_delete_cb, selected_list);
+	g_signal_connect_object(G_OBJECT(ok), "clicked", GTK_SIGNAL_FUNC(gtk_widget_destroy), G_OBJECT(dialog));
+	g_signal_connect_object(G_OBJECT(cancel), "clicked", GTK_SIGNAL_FUNC(gtk_widget_destroy), G_OBJECT(dialog));
 	gtk_box_pack_start(GTK_BOX(bbox), ok, FALSE, FALSE, 0);
-	GTK_WIDGET_SET_FLAGS(ok, gtk_widget_set_can_default());
+	gtk_widget_set_can_default(ok,TRUE);
 	gtk_box_pack_start(GTK_BOX(bbox), cancel, FALSE, FALSE, 0);
-	GTK_WIDGET_SET_FLAGS(cancel, gtk_widget_set_can_default());
+	gtk_widget_set_can_default(cancel, TRUE);
 	gtk_widget_grab_default(ok);
 
 	gtk_widget_show_all(dialog);
@@ -1309,6 +1321,7 @@ gboolean playlistwin_keypress(GtkWidget * w, GdkEventKey * event, gpointer data)
 			playlist_select_range(playlistwin_list->pl_prev_selected, playlistwin_list->pl_prev_selected, TRUE);
 			playlistwin_list->pl_prev_min = -1;
 			break;
+#if 0
 		case GDK_Page_Up:
 			playlistwin_scroll(-playlistwin_list->pl_num_visible);
 			break;
@@ -1351,6 +1364,7 @@ gboolean playlistwin_keypress(GtkWidget * w, GdkEventKey * event, gpointer data)
 				playlistwin_show_filebrowser();
 			refresh=FALSE;
 			break;
+#endif
 		default:
 			gtk_widget_event(mainwin, (GdkEvent *) event);
 			refresh = FALSE;
@@ -1587,6 +1601,7 @@ static void playlistwin_drag_data_received(GtkWidget * widget,
 					   guint time,
 					   gpointer user_data)
 {
+#if 0
 	guint pos;
 
 	if (selection_data->data)
@@ -1601,6 +1616,7 @@ static void playlistwin_drag_data_received(GtkWidget * widget,
 		else
 			playlist_add_url_string((gchar *) selection_data->data);
 	}
+#endif
 }
 
 void playlistwin_close_cb(void)
@@ -1626,7 +1642,7 @@ static void playlistwin_create_widgets(void)
 	playlistwin_time_min = create_textbox(&playlistwin_wlist, playlistwin_bg, playlistwin_gc, cfg.playlist_width - 82, cfg.playlist_height - 15, 15, FALSE, SKIN_TEXT);
 	playlistwin_time_sec = create_textbox(&playlistwin_wlist, playlistwin_bg, playlistwin_gc, cfg.playlist_width - 64, cfg.playlist_height - 15, 10, FALSE, SKIN_TEXT);
 	playlistwin_info = create_textbox(&playlistwin_wlist, playlistwin_bg, playlistwin_gc, cfg.playlist_width - 143, cfg.playlist_height - 28, 85, FALSE, SKIN_TEXT);
-	playlistwin_vis = create_vis(&playlistwin_wlist, playlistwin_bg, playlistwin->window, playlistwin_gc, cfg.playlist_width - 223, cfg.playlist_height - 26, 72, FALSE);
+	playlistwin_vis = create_vis(&playlistwin_wlist, playlistwin_bg, gtk_widget_get_window(playlistwin), playlistwin_gc, cfg.playlist_width - 223, cfg.playlist_height - 26, 72, FALSE);
 	hide_widget(playlistwin_vis);
 
 	playlistwin_srew = create_sbutton(&playlistwin_wlist, playlistwin_bg, playlistwin_gc, cfg.playlist_width - 144, cfg.playlist_height - 16, 8, 7, playlist_prev);
@@ -1642,14 +1658,14 @@ static void playlistwin_create_widgets(void)
 
 static void selection_received(GtkWidget *widget, GtkSelectionData *selection_data, gpointer data)
 {
-	if (selection_data->type == GDK_SELECTION_TYPE_STRING &&
-	    selection_data->length > 0)
-		playlist_add_url_string(selection_data->data);
+//	if (selection_data->type == GDK_SELECTION_TYPE_STRING &&
+//	    selection_data->length > 0)
+//		playlist_add_url_string(selection_data->data);
 }
 
 static void playlistwin_create_gtk(void)
 {
-	playlistwin = gtk_window_new(GTK_WINDOW_DIALOG);
+	playlistwin = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 	dock_add_window(dock_window_list, playlistwin);
 	gtk_widget_set_app_paintable(playlistwin, TRUE);
 	if (cfg.show_wm_decorations)
@@ -1668,18 +1684,18 @@ static void playlistwin_create_gtk(void)
 	playlistwin_set_hints();
 	util_set_cursor(playlistwin);
 
-	gtk_signal_connect(G_OBJECT(playlistwin), "delete_event", GTK_SIGNAL_FUNC(playlistwin_delete), NULL);
-	gtk_signal_connect(G_OBJECT(playlistwin), "button_press_event", GTK_SIGNAL_FUNC(playlistwin_press), NULL);
-	gtk_signal_connect(G_OBJECT(playlistwin), "button_release_event", GTK_SIGNAL_FUNC(playlistwin_release), NULL);
-	gtk_signal_connect(G_OBJECT(playlistwin), "motion_notify_event", GTK_SIGNAL_FUNC(playlistwin_motion), NULL);
-	gtk_signal_connect(G_OBJECT(playlistwin), "focus_in_event", GTK_SIGNAL_FUNC(playlistwin_focus_in), NULL);
-	gtk_signal_connect(G_OBJECT(playlistwin), "focus_out_event", GTK_SIGNAL_FUNC(playlistwin_focus_out), NULL);
-	gtk_signal_connect(G_OBJECT(playlistwin), "configure_event", GTK_SIGNAL_FUNC(playlistwin_configure), NULL);
-	gtk_signal_connect(G_OBJECT(playlistwin), "client_event", GTK_SIGNAL_FUNC(playlistwin_client_event), NULL);
+	g_signal_connect(G_OBJECT(playlistwin), "delete_event", GTK_SIGNAL_FUNC(playlistwin_delete), NULL);
+	g_signal_connect(G_OBJECT(playlistwin), "button_press_event", GTK_SIGNAL_FUNC(playlistwin_press), NULL);
+	g_signal_connect(G_OBJECT(playlistwin), "button_release_event", GTK_SIGNAL_FUNC(playlistwin_release), NULL);
+	g_signal_connect(G_OBJECT(playlistwin), "motion_notify_event", GTK_SIGNAL_FUNC(playlistwin_motion), NULL);
+	g_signal_connect(G_OBJECT(playlistwin), "focus_in_event", GTK_SIGNAL_FUNC(playlistwin_focus_in), NULL);
+	g_signal_connect(G_OBJECT(playlistwin), "focus_out_event", GTK_SIGNAL_FUNC(playlistwin_focus_out), NULL);
+	g_signal_connect(G_OBJECT(playlistwin), "configure_event", GTK_SIGNAL_FUNC(playlistwin_configure), NULL);
+	//g_signal_connect(G_OBJECT(playlistwin), "client_event", GTK_SIGNAL_FUNC(playlistwin_client_event), NULL);
 	xmms_drag_dest_set(playlistwin);
-	gtk_signal_connect(G_OBJECT(playlistwin), "drag-data-received", GTK_SIGNAL_FUNC(playlistwin_drag_data_received), NULL);
-	gtk_signal_connect(G_OBJECT(playlistwin), "key-press-event", GTK_SIGNAL_FUNC(playlistwin_keypress), NULL);
-	gtk_signal_connect(G_OBJECT(playlistwin), "selection_received", GTK_SIGNAL_FUNC(selection_received), NULL);
+	g_signal_connect(G_OBJECT(playlistwin), "drag-data-received", GTK_SIGNAL_FUNC(playlistwin_drag_data_received), NULL);
+	g_signal_connect(G_OBJECT(playlistwin), "key-press-event", GTK_SIGNAL_FUNC(playlistwin_keypress), NULL);
+	g_signal_connect(G_OBJECT(playlistwin), "selection_received", GTK_SIGNAL_FUNC(selection_received), NULL);
 
 	if (!cfg.show_wm_decorations)
 		gdk_window_set_decorations(gtk_widget_get_window(playlistwin), 0);
@@ -1705,9 +1721,9 @@ void playlistwin_create(void)
 	gtk_item_factory_create_items(GTK_ITEM_FACTORY(playlistwin_sub_menu),
 				      playlistwin_sub_menu_entries_num,
 				      playlistwin_sub_menu_entries, NULL);
-	playlistwin_bg = cairo_image_surface_create(NULL, cfg.playlist_width,
-					cfg.playlist_height,
-					gdk_rgb_get_visual()->depth);
+//	playlistwin_bg = cairo_image_surface_create(NULL, cfg.playlist_width,
+//					cfg.playlist_height,
+//					gdk_rgb_get_visual()->depth);
 
 	playlistwin_popup_menu =
 		gtk_item_factory_new(GTK_TYPE_MENU, "<Main>", NULL);
@@ -1793,3 +1809,4 @@ void playlistwin_popup_menu_callback(gpointer cb_data, guint action, GtkWidget *
 			playlistwin_popup_handler(action);
 	}
 }
+

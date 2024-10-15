@@ -701,33 +701,60 @@ void mainwin_set_shape_mask(void)
 
 void set_doublesize(gboolean ds)
 {
-	gint height;
+    gint height;
 
-	cfg.doublesize = ds;
+    cfg.doublesize = ds;
 
-	if (cfg.player_shaded)
-		height = 14;
-	else
-		height = 116;
+    if (cfg.player_shaded)
+        height = 14;
+    else
+        height = 116;
 
-	mainwin_set_shape_mask();
-	if (cfg.doublesize)
-	{
-		dock_resize(dock_window_list, mainwin, 550, height * 2);
-		//gdk_window_set_back_pixmap(gdk_window_raise(gtk_widget_get_window(mainwin), mainwin_bg_dblsize, 0);
-		gdk_window_set_back_pixmap(gdk_window_raise(gtk_widget_get_window(mainwin)));
-	}
-	else
-	{
-		dock_resize(dock_window_list, mainwin, 275, height);		
-		gdk_window_set_back_pixmap(gdk_window_raise(mainwin), mainwin_bg, 0);
-	}
-	draw_main_window(TRUE);
-	vis_set_doublesize(mainwin_vis, ds);
+    // Adjust the window shape mask
+    mainwin_set_shape_mask();
 
-	if (cfg.eq_doublesize_linked)
-		equalizerwin_set_doublesize(ds);
+    // Resize the window based on the doublesize setting
+    if (cfg.doublesize)
+    {       
+        dock_resize(dock_window_list, mainwin, 550, height * 2);
+
+        // Raise the window and show it
+        gdk_window_show(gtk_widget_get_window(mainwin));
+    }
+    else
+    {       
+        dock_resize(dock_window_list, mainwin, 275, height);
+
+        // Show the window without raising
+        gdk_window_show(gtk_widget_get_window(mainwin));
+    }
+
+    // Redraw the main window
+    draw_main_window(TRUE);
+
+    // Adjust visual settings for doublesize
+    vis_set_doublesize(mainwin_vis, ds);
+
+    // Handle equalizer window doublesize if linked
+    if (cfg.eq_doublesize_linked)
+        equalizerwin_set_doublesize(ds);
 }
+
+#if 0
+static gboolean on_draw_event(GtkWidget *widget, cairo_t *cr, gpointer user_data)
+{
+    // Set background color or image
+    GdkPixbuf *pixbuf = gdk_pixbuf_new_from_file("background.png", NULL);
+    gdk_cairo_set_source_pixbuf(cr, pixbuf, 0, 0);
+    cairo_paint(cr);
+    g_object_unref(pixbuf);
+
+    return FALSE;
+}
+
+// Connect to the draw signal of the window
+g_signal_connect(G_OBJECT(mainwin), "draw", G_CALLBACK(on_draw_event), NULL);
+#endif
 
 void mainwin_set_shade(gboolean shaded)
 {
@@ -836,9 +863,9 @@ void mainwin_vis_set_analyzer_type(AnalyzerType mode)
 
 void mainwin_vis_set_type(VisType mode)
 {
-	char* path = mainwin_vis_menu_entries[MAINWIN_VIS_MENU_VIS_MODE + mode].path;
-	GtkWidget *widget = gtk_item_factory_get_widget(mainwin_vis_menu, path);
-	gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(widget), TRUE);
+	//char* path = mainwin_vis_menu_entries[MAINWIN_VIS_MENU_VIS_MODE + mode].path;
+	//GtkWidget *widget = gtk_item_factory_get_widget(mainwin_vis_menu, path);
+	//gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(widget), TRUE);
 }
 
 static void mainwin_vis_set_type_menu_cb(VisType mode)
@@ -871,7 +898,7 @@ void mainwin_minimize_cb(void)
 {
 //	Window xwindow;
 
-	if (!mainwin->window)
+	if (!gtk_widget_get_window(mainwin))
 		return;
 
 //	xwindow = GDK_WINDOW_XWINDOW(mainwin->window);
@@ -1336,20 +1363,20 @@ gboolean mainwin_keypress(GtkWidget * w, GdkEventKey * event, gpointer data)
 	switch(event->keyval)
 	{
 	case GDK_KEY_Up:
-	case GDK_KP_Up:
+	case GDK_KEY_KP_Up:
 		mainwin_set_volume_diff(2);
 		break;
 	case GDK_KEY_Down:
-	case GDK_KP_Down:
+	case GDK_KEY_KP_Down:
 		mainwin_set_volume_diff(-2);
 		break;
 	case GDK_KEY_Left:
-	case GDK_KP_Left:
+	case GDK_KEY_KP_Left:
 		if(playlist_get_current_length() != -1)
 			input_seek(CLAMP(input_get_time() - 5000, 0, playlist_get_current_length()) / 1000);
 		break;
 	case GDK_KEY_Right:
-	case GDK_KP_Right:
+	case GDK_KEY_KP_Right:
 		if(playlist_get_current_length() != -1)
 			input_seek(CLAMP(input_get_time() + 5000, 0, playlist_get_current_length()) / 1000);
 		break;
@@ -1402,7 +1429,7 @@ void mainwin_jump_to_time()
 	gtk_window_set_position(GTK_WINDOW(mainwin_jtt), GTK_WIN_POS_CENTER);
 	gtk_window_set_policy(GTK_WINDOW(mainwin_jtt), FALSE, FALSE, FALSE);
 	gtk_window_set_transient_for(GTK_WINDOW(mainwin_jtt), GTK_WINDOW(mainwin));
-	gtk_signal_connect(G_OBJECT(mainwin_jtt), "destroy", GTK_SIGNAL_FUNC(gtk_widget_destroyed), &mainwin_jtt);
+	g_signal_connect(G_OBJECT(mainwin_jtt), "destroy", GTK_SIGNAL_FUNC(gtk_widget_destroyed), &mainwin_jtt);
 	gtk_container_border_width(GTK_CONTAINER(mainwin_jtt), 10);
 
 	vbox = gtk_vbox_new(FALSE, 5);
@@ -1421,7 +1448,7 @@ void mainwin_jump_to_time()
 	gtk_widget_show(hbox_new);
 	time_entry = gtk_entry_new_with_max_length(5);
 	gtk_box_pack_start(GTK_BOX(hbox_new), time_entry, FALSE, FALSE, 5);
-	gtk_signal_connect(G_OBJECT(time_entry), "activate", GTK_SIGNAL_FUNC(mainwin_jump_to_time_cb), time_entry);
+	g_signal_connect(G_OBJECT(time_entry), "activate", GTK_SIGNAL_FUNC(mainwin_jump_to_time_cb), time_entry);
 	gtk_widget_show(time_entry);
 	gtk_widget_set_usize(time_entry, 70, -1);
 	label = gtk_label_new(_("minutes:seconds"));
@@ -1446,14 +1473,14 @@ void mainwin_jump_to_time()
 	gtk_button_box_set_spacing(GTK_BUTTON_BOX(bbox), 5);
 	gtk_widget_show(bbox);
 	jump = gtk_button_new_with_label(_("Jump"));
-	GTK_WIDGET_SET_FLAGS(jump, gtk_widget_set_can_default());
+	gtk_widget_set_can_default(jump, TRUE);
 	gtk_container_add(GTK_CONTAINER(bbox), jump);
-	gtk_signal_connect(G_OBJECT(jump), "clicked", GTK_SIGNAL_FUNC(mainwin_jump_to_time_cb), time_entry);
+	g_signal_connect(G_OBJECT(jump), "clicked", GTK_SIGNAL_FUNC(mainwin_jump_to_time_cb), time_entry);
 	gtk_widget_show(jump);
 	cancel = gtk_button_new_with_label(_("Cancel"));
-	GTK_WIDGET_SET_FLAGS(cancel, gtk_widget_set_can_default());
+	gtk_widget_set_can_default(cancel, TRUE);
 	gtk_container_add(GTK_CONTAINER(bbox), cancel);
-	gtk_signal_connect_object(G_OBJECT(cancel), "clicked", GTK_SIGNAL_FUNC(gtk_widget_destroy), G_OBJECT(mainwin_jtt));
+	g_signal_connect_object(G_OBJECT(cancel), "clicked", GTK_SIGNAL_FUNC(gtk_widget_destroy), G_OBJECT(mainwin_jtt));
 	gtk_widget_show(cancel);
 
 	tindex = input_get_time() / 1000;
@@ -1467,75 +1494,98 @@ void mainwin_jump_to_time()
 	gtk_widget_grab_default(jump);
 }
 
-static void mainwin_jump_to_file_real_cb(GtkCList* clist)
-{
-	gint *pos;
+enum {
+    COLUMN_POSITION,  // This should be the column index where the position data is stored
+    COLUMN_OTHER,     // Add other columns as needed
+    NUM_COLUMNS
+};
 
-	if (clist->selection)
-	{
-		if (get_input_playing())
-			input_stop();
-		pos = (gint *) gtk_clist_get_row_data(clist, GPOINTER_TO_INT(clist->selection->data));
-		playlist_set_position(*pos);
-		playlist_play();
-		gtk_widget_destroy(mainwin_jtf);
-	}
+static void mainwin_jump_to_file_real_cb(GtkTreeView *tree_view)
+{
+    GtkTreeSelection *selection;
+    GtkTreeModel *model;
+    GtkTreeIter iter;
+
+    // Get the current selection from the tree view
+    selection = gtk_tree_view_get_selection(tree_view);
+
+    // Check if something is selected
+    if (gtk_tree_selection_get_selected(selection, &model, &iter))
+    {
+        gint pos;
+
+        // Stop the current input if something is playing
+        if (get_input_playing())
+            input_stop();
+
+        // Retrieve the position from the model
+        gtk_tree_model_get(model, &iter, COLUMN_POSITION, &pos, -1);
+
+        // Set the playlist position and start playback
+        playlist_set_position(pos);
+        playlist_play();
+
+        // Destroy the jump-to-file dialog
+        gtk_widget_destroy(mainwin_jtf);
+    }
 }
 
-static void mainwin_jump_to_file_select_row_cb(GtkCList * widget, gint row, gint column, GdkEventButton * event, gpointer cb_data)
+static void mainwin_jump_to_file_select_row_cb(GtkTreeView *tree_view, GtkTreePath *path, GtkTreeViewColumn *column, gpointer userdata)
 {
-	if (event && event->button == 1 && event->type == GDK_2BUTTON_PRESS)
-		mainwin_jump_to_file_real_cb(widget);
+    mainwin_jump_to_file_real_cb(tree_view);
 }
 
-static void mainwin_jump_to_file_keypress_cb(GtkWidget * widget, GdkEventKey * event, gpointer userdata)
+static void mainwin_jump_to_file_keypress_cb(GtkWidget *widget, GdkEventKey *event, gpointer userdata)
 {
-	if (event && (event->keyval == GDK_Return))
-		mainwin_jump_to_file_real_cb(GTK_CLIST(widget));
-	else if (event && (event->keyval == GDK_Escape))
-		gtk_widget_destroy(mainwin_jtf);
+    if (event && event->keyval == GDK_KEY_Return)
+    {
+        // Replace GtkCList with GtkTreeView
+        mainwin_jump_to_file_real_cb(GTK_TREE_VIEW(widget));
+    }
+    else if (event && event->keyval == GDK_KEY_Escape)
+    {
+        gtk_widget_destroy(mainwin_jtf);
+    }
 }
 
-static gboolean mainwin_jump_to_file_entry_keypress_cb(GtkWidget * widget, GdkEventKey * event, gpointer userdata)
+static gboolean mainwin_jump_to_file_entry_keypress_cb(GtkWidget *widget, GdkEventKey *event, gpointer userdata)
 {
-	GtkCList* clist = GTK_CLIST(userdata);
-	gboolean stop = FALSE;
+    GtkTreeView *tree_view = GTK_TREE_VIEW(userdata);  // Replace GtkCList with GtkTreeView
+    gboolean stop = FALSE;
 
-	if (!event)
-		return FALSE;
-	
-	switch (event->keyval)
-	{
-		case GDK_Return:
-			mainwin_jump_to_file_real_cb(clist);
-			break;
-		case GDK_Escape:
-			gtk_widget_destroy(mainwin_jtf);
-			break;
-		case GDK_Up:
-		case GDK_Down:
-		case GDK_Page_Up:
-		case GDK_Page_Down:
-			gtk_widget_event(GTK_WIDGET(clist), (GdkEvent *)event);
-			/* Stop the signal or we might lose focus */
-			stop = TRUE;
-			break;
-		case GDK_BackSpace:
-		case GDK_Delete:
-			if (strlen(gtk_entry_get_text(GTK_ENTRY(widget))) == 0)
-				/* Optimization: Ignore delete keys if
-                                   the string already is empty */
-				stop = TRUE;
-			break;
-		default:
-			return FALSE;
-	}
+    if (!event)
+        return FALSE;
 
-	if (stop)
-		gtk_signal_emit_stop_by_name(G_OBJECT(widget),
-					     "key_press_event");
+    switch (event->keyval)
+    {
+        case GDK_KEY_Return:
+            mainwin_jump_to_file_real_cb(tree_view);
+            break;
+        case GDK_KEY_Escape:
+            gtk_widget_destroy(mainwin_jtf);
+            break;
+        case GDK_KEY_Up:
+        case GDK_KEY_Down:
+        case GDK_KEY_Page_Up:
+        case GDK_KEY_Page_Down:
+            // You can use gdk_event_put() if needed, but better to handle directly
+            // Forward the event to GtkTreeView
+            gtk_widget_event(GTK_WIDGET(tree_view), (GdkEvent *)event);
+            stop = TRUE;
+            break;
+        case GDK_KEY_BackSpace:
+        case GDK_KEY_Delete:
+            if (strlen(gtk_entry_get_text(GTK_ENTRY(widget))) == 0)
+                stop = TRUE;  // Ignore delete keys if the string is already empty
+            break;
+        default:
+            return FALSE;
+    }
 
-	return TRUE;
+    if (stop)
+        g_signal_stop_emission_by_name(G_OBJECT(widget), "key_press_event");
+
+    return TRUE;
 }
 
 static void mainwin_jump_to_file_jump_cb(GtkButton * widget, gpointer userdata)
@@ -1558,8 +1608,9 @@ static int mainwin_jump_to_file_match(gchar* song, gchar * keys[], gint nw)
 
 static void mainwin_jump_to_file_edit_cb(GtkWidget * widget, gpointer userdata)
 {
+#if todo_gtk3_gtk4 
 	gchar* key;
-	GtkCList* clist;
+	GtkCList* cllist;
 	GList *playlist;
 	gchar *desc_buf;
 	gint songnr = 0;
@@ -1572,7 +1623,7 @@ static void mainwin_jump_to_file_edit_cb(GtkWidget * widget, gpointer userdata)
 	PL_LOCK();
 	playlist = get_playlist();
 	key = g_strdup(gtk_entry_get_text(GTK_ENTRY(widget)));
-	clist = GTK_CLIST(userdata);
+	cllist = GTK_CLIST(userdata);
 
 	/* lowercase the key string */
 	g_strdown(key);
@@ -1597,8 +1648,8 @@ static void mainwin_jump_to_file_edit_cb(GtkWidget * widget, gpointer userdata)
 		}
 	}
 	
-	gtk_clist_freeze(clist);
-	gtk_clist_clear(clist);
+	gtk_cllist_freeze(cllist);
+	gtk_cllist_clear(cllist);
 
 	while (playlist)
 	{
@@ -1650,17 +1701,17 @@ static void mainwin_jump_to_file_edit_cb(GtkWidget * widget, gpointer userdata)
  			song[i] = '\0';
 
 			/* Compare the key words to the string - if
-                           all the words match, add to the clist */
+                           all the words match, add to the cllist */
 			match = mainwin_jump_to_file_match(song, words, nw);
 		}
 
 		if (match)
 		{
 			int row;
-			row = gtk_clist_append(clist, &desc_buf);
+			row = gtk_cllist_append(cllist, &desc_buf);
 			data_buf = g_malloc(sizeof (gint));
 			*data_buf = songnr;
-			gtk_clist_set_row_data_full(clist, row, data_buf, g_free_func);
+			gtk_cllist_set_row_data_full(cllist, row, data_buf, g_free_func);
 		}
 
 		songnr++;
@@ -1671,20 +1722,21 @@ static void mainwin_jump_to_file_edit_cb(GtkWidget * widget, gpointer userdata)
 
 	if (cfg.sort_jump_to_file)
 	{
-		gtk_clist_set_sort_column(clist, 0);
-		gtk_clist_set_sort_type(clist, GTK_SORT_ASCENDING);
-		gtk_clist_sort(clist);
+		gtk_cllist_set_sort_column(cllist, 0);
+		gtk_cllist_set_sort_type(cllist, GTK_SORT_ASCENDING);
+		gtk_cllist_sort(cllist);
 	}
-	if (clist->selection)
-		clist->focus_row = GPOINTER_TO_INT(clist->selection->data);
-	gtk_clist_thaw(clist);
-
+	if (cllist->selection)
+		cllist->focus_row = GPOINTER_TO_INT(cllist->selection->data);
+	gtk_cllist_thaw(cllist);
 	g_free(key);
+#endif
 }
 
 static void mainwin_jump_to_file(void)
 {
-	GtkWidget *vbox, *scrollwin, *clist, *sep, *bbox, *jump, *cancel, *edit, *search_label, *hbox;
+#if todo_gtk3_gtk4
+	GtkWidget *vbox, *scrollwin, *cllist, *sep, *bbox, *jump, *cancel, *edit, *search_label, *hbox;
 	GList *playlist;
 	char *title[1];
 	gchar *desc_buf;
@@ -1704,7 +1756,7 @@ static void mainwin_jump_to_file(void)
 	gtk_window_set_title(GTK_WINDOW(mainwin_jtf), _("Jump to file"));
 	gtk_window_set_position(GTK_WINDOW(mainwin_jtf), GTK_WIN_POS_CENTER);
 	gtk_window_set_transient_for(GTK_WINDOW(mainwin_jtf), GTK_WINDOW(mainwin));
-	gtk_signal_connect(G_OBJECT(mainwin_jtf), "destroy", GTK_SIGNAL_FUNC(gtk_widget_destroyed), &mainwin_jtf);
+	g_signal_connect(G_OBJECT(mainwin_jtf), "destroy", GTK_SIGNAL_FUNC(gtk_widget_destroyed), &mainwin_jtf);
 	gtk_container_border_width(GTK_CONTAINER(mainwin_jtf), 10);
 	gtk_window_set_default_size(GTK_WINDOW(mainwin_jtf), 300, 350);
 
@@ -1713,10 +1765,10 @@ static void mainwin_jump_to_file(void)
 	gtk_widget_show(vbox);
 
 	title[0] = _("Files");
-	clist = gtk_clist_new_with_titles(1, title);
-	gtk_clist_set_selection_mode(GTK_CLIST(clist), GTK_SELECTION_BROWSE);
-	gtk_signal_connect(G_OBJECT(clist), "select_row", GTK_SIGNAL_FUNC(mainwin_jump_to_file_select_row_cb), NULL);
-	gtk_signal_connect(G_OBJECT(clist), "key_press_event", GTK_SIGNAL_FUNC(mainwin_jump_to_file_keypress_cb), NULL);
+	cllist = gtk_cllist_new_with_titles(1, title);
+	gtk_cllist_set_selection_mode(GTK_CLIST(cllist), GTK_SELECTION_BROWSE);
+	g_signal_connect(G_OBJECT(cllist), "select_row", GTK_SIGNAL_FUNC(mainwin_jump_to_file_select_row_cb), NULL);
+	g_signal_connect(G_OBJECT(cllist), "key_press_event", GTK_SIGNAL_FUNC(mainwin_jump_to_file_keypress_cb), NULL);
 	hbox = gtk_hbox_new(FALSE, 3);
  	gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, FALSE, 3);
  	gtk_widget_show(hbox);
@@ -1727,17 +1779,17 @@ static void mainwin_jump_to_file(void)
  
  	edit = gtk_entry_new();
  	gtk_entry_set_editable(GTK_ENTRY(edit), TRUE);
- 	gtk_signal_connect(G_OBJECT(edit), "changed", GTK_SIGNAL_FUNC(mainwin_jump_to_file_edit_cb), clist);
- 	gtk_signal_connect(G_OBJECT(edit), "key_press_event", GTK_SIGNAL_FUNC(mainwin_jump_to_file_entry_keypress_cb), clist);
+ 	g_signal_connect(G_OBJECT(edit), "changed", GTK_SIGNAL_FUNC(mainwin_jump_to_file_edit_cb), cllist);
+ 	g_signal_connect(G_OBJECT(edit), "key_press_event", GTK_SIGNAL_FUNC(mainwin_jump_to_file_entry_keypress_cb), cllist);
  	gtk_box_pack_start(GTK_BOX(hbox), edit, TRUE, TRUE, 3);
  	gtk_widget_show(edit);
 	
 	scrollwin = gtk_scrolled_window_new(NULL, NULL);
-	gtk_container_add(GTK_CONTAINER(scrollwin), clist);
+	gtk_container_add(GTK_CONTAINER(scrollwin), cllist);
 	gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrollwin), GTK_POLICY_AUTOMATIC, GTK_POLICY_ALWAYS);
 	gtk_box_pack_start(GTK_BOX(vbox), scrollwin, TRUE, TRUE, 0);
 	gtk_widget_set_usize(scrollwin, 330, 200);
-	gtk_widget_show(clist);
+	gtk_widget_show(cllist);
 	gtk_widget_show(scrollwin);
 
 	sep = gtk_hseparator_new();
@@ -1751,19 +1803,19 @@ static void mainwin_jump_to_file(void)
 
 	jump = gtk_button_new_with_label(_("Jump"));
 	gtk_box_pack_start(GTK_BOX(bbox), jump, FALSE, FALSE, 0);
-	gtk_signal_connect(G_OBJECT(jump), "clicked", GTK_SIGNAL_FUNC(mainwin_jump_to_file_jump_cb), clist);
+	g_signal_connect(G_OBJECT(jump), "clicked", GTK_SIGNAL_FUNC(mainwin_jump_to_file_jump_cb), cllist);
 	GTK_WIDGET_SET_FLAGS(jump, GTK_CAN_DEFAULT);
 	gtk_widget_show(jump);
 	gtk_widget_grab_default(jump);
 
 	cancel = gtk_button_new_with_label(_("Close"));
 	gtk_box_pack_start(GTK_BOX(bbox), cancel, FALSE, FALSE, 0);
-	gtk_signal_connect_object(G_OBJECT(cancel), "clicked", GTK_SIGNAL_FUNC(gtk_widget_destroy), G_OBJECT(mainwin_jtf));
+	g_signal_connect_object(G_OBJECT(cancel), "clicked", GTK_SIGNAL_FUNC(gtk_widget_destroy), G_OBJECT(mainwin_jtf));
 	GTK_WIDGET_SET_FLAGS(cancel, GTK_CAN_DEFAULT);
 	gtk_widget_show(cancel);
 	gtk_widget_show(bbox);
 
-	gtk_clist_clear(GTK_CLIST(clist));
+	gtk_cllist_clear(GTK_CLIST(cllist));
 
 	while (playlist)
 	{
@@ -1771,29 +1823,30 @@ static void mainwin_jump_to_file(void)
 			desc_buf = ((PlaylistEntry *) playlist->data)->title;
 		else
 			desc_buf = strrchr(((PlaylistEntry *) playlist->data)->filename, '/') + 1;
-		row = gtk_clist_append(GTK_CLIST(clist), &desc_buf);
+		row = gtk_cllist_append(GTK_CLIST(cllist), &desc_buf);
 		data_buf = g_malloc(sizeof (gint));
 		*data_buf = row;
-		gtk_clist_set_row_data_full(GTK_CLIST(clist), row, data_buf, g_free_func);
+		gtk_cllist_set_row_data_full(GTK_CLIST(cllist), row, data_buf, g_free_func);
 		playlist = playlist->next;
 	}
 
-	gtk_clist_select_row(GTK_CLIST(clist), __get_playlist_position(), 0);
+	gtk_cllist_select_row(GTK_CLIST(cllist), __get_playlist_position(), 0);
 	PL_UNLOCK();
 
 	if (cfg.sort_jump_to_file)
 	{
-		gtk_clist_set_sort_column(GTK_CLIST(clist), 0);
-		gtk_clist_set_sort_type(GTK_CLIST(clist), GTK_SORT_ASCENDING);
-		gtk_clist_sort(GTK_CLIST(clist));
+		gtk_cllist_set_sort_column(GTK_CLIST(cllist), 0);
+		gtk_cllist_set_sort_type(GTK_CLIST(cllist), GTK_SORT_ASCENDING);
+		gtk_cllist_sort(GTK_CLIST(cllist));
 	}
 	gtk_window_set_modal(GTK_WINDOW(mainwin_jtf), 1);
 	gtk_widget_show(mainwin_jtf);
 	gtk_widget_grab_focus(edit);
-	gtk_clist_moveto(GTK_CLIST(clist),
-			 GPOINTER_TO_INT(GTK_CLIST(clist)->selection->data),
+	gtk_cllist_moveto(GTK_CLIST(cllist),
+			 GPOINTER_TO_INT(GTK_CLIST(cllist)->selection->data),
 			 0, 0.5, 0.0);
-	GTK_CLIST(clist)->focus_row = GPOINTER_TO_INT(GTK_CLIST(clist)->selection->data);
+	GTK_CLIST(cllist)->focus_row = GPOINTER_TO_INT(GTK_CLIST(cllist)->selection->data);
+#endif
 }
 
 static gboolean mainwin_configure(GtkWidget * window, GdkEventConfigure *event, gpointer data)
@@ -1802,10 +1855,10 @@ static gboolean mainwin_configure(GtkWidget * window, GdkEventConfigure *event, 
 		return FALSE;
 
 	if (cfg.show_wm_decorations)
-		gdk_window_get_root_origin(window->window,
+		gdk_window_get_root_origin(gtk_widget_get_window(window),
 					   &cfg.player_x, &cfg.player_y);
 	else		
-		gdk_window_get_deskrelative_origin(window->window,
+		gdk_window_get_deskrelative_origin(gtk_widget_get_window(window),
 						   &cfg.player_x, &cfg.player_y);
 	return FALSE;
 }
@@ -1813,9 +1866,9 @@ static gboolean mainwin_configure(GtkWidget * window, GdkEventConfigure *event, 
 void mainwin_set_back_pixmap(void)
 {
 	if (cfg.doublesize)
-		gdk_window_set_back_pixmap(mainwin->window, mainwin_bg_dblsize, 0);
+		gdk_window_set_back_pixmap(gtk_widget_get_window(mainwin), mainwin_bg_dblsize, 0);
 	else
-		gdk_window_set_back_pixmap(mainwin->window, mainwin_bg, 0);
+		gdk_window_set_back_pixmap(gtk_widget_get_window(mainwin), mainwin_bg, 0);
 
 	cairo_t *cr = gdk_cairo_create(gtk_widget_get_window(mainwin));
 	cairo_set_source_rgb(cr, 0, 0, 0); // Set the background color to black
@@ -1823,8 +1876,9 @@ void mainwin_set_back_pixmap(void)
 	cairo_destroy(cr);
 }
 
-gint mainwin_client_event(GtkWidget *w,GdkEventClient *event, gpointer data)
+gint mainwin_client_event(GtkWidget *w,GdkEvent *event, gpointer data)
 {
+#if gtk3_gtk4
 	static GdkAtom atom_rcfiles = GDK_NONE;
 
 	if (!atom_rcfiles)
@@ -1837,6 +1891,7 @@ gint mainwin_client_event(GtkWidget *w,GdkEventClient *event, gpointer data)
 		return TRUE;
 		
 	}
+#endif
 	return FALSE;
 }
 
@@ -1849,12 +1904,14 @@ static void mainwin_drag_data_received(GtkWidget * widget,
 				       guint time,
 				       gpointer user_data)
 {
+#if 0
 	if (selection_data->data)
 	{
 		playlist_clear();
 		playlist_add_url_string((gchar *) selection_data->data);
 		playlist_play();
 	}
+#endif
 }
 
 void mainwin_add_dir_handler(gchar * dir)
@@ -1872,7 +1929,7 @@ void mainwin_show_dirbrowser(void)
 	if (!mainwin_dir_browser)
 	{
 		mainwin_dir_browser = xmms_create_dir_browser(_("Select directory to add:"), cfg.filesel_path, GTK_SELECTION_SINGLE, mainwin_add_dir_handler);
-		gtk_signal_connect(G_OBJECT(mainwin_dir_browser), "destroy", GTK_SIGNAL_FUNC(gtk_widget_destroyed), &mainwin_dir_browser);
+		g_signal_connect(G_OBJECT(mainwin_dir_browser), "destroy", GTK_SIGNAL_FUNC(gtk_widget_destroyed), &mainwin_dir_browser);
 		gtk_window_set_transient_for(GTK_WINDOW(mainwin_dir_browser), GTK_WINDOW(mainwin));
 	}
 	if (!GTK_WIDGET_VISIBLE(mainwin_dir_browser))
@@ -1910,7 +1967,7 @@ void mainwin_show_add_url_window(void)
 	{
 		mainwin_url_window = util_create_add_url_window(_("Enter location to play:"), GTK_SIGNAL_FUNC(mainwin_url_ok_clicked), GTK_SIGNAL_FUNC(mainwin_url_enqueue_clicked));
 		gtk_window_set_transient_for(GTK_WINDOW(mainwin_url_window), GTK_WINDOW(mainwin));
-		gtk_signal_connect(G_OBJECT(mainwin_url_window), "destroy", GTK_SIGNAL_FUNC(gtk_widget_destroyed), &mainwin_url_window);
+		g_signal_connect(G_OBJECT(mainwin_url_window), "destroy", GTK_SIGNAL_FUNC(gtk_widget_destroyed), &mainwin_url_window);
 		gtk_widget_show(mainwin_url_window);
 	}
 }
@@ -1920,11 +1977,11 @@ void mainwin_eject_pushed(void)
 	static GtkWidget *filebrowser;
 	if (filebrowser != NULL)
 	{
-		gdk_window_raise(filebrowser->window);
+		gdk_window_raise(gtk_widget_get_window(filebrowser));
 		return;
 	}
 	filebrowser = util_create_filebrowser(TRUE);
-	gtk_signal_connect(G_OBJECT(filebrowser), "destroy",
+	g_signal_connect(G_OBJECT(filebrowser), "destroy",
 			   GTK_SIGNAL_FUNC(gtk_widget_destroyed), &filebrowser);
 
 }
@@ -2189,13 +2246,13 @@ void mainwin_real_show(void)
 		return;
 	gdk_pixmap_unref(nullmask);
 	nullmask = NULL;
-	gdk_window_set_hints(mainwin->window, 0, 0,
+	gdk_window_set_hints(gtk_widget_get_window(mainwin), 0, 0,
 			     PLAYER_WIDTH, PLAYER_HEIGHT,
 			     PLAYER_WIDTH, PLAYER_HEIGHT,
 			     GDK_HINT_MIN_SIZE | GDK_HINT_MAX_SIZE);
-	gdk_window_resize(mainwin->window, PLAYER_WIDTH, PLAYER_HEIGHT);
+	gdk_window_resize(gtk_widget_get_window(mainwin), PLAYER_WIDTH, PLAYER_HEIGHT);
 	draw_main_window(TRUE);
-	gdk_window_raise(mainwin->window);
+	gdk_window_raise(gtk_widget_get_window(mainwin));
 }
 
 void mainwin_real_hide(void)
@@ -2215,7 +2272,8 @@ void mainwin_real_hide(void)
 		gtk_widget_hide(mainwin);
 	else
 	{
-		nullmask = cairo_image_surface_create(mainwin->window, 20, 20, 1);
+		//nullmask = cairo_image_surface_create(mainwin, 20, 20, 1);
+		nullmask = cairo_image_surface_create(mainwin, 20, 20);
 		cairo_t *gc = cairo_create(nullmask);
 		pattern.pixel = 0;
 		gdk_gc_set_foreground(gc, &pattern);
@@ -2223,8 +2281,8 @@ void mainwin_real_hide(void)
 		cairo_destroy(gc);
 		gtk_widget_shape_combine_mask(mainwin, nullmask, 0, 0);
 
-		gdk_window_set_hints(mainwin->window, 0, 0, 0, 0, 0, 0, GDK_HINT_MIN_SIZE | GDK_HINT_MAX_SIZE);
-		gdk_window_resize(mainwin->window, 0, 0);
+		gdk_window_set_hints(gtk_widget_get_window(mainwin), 0, 0, 0, 0, 0, 0, GDK_HINT_MIN_SIZE | GDK_HINT_MAX_SIZE);
+		gdk_window_resize(gtk_widget_get_window(mainwin), 0, 0);
 
 	}
 	mainwin_vis_set_active_vis(MAINWIN_VIS_ACTIVE_PLAYLISTWIN);
@@ -2245,7 +2303,7 @@ void mainwin_songname_menu_callback(gpointer cb_data, guint action, GtkWidget * 
 			mainwin_jump_to_time();
 			break;
 		case MAINWIN_SONGNAME_SCROLL:
-			cfg.autoscroll = GTK_CHECK_MENU_ITEM(gtk_item_factory_get_widget(mainwin_songname_menu, "/Autoscroll Songname"))->active;
+			cfg.autoscroll = gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(gtk_item_factory_get_widget(mainwin_songname_menu, "/Autoscroll Songname")));
 			textbox_set_scroll(mainwin_info, cfg.autoscroll);
 			break;
 	}
@@ -2265,11 +2323,11 @@ void mainwin_options_menu_callback(gpointer cb_data, guint action, GtkWidget * w
 		reload_skin();
 		break;
 	case MAINWIN_OPT_SHUFFLE:
-		cfg.shuffle = GTK_CHECK_MENU_ITEM(gtk_item_factory_get_widget(mainwin_options_menu, "/Shuffle"))->active;
+		cfg.shuffle = gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(gtk_item_factory_get_widget(mainwin_options_menu, "/Shuffle")));
 		tbutton_set_toggled(mainwin_shuffle, cfg.shuffle);
 		break;
 	case MAINWIN_OPT_REPEAT:
-		cfg.repeat = GTK_CHECK_MENU_ITEM(gtk_item_factory_get_widget(mainwin_options_menu, "/Repeat"))->active;
+		cfg.repeat = gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(gtk_item_factory_get_widget(mainwin_options_menu, "/Repeat")));
 		tbutton_set_toggled(mainwin_repeat, cfg.repeat);
 		break;
 	case MAINWIN_OPT_TELAPSED:
@@ -2279,35 +2337,35 @@ void mainwin_options_menu_callback(gpointer cb_data, guint action, GtkWidget * w
 		set_timer_mode_menu_cb(TIMER_REMAINING);
 		break;
 	case MAINWIN_OPT_ALWAYS:
-		mainwin_menurow->mr_always_selected = GTK_CHECK_MENU_ITEM(gtk_item_factory_get_widget(mainwin_options_menu, "/Always On Top"))->active;
+		mainwin_menurow->mr_always_selected = GTK_CHECK_MENU_ITEM(gtk_item_factory_get_widget(mainwin_options_menu, "/Always On Top"));
 		cfg.always_on_top = mainwin_menurow->mr_always_selected;
 		draw_widget(mainwin_menurow);
 		mainwin_set_always_on_top(mainwin_menurow->mr_always_selected);
 		break;
 	case MAINWIN_OPT_STICKY:
-		cfg.sticky = GTK_CHECK_MENU_ITEM(gtk_item_factory_get_widget(mainwin_options_menu, "/Sticky"))->active;
+		cfg.sticky = GTK_CHECK_MENU_ITEM(gtk_item_factory_get_widget(mainwin_options_menu, "/Sticky"));
 		hint_set_sticky(cfg.sticky);
 		break;
 	case MAINWIN_OPT_WS:
-		mainwin_set_shade_menu_cb(GTK_CHECK_MENU_ITEM(gtk_item_factory_get_widget(mainwin_options_menu, "/WindowShade Mode"))->active);
+		mainwin_set_shade_menu_cb(GTK_CHECK_MENU_ITEM(gtk_item_factory_get_widget(mainwin_options_menu, "/WindowShade Mode")));
 		break;
 	case MAINWIN_OPT_PWS:
-		playlistwin_set_shade(GTK_CHECK_MENU_ITEM(gtk_item_factory_get_widget(mainwin_options_menu, "/Playlist WindowShade Mode"))->active);
+		playlistwin_set_shade(GTK_CHECK_MENU_ITEM(gtk_item_factory_get_widget(mainwin_options_menu, "/Playlist WindowShade Mode")));
 		break;
 	case MAINWIN_OPT_EQWS:
-		equalizerwin_set_shade(GTK_CHECK_MENU_ITEM(gtk_item_factory_get_widget(mainwin_options_menu, "/Equalizer WindowShade Mode"))->active);
+		equalizerwin_set_shade(GTK_CHECK_MENU_ITEM(gtk_item_factory_get_widget(mainwin_options_menu, "/Equalizer WindowShade Mode")));
 		break;
 	case MAINWIN_OPT_DOUBLESIZE:
-		mainwin_menurow->mr_doublesize_selected = GTK_CHECK_MENU_ITEM(gtk_item_factory_get_widget(mainwin_options_menu, "/DoubleSize"))->active;
+		mainwin_menurow->mr_doublesize_selected = GTK_CHECK_MENU_ITEM(gtk_item_factory_get_widget(mainwin_options_menu, "/DoubleSize"));
 		draw_widget(mainwin_menurow);
 		set_doublesize(mainwin_menurow->mr_doublesize_selected);
 		gdk_display_flush(gdk_display_get_default());
 		break;
 	case MAINWIN_OPT_EASY_MOVE:
-		cfg.easy_move = GTK_CHECK_MENU_ITEM(gtk_item_factory_get_widget(mainwin_options_menu, "/Easy Move"))->active;
+		cfg.easy_move = GTK_CHECK_MENU_ITEM(gtk_item_factory_get_widget(mainwin_options_menu, "/Easy Move"));
 		break;
 	case MAINWIN_OPT_NPA:
-		cfg.no_playlist_advance = GTK_CHECK_MENU_ITEM(gtk_item_factory_get_widget(mainwin_options_menu, "/No Playlist Advance"))->active;
+		cfg.no_playlist_advance = GTK_CHECK_MENU_ITEM(gtk_item_factory_get_widget(mainwin_options_menu, "/No Playlist Advance"));
 	}
 }
 
@@ -2330,7 +2388,7 @@ void mainwin_vis_menu_callback(gpointer cb_data, guint action, GtkWidget * w)
 		mainwin_vis_set_analyzer_type(action - MAINWIN_VIS_ANALYZER_LINES);
 		break;
 	case MAINWIN_VIS_ANALYZER_PEAKS:
-		cfg.analyzer_peaks = GTK_CHECK_MENU_ITEM(gtk_item_factory_get_widget(mainwin_vis_menu, mainwin_vis_menu_entries[MAINWIN_VIS_MENU_ANALYZER_PEAKS].path))->active;
+//		cfg.analyzer_peaks = GTK_CHECK_MENU_ITEM(gtk_item_factory_get_widget(mainwin_vis_menu, mainwin_vis_menu_entries[MAINWIN_VIS_MENU_ANALYZER_PEAKS].path));
 		break;
 	case MAINWIN_VIS_SCOPE_DOT:
 	case MAINWIN_VIS_SCOPE_LINE:
@@ -2388,19 +2446,19 @@ void mainwin_general_menu_callback(gpointer cb_data, guint action, GtkWidget * w
 		playlist_fileinfo_current();
 		break;
 	case MAINWIN_GENERAL_SHOWMWIN:
-		if (GTK_CHECK_MENU_ITEM(gtk_item_factory_get_widget(mainwin_general_menu, "/Main Window"))->active)
+		if (GTK_CHECK_MENU_ITEM(gtk_item_factory_get_widget(mainwin_general_menu, "/Main Window")))
 			mainwin_real_show();
 		else
 			mainwin_real_hide();
 		break;
 	case MAINWIN_GENERAL_SHOWPLWIN:
-		if (GTK_CHECK_MENU_ITEM(gtk_item_factory_get_widget(mainwin_general_menu, "/Playlist Editor"))->active)
+		if (GTK_CHECK_MENU_ITEM(gtk_item_factory_get_widget(mainwin_general_menu, "/Playlist Editor")))
 			playlistwin_real_show();
 		else
 			playlistwin_real_hide();
 		break;
 	case MAINWIN_GENERAL_SHOWEQWIN:
-		if (GTK_CHECK_MENU_ITEM(gtk_item_factory_get_widget(mainwin_general_menu, "/Graphical EQ"))->active)
+		if (GTK_CHECK_MENU_ITEM(gtk_item_factory_get_widget(mainwin_general_menu, "/Graphical EQ")))
 			equalizerwin_real_show();
 		else
 			equalizerwin_real_hide();
@@ -2678,6 +2736,7 @@ void create_popups(void)
 	gtk_item_factory_set_translate_func(mainwin_vis_menu,
 					    util_menu_translate, NULL, NULL);
 	gtk_item_factory_create_items(mainwin_vis_menu, mainwin_vis_menu_entries_num, mainwin_vis_menu_entries, NULL);
+#if gtk3_gtk4
 	CHECK_SET(mainwin_vis_menu, mainwin_vis_menu_entries[MAINWIN_VIS_MENU_VIS_MODE + cfg.vis_type].path, TRUE);
 	CHECK_SET(mainwin_vis_menu, mainwin_vis_menu_entries[MAINWIN_VIS_MENU_ANALYZER_MODE + cfg.analyzer_mode].path, TRUE);
 	CHECK_SET(mainwin_vis_menu, mainwin_vis_menu_entries[MAINWIN_VIS_MENU_ANALYZER_TYPE + cfg.analyzer_type].path, TRUE);
@@ -2687,7 +2746,7 @@ void create_popups(void)
 	CHECK_SET(mainwin_vis_menu, mainwin_vis_menu_entries[MAINWIN_VIS_MENU_REFRESH_RATE + cfg.vis_refresh].path, TRUE);
 	CHECK_SET(mainwin_vis_menu, mainwin_vis_menu_entries[MAINWIN_VIS_MENU_AFALLOFF + cfg.analyzer_falloff].path, TRUE);
 	gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(gtk_item_factory_get_widget(mainwin_vis_menu, mainwin_vis_menu_entries[MAINWIN_VIS_MENU_PFALLOFF + cfg.peaks_falloff].path)), TRUE);
-
+#endif
 	mainwin_general_menu = gtk_item_factory_new(GTK_TYPE_MENU, "<Main>", mainwin_accel);
 	gtk_item_factory_set_translate_func(mainwin_general_menu,
 					    util_menu_translate, NULL, NULL);
@@ -2704,21 +2763,21 @@ static void mainwin_set_icon (GtkWidget *win)
 	Atom icon_atom;
 	glong data[2];
 
-	if (!icon)
-		icon = gdk_pixmap_create_from_xpm_d (win->window, &mask, &win->style->bg[GTK_STATE_NORMAL], xmms_mini_xpm);
-	data[0] = GDK_WINDOW_XWINDOW(icon);
-	data[1] = GDK_WINDOW_XWINDOW(mask);
+//	if (!icon)
+//		icon = gdk_pixmap_create_from_xpm_d (gtk_widget_get_window(win), &mask, GTK_WIDGET(&xwin->style->bg[GTK_STATE_NORMAL]), xmms_mini_xpm);
+//	data[0] = GDK_WINDOW_XWINDOW(icon);
+//	data[1] = GDK_WINDOW_XWINDOW(mask);
 
 	icon_atom = gdk_atom_intern ("KWM_WIN_ICON", FALSE);
-	gdk_property_change (win->window, icon_atom, icon_atom, 32,
+	gdk_property_change (gtk_widget_get_window(win), icon_atom, icon_atom, 32,
 			     GDK_PROP_MODE_REPLACE, (guchar *)data, 2);
-	gdk_window_set_icon(win->window, NULL, icon, mask);
-	gdk_window_set_icon_name(win->window, PACKAGE);
+	gdk_window_set_icon((gtk_widget_get_window(win)), NULL, icon, mask);
+	gdk_window_set_icon_name((gtk_widget_get_window(win)), PACKAGE);
 }
 
 static void mainwin_create_widgets(void)
 {
-	mainwin_gc = gdk_gc_new(mainwin->window);
+	mainwin_gc = gdk_gc_new(gtk_widget_get_window(mainwin));
 
 	mainwin_menubtn = create_pbutton(&mainwin_wlist, mainwin_bg, mainwin_gc, 6, 3, 9, 9, 0, 0, 0, 9, mainwin_menubtn_cb, SKIN_TITLEBAR);
 	mainwin_menubtn->pb_allow_draw = FALSE;
@@ -2781,7 +2840,7 @@ static void mainwin_create_widgets(void)
 
 	mainwin_about = create_sbutton(&mainwin_wlist, mainwin_bg, mainwin_gc, 247, 83, 20, 25, show_about_window);
 
-	mainwin_vis = create_vis(&mainwin_wlist, mainwin_bg, mainwin->window, mainwin_gc, 24, 43, 76, cfg.doublesize);
+	mainwin_vis = create_vis(&mainwin_wlist, mainwin_bg, gtk_widget_get_window(mainwin), mainwin_gc, 24, 43, 76, cfg.doublesize);
 	mainwin_svis = create_svis(&mainwin_wlist, mainwin_bg, mainwin_gc, 79, 5);
 	active_vis = mainwin_vis;
 
@@ -2831,29 +2890,31 @@ static void mainwin_create_gtk(void)
 	else
 		gtk_widget_set_usize(mainwin, 275, cfg.player_shaded ? 14 : 116);
 	if (!cfg.show_wm_decorations)
-		gdk_window_set_decorations(mainwin->window, 0);
+		gdk_window_set_decorations(gtk_widget_get_window(mainwin), 0);
 	gtk_window_add_accel_group(GTK_WINDOW(mainwin), mainwin_accel);
 
-	gtk_signal_connect(G_OBJECT(mainwin), "destroy", GTK_SIGNAL_FUNC(mainwin_destroy), NULL);
-	gtk_signal_connect(G_OBJECT(mainwin), "button_press_event", GTK_SIGNAL_FUNC(mainwin_press), NULL);
-	gtk_signal_connect(G_OBJECT(mainwin), "button_release_event", GTK_SIGNAL_FUNC(mainwin_release), NULL);
-	gtk_signal_connect(G_OBJECT(mainwin), "motion_notify_event", GTK_SIGNAL_FUNC(mainwin_motion), NULL);
-	gtk_signal_connect(G_OBJECT(mainwin), "focus_in_event", GTK_SIGNAL_FUNC(mainwin_focus_in), NULL);
-	gtk_signal_connect(G_OBJECT(mainwin), "focus_out_event", GTK_SIGNAL_FUNC(mainwin_focus_out), NULL);
-	gtk_signal_connect(G_OBJECT(mainwin), "configure_event", GTK_SIGNAL_FUNC(mainwin_configure), NULL);
-	gtk_signal_connect(G_OBJECT(mainwin), "client_event", GTK_SIGNAL_FUNC(mainwin_client_event), NULL);
+	g_signal_connect(G_OBJECT(mainwin), "destroy", GTK_SIGNAL_FUNC(mainwin_destroy), NULL);
+	g_signal_connect(G_OBJECT(mainwin), "button_press_event", GTK_SIGNAL_FUNC(mainwin_press), NULL);
+	g_signal_connect(G_OBJECT(mainwin), "button_release_event", GTK_SIGNAL_FUNC(mainwin_release), NULL);
+	g_signal_connect(G_OBJECT(mainwin), "motion_notify_event", GTK_SIGNAL_FUNC(mainwin_motion), NULL);
+	g_signal_connect(G_OBJECT(mainwin), "focus_in_event", GTK_SIGNAL_FUNC(mainwin_focus_in), NULL);
+	g_signal_connect(G_OBJECT(mainwin), "focus_out_event", GTK_SIGNAL_FUNC(mainwin_focus_out), NULL);
+	g_signal_connect(G_OBJECT(mainwin), "configure_event", GTK_SIGNAL_FUNC(mainwin_configure), NULL);
+	g_signal_connect(G_OBJECT(mainwin), "client_event", GTK_SIGNAL_FUNC(mainwin_client_event), NULL);
 	xmms_drag_dest_set(mainwin);
-	gtk_signal_connect(G_OBJECT(mainwin), "drag-data-received", GTK_SIGNAL_FUNC(mainwin_drag_data_received), NULL);
-	gtk_signal_connect(G_OBJECT(mainwin), "key-press-event", GTK_SIGNAL_FUNC(mainwin_keypress), NULL);
+	g_signal_connect(G_OBJECT(mainwin), "drag-data-received", GTK_SIGNAL_FUNC(mainwin_drag_data_received), NULL);
+	g_signal_connect(G_OBJECT(mainwin), "key-press-event", GTK_SIGNAL_FUNC(mainwin_keypress), NULL);
 
-	gdk_window_set_group(mainwin->window, mainwin->window);
+	gdk_window_set_group(gtk_widget_get_window(mainwin),gtk_widget_get_window(mainwin));
 	mainwin_set_back_pixmap();
 }
 
 void mainwin_create(void)
 {
+#if gtk3_gtk4
 	mainwin_bg = cairo_image_surface_create(NULL, 275, 116, gdk_rgb_get_visual()->depth);
 	mainwin_bg_dblsize = cairo_image_surface_create(NULL, 550, 232, gdk_rgb_get_visual()->depth);
+#endif
 	mainwin_create_gtk();
 	mainwin_create_widgets();
 }
@@ -2864,7 +2925,7 @@ void mainwin_recreate(void)
 	dock_window_list = g_list_remove(dock_window_list, mainwin);
 	gtk_widget_destroy(mainwin);
 	mainwin_create_gtk();
-	vis_set_window(mainwin_vis, mainwin->window);
+	vis_set_window(mainwin_vis, gtk_widget_get_window(mainwin));
 	mainwin_set_shape_mask();
 	draw_main_window(TRUE);
 }
@@ -2952,12 +3013,12 @@ gint idle_func(gpointer data)
 				   "2. No other programs is blocking the soundcard\n"
 				   "3. Your soundcard is configured properly"),
 				 _("Ok"), FALSE, NULL, NULL);
-				gtk_signal_connect(G_OBJECT(infobox), "destroy",
+				g_signal_connect(G_OBJECT(infobox), "destroy",
 						   GTK_SIGNAL_FUNC(gtk_widget_destroyed),
 						   &infobox);
 			}
 			else
-				gdk_window_raise(infobox->window);
+				gdk_window_raise(gtk_widget_get_window(infobox));
 			mainwin_stop_pushed();
 		}
 		else
@@ -3248,7 +3309,7 @@ void segfault_handler(int sig)
 static gboolean pposition_configure(GtkWidget *w, GdkEventConfigure *event, gpointer data)
 {
 	gint x,y;
-	gdk_window_get_deskrelative_origin(w->window, &x, &y);
+	gdk_window_get_deskrelative_origin(gtk_widget_get_window(w), &x, &y);
 	if(x != 0 || y != 0)
 		pposition_broken = TRUE;
 	gtk_widget_destroy(w);
@@ -3265,16 +3326,16 @@ void check_pposition(void)
 
 	window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 	gtk_window_set_wmclass(GTK_WINDOW(window), "XMMS_Player", "xmms");
-	gtk_signal_connect(G_OBJECT(window), "configure_event",
+	g_signal_connect(G_OBJECT(window), "configure_event",
 			   GTK_SIGNAL_FUNC(pposition_configure), NULL);
 	gtk_widget_set_uposition(window, 0, 0);
 	gtk_widget_realize(window);
 	
 	gtk_widget_set_usize(window, 1, 1);
-	gdk_window_set_decorations(window->window, 0);
+	gdk_window_set_decorations(gtk_widget_get_window(window), 0);
 	
-	mask = cairo_image_surface_create(window->window, 1, 1, 1);
-	cairo_t *gc = cairo_create(mask);
+	mask = cairo_image_surface_create(gtk_widget_get_window(window), 1, 1);
+	gc = cairo_create(mask);
 	pattern.pixel = 0;
 	gdk_gc_set_foreground(gc, &pattern);
 	gdk_draw_rectangle(mask, gc, TRUE, 0, 0, 1, 1);
@@ -3283,8 +3344,7 @@ void check_pposition(void)
 
 	gtk_widget_show(window);
 
-	while (g_main_iteration(FALSE))
-		;
+	while (g_main_iteration(FALSE));
 }
 
 #if 0

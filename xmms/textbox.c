@@ -21,6 +21,8 @@
 #include <gdk/gdkprivate.h>
 #include <ctype.h>
 
+#if gtk3_gtk4
+
 static void textbox_generate_pixmap(TextBox * tb);
 
 static void textbox_draw(Widget * w)
@@ -529,3 +531,6 @@ void free_textbox(TextBox * tb)
 	g_free(tb->tb_text);
 	g_free(tb);
 }
+
+#endif
+

@@ -19,11 +19,11 @@
  */
 #include "xmms.h"
 
-#include <pango.h>
-
 #ifdef HAVE_WCHAR_H
 #include <wchar.h>
 #endif
+
+#if gtk3_gtk4
 
 static PangoFontDescription *playlist_list_font = NULL;
 
@@ -516,3 +516,7 @@ void playlist_list_set_font(char *font)
 
 	playlist_list_font = util_font_load(font);
 }
+
+#endif
+
+

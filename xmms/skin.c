@@ -87,7 +87,6 @@ static void setup_skin_masks(void)
 static cairo_surface_t *create_default_mask(GdkWindow * parent, gint w, gint h)
 {
 	cairo_surface_t *ret;
-	cairo_t *gc;
 	GdkColor pattern;
 
         ret = cairo_image_surface_create(CAIRO_FORMAT_A1, w, h);
@@ -106,12 +105,22 @@ static cairo_surface_t *create_default_mask(GdkWindow * parent, gint w, gint h)
 
 static void load_def_pixmap(SkinPixmap *skinpixmap, gchar **skindata)
 {
+#if 0
 	GdkPixbuf *pixbuf = gdk_pixbuf_new_from_xpm_data(skindata);
 	cairo_surface_t *surface = gdk_cairo_surface_create_from_pixbuf(pixbuf, 0);
 	skinpixmap->def_pixmap = surface;
 
 	gtk_window_get_size(GTK_WINDOW(mainwin), &skinpixmap->width, &skinpixmap->height);
 	/* g_object_unref(pixbuf); */
+#endif
+    GdkPixbuf *pixbuf = gdk_pixbuf_new_from_xpm_data(skindata);
+    
+    // Use NULL for GdkWindow if it's not applicable
+    cairo_surface_t *surface = gdk_cairo_surface_create_from_pixbuf(pixbuf, 0, NULL);
+    
+    skinpixmap->def_pixmap = surface;
+
+    gtk_window_get_size(GTK_WINDOW(mainwin), &skinpixmap->width, &skinpixmap->height);
 }
 
 static glong skin_calc_luminance(GdkColor *c)
@@ -127,7 +136,7 @@ static void skin_get_textcolors(cairo_surface_t *text, GdkColor *bgc, GdkColor *
 	 */
 	
 	cairo_surface_t *gi;
-	GdkColormap *cm;
+	GdkVisual *visual = gdk_screen_get_system_visual(gdk_screen_get_default());
 	int i;
 
 	if (text == NULL)
@@ -135,7 +144,7 @@ static void skin_get_textcolors(cairo_surface_t *text, GdkColor *bgc, GdkColor *
 	
 	/* Get the first line of text */
 	gi = gdk_image_get(text, 0, 0, 155, 6);
-	cm = gdk_window_get_colormap(gtk_widget_get_window(playlistwin));
+	visual = gdk_window_get_colormap(gtk_widget_get_window(playlistwin));
 	for (i = 0; i < 6; i ++)
 	{
 		GdkColor c;
@@ -144,13 +153,13 @@ static void skin_get_textcolors(cairo_surface_t *text, GdkColor *bgc, GdkColor *
 
 		/* Get a pixel from the middle of the space character */
 		bgc[i].pixel = gdk_image_get_pixel(gi, 151, i);
-		skin_query_color(cm, &bgc[i]);
+		skin_query_color(visual, &bgc[i]);
 
 		max_d = 0;
 		for (x = 1; x < 150; x ++)
 		{
 			c.pixel = gdk_image_get_pixel(gi, x, i);
-			skin_query_color(cm, &c);
+			skin_query_color(visual, &c);
 
 			d = labs(skin_calc_luminance(&c) -
 				 skin_calc_luminance(&bgc[i]));
@@ -307,7 +316,7 @@ cairo_surface_t *skin_create_transparent_mask(const gchar * path, const gchar * 
 	gchar *filename;
 
 	cairo_surface_t *mask = NULL;
-	cairo_t *gc = NULL;
+	cairo_t *gc;
 	GdkColor pattern;
 	GdkPoint *gpoints;
 
@@ -335,7 +344,7 @@ cairo_surface_t *skin_create_transparent_mask(const gchar * path, const gchar * 
 	}
 
 	mask = cairo_image_surface_create(window, width, height);
-	cairo_t *gc = gdk_cairo_create(mask);
+	gc = gdk_cairo_create(mask);
 	
 	pattern.pixel = 0;
 	cairo_set_source_rgb(gc, pattern.red / 65535.0, pattern.green / 65535.0, pattern.blue / 65535.0);
@@ -419,6 +428,7 @@ void load_skin_viscolor(const gchar * path, const gchar * file)
 	g_free(filename);
 }
 
+#if 0
 static void skin_numbers_generate_dash(SkinPixmap *numbers)
 {
 	cairo_t *gc;
@@ -428,7 +438,7 @@ static void skin_numbers_generate_dash(SkinPixmap *numbers)
 	    numbers->current_width < 99)
 		return;
 
-	cairo_t *gc = gdk_cairo_create(numbers->pixmap);
+	gc = gdk_cairo_create(numbers->pixmap);
 	pixmap = cairo_image_surface_create(gtk_widget_get_window(mainwin), 108,
 				numbers->current_height,
 				gdk_rgb_get_visual()->depth);
@@ -442,6 +452,43 @@ static void skin_numbers_generate_dash(SkinPixmap *numbers)
 	gdk_pixmap_unref(numbers->pixmap);
 	numbers->pixmap = pixmap;
 	numbers->current_width = 108;
+}
+#endif
+
+static void skin_numbers_generate_dash(SkinPixmap *numbers)
+{       
+    cairo_t *gc;
+    cairo_surface_t *surface;
+    GdkVisual *visual;
+
+    if (numbers->pixmap == NULL || numbers->current_width < 99)
+        return;
+
+    // Create a Cairo context for drawing on the existing pixmap
+    gc = gdk_cairo_create(gtk_widget_get_window(mainwin));
+
+    // Create a new surface with the appropriate dimensions
+    surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, 108, numbers->current_height);
+
+    // Replace gdk_rgb_get_visual() -> gdk_screen_get_system_visual()
+    visual = gdk_screen_get_system_visual(gdk_screen_get_default());
+    int depth = gdk_visual_get_depth(visual);
+
+    // Drawing operations (adjust for new surface)
+    skin_draw_pixmap(surface, gc, SKIN_NUMBERS, 0, 0, 0, 0, 99, 13);
+    skin_draw_pixmap(surface, gc, SKIN_NUMBERS, 90, 0, 99, 0, 9, 13);
+    skin_draw_pixmap(surface, gc, SKIN_NUMBERS, 20, 6, 101, 6, 5, 1);
+
+    // Clean up Cairo context
+    cairo_destroy(gc);
+
+    // Release the old pixmap
+    if (numbers->pixmap != NULL)
+        cairo_surface_destroy(numbers->pixmap);
+
+    // Update the pixmap to the new surface
+    numbers->pixmap = surface;
+    numbers->current_width = 108;
 }
 
 

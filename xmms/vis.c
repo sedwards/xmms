@@ -116,7 +116,7 @@ void vis_draw(Widget * w)
 	guchar vis_color[24][3];
 	guchar rgb_data[152 * 32], *ptr, c;
 	guint32 colors[24];
-	GdkRgbCmap *cmap;
+	//GdkRgbCmap *cmap;
 
 	if (!vis->vs_widget.visible)
 		return;
@@ -127,7 +127,7 @@ void vis_draw(Widget * w)
 	{
 		colors[y] = vis_color[y][0] << 16 | vis_color[y][1] << 8 | vis_color[y][2];
 	}
-	cmap = gdk_rgb_cmap_new(colors, 24);
+	//cmap = gdk_rgb_cmap_new(colors, 24);
 
 	if (!vis->vs_doublesize)
 	{
@@ -232,7 +232,7 @@ void vis_draw(Widget * w)
 			}
 		}
 
-		gdk_draw_indexed_image(vis->vs_window, vis->vs_widget.gc, vis->vs_widget.x, vis->vs_widget.y, vis->vs_widget.width, vis->vs_widget.height, GDK_RGB_DITHER_NORMAL, (guchar *) rgb_data, 76, cmap);
+		gdk_draw_indexed_image(vis->vs_window, vis->vs_widget.gc, vis->vs_widget.x, vis->vs_widget.y, vis->vs_widget.width, vis->vs_widget.height, (guchar *) rgb_data);
 	}
 	else
 	{
@@ -381,7 +381,7 @@ void vis_draw(Widget * w)
 			}
 		}
 
-		gdk_draw_indexed_image(vis->vs_window, vis->vs_widget.gc, vis->vs_widget.x << 1, vis->vs_widget.y << 1, vis->vs_widget.width << 1, vis->vs_widget.height << 1, GDK_RGB_DITHER_NONE, (guchar *) rgb_data, 152, cmap);
+		gdk_draw_indexed_image(vis->vs_window, vis->vs_widget.gc, vis->vs_widget.x << 1, vis->vs_widget.y << 1, vis->vs_widget.width << 1, vis->vs_widget.height << 1, (guchar *) rgb_data);
 	}
 
 }

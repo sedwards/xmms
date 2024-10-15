@@ -19,14 +19,11 @@
  */
 #include "xmms.h"
 #include <gdk/gdkprivate.h>
-#include <X11/Xlib.h>
 #include <sys/ipc.h>
 #include <ctype.h>
 #ifdef HAVE_FTS_H
 #include <fts.h>
 #endif
-
-#include <cairo.h>
 
 static GQuark quark_popup_data;
 
@@ -169,148 +166,65 @@ void del_directory(const char *dirname)
 
 cairo_surface_t *create_dblsize_image(cairo_surface_t * img)
 {
-	cairo_surface_t *dblimg;
-	register guint x, y;
+    cairo_surface_t *dblimg;
+    register guint x, y;
 
-	/*
-	 * This needs to be optimized
-	 */
+    // Get the width, height, and stride (bpl) of the original image
+    int img_width = cairo_image_surface_get_width(img);
+    int img_height = cairo_image_surface_get_height(img);
+    int img_stride = cairo_image_surface_get_stride(img);
 
-	dblimg = cairo_image_surface_create(CAIRO_FORMAT_RGB24, img->width << 1, img->height << 1);
+    // Create a new surface double the size of the original
+    dblimg = cairo_image_surface_create(CAIRO_FORMAT_RGB24, img_width << 1, img_height << 1);
 
-        if (cairo_image_surface_get_format(dblimg) == CAIRO_FORMAT_A1)
-	{
-		register guint8 *srcptr, *ptr, *ptr2, pix;
+    // Get the stride (bpl) of the new double-size image
+    int dblimg_stride = cairo_image_surface_get_stride(dblimg);
 
-		unsigned char *srcptr = cairo_image_surface_get_data(img);
-		unsigned char *ptr = cairo_image_surface_get_data(dblimg);
-		cairo_surface_flush(img);
-		cairo_surface_flush(dblimg);
+    if (cairo_image_surface_get_format(dblimg) == CAIRO_FORMAT_A1)
+    {
+        register guint8 *srcptr, *ptr, *ptr2, pix;
 
-		ptr2 = ptr + dblimg->bpl;
+        // Get data pointers for both images
+        srcptr = cairo_image_surface_get_data(img);
+        ptr = cairo_image_surface_get_data(dblimg);
+        cairo_surface_flush(img);
+        cairo_surface_flush(dblimg);
 
-		for (y = 0; y < img->height; y++)
-		{
-			for (x = 0; x < img->width; x++)
-			{
-				pix = *srcptr++;
-				*ptr++ = pix;
-				*ptr++ = pix;
-				*ptr2++ = pix;
-				*ptr2++ = pix;
-			}
-			srcptr += img->bpl - img->width;
-			ptr += (dblimg->bpl << 1) - dblimg->width;
-			ptr2 += (dblimg->bpl << 1) - dblimg->width;
-		}
-		cairo_surface_mark_dirty(img);
-		cairo_surface_mark_dirty(dblimg);
-	}
-	if (dblimg->bpp == 2)
-	{
-		guint16 *srcptr, *ptr, *ptr2, pix;
-                unsigned char *srcptr = cairo_image_surface_get_data(img);
-                unsigned char *ptr = cairo_image_surface_get_data(dblimg);
-                cairo_surface_flush(img);
-                cairo_surface_flush(dblimg);
-		ptr2 = ptr + (dblimg->bpl >> 1);
+        // Set the second pointer to the next row
+        ptr2 = ptr + dblimg_stride;
 
-		for (y = 0; y < img->height; y++)
-		{
-			for (x = 0; x < img->width; x++)
-			{
-				pix = *srcptr++;
-				*ptr++ = pix;
-				*ptr++ = pix;
-				*ptr2++ = pix;
-				*ptr2++ = pix;
-			}
-			srcptr += (img->bpl >> 1) - img->width;
-			ptr += (dblimg->bpl) - dblimg->width;
-			ptr2 += (dblimg->bpl) - dblimg->width;
-		}
-                cairo_surface_mark_dirty(img);
-                cairo_surface_mark_dirty(dblimg);
-	}
-	if (dblimg->bpp == 3)
-	{
-		register guint8 *srcptr, *ptr, *ptr2, pix1, pix2, pix3;
+        for (y = 0; y < img_height; y++)
+        {
+            for (x = 0; x < img_width; x++)
+            {
+                pix = *srcptr++;
+                *ptr++ = pix;
+                *ptr++ = pix;
+                *ptr2++ = pix;
+                *ptr2++ = pix;
+            }
 
-		srcptr = GDK_IMAGE_XIMAGE(img)->data;
-		ptr = GDK_IMAGE_XIMAGE(dblimg)->data;
-		ptr2 = ptr + dblimg->bpl;
+            // Move the pointers to the next row
+            srcptr += img_stride - img_width;
+            ptr += (dblimg_stride << 1) - (img_width << 1);
+            ptr2 += (dblimg_stride << 1) - (img_width << 1);
+        }
+        cairo_surface_mark_dirty(img);
+        cairo_surface_mark_dirty(dblimg);
+    }
+#if 0
+    if (cairo_image_surface_get_format(dblimg) == CAIRO_FORMAT_RGB16_565)
+    {
+        guint16 *srcptr, *ptr, *ptr2, pix;
 
-		for (y = 0; y < img->height; y++)
-		{
-			for (x = 0; x < img->width; x++)
-			{
-				pix1 = *srcptr++;
-				pix2 = *srcptr++;
-				pix3 = *srcptr++;
-				*ptr++ = pix1;
-				*ptr++ = pix2;
-				*ptr++ = pix3;
-				*ptr++ = pix1;
-				*ptr++ = pix2;
-				*ptr++ = pix3;
-				*ptr2++ = pix1;
-				*ptr2++ = pix2;
-				*ptr2++ = pix3;
-				*ptr2++ = pix1;
-				*ptr2++ = pix2;
-				*ptr2++ = pix3;
-
-			}
-			srcptr += img->bpl - (img->width * 3);
-			ptr += (dblimg->bpl << 1) - (dblimg->width * 3);
-			ptr2 += (dblimg->bpl << 1) - (dblimg->width * 3);
-		}
-	}
-	if (dblimg->bpp == 4)
-	{
-		register guint32 *srcptr, *ptr, *ptr2, pix;
-
-		srcptr = (guint32 *) GDK_IMAGE_XIMAGE(img)->data;
-		ptr = (guint32 *) GDK_IMAGE_XIMAGE(dblimg)->data;
-
-/*
-// Old code
-srcptr = GDK_IMAGE_XIMAGE(img)->data;
-ptr = GDK_IMAGE_XIMAGE(dblimg)->data;
-
-// New code using Cairo
-unsigned char *srcptr = cairo_image_surface_get_data(img);
-unsigned char *ptr = cairo_image_surface_get_data(dblimg);
-
-// Ensure surfaces are flushed before manipulating the data
-cairo_surface_flush(img);
-cairo_surface_flush(dblimg);
-
-// Perform your data manipulations here...
-
-// Mark surfaces as dirty after modifications
-cairo_surface_mark_dirty(img);
-cairo_surface_mark_dirty(dblimg);
-*/
-		ptr2 = ptr + (dblimg->bpl >> 2);
-
-		for (y = 0; y < img->height; y++)
-		{
-			for (x = 0; x < img->width; x++)
-			{
-				pix = *srcptr++;
-				*ptr++ = pix;
-				*ptr++ = pix;
-				*ptr2++ = pix;
-				*ptr2++ = pix;
-			}
-			srcptr += (img->bpl >> 2) - img->width;
-			ptr += (dblimg->bpl >> 1) - dblimg->width;
-			ptr2 += (dblimg->bpl >> 1) - dblimg->width;
-		}
-	}
-	return dblimg;
+        // Similar logic for RGB16_565 format goes here...
+    }
+#endif
+    return dblimg;
 }
+
+
+
 
 char *read_ini_string(const char *filename, const char *section, const char *key)
 {
@@ -514,6 +428,7 @@ void util_item_factory_popup_with_data(GtkUIManager * ifactory,
 				       guint x, guint y,
 				       guint mouse_button, guint32 time)
 {
+#if 0
 	static GQuark quark_user_menu_pos = 0;
 	struct MenuPos *pos;
 
@@ -527,13 +442,13 @@ void util_item_factory_popup_with_data(GtkUIManager * ifactory,
 
 	pos = gtk_object_get_data_by_id(G_OBJECT(ifactory),
 					quark_user_menu_pos);
-	if (!pos)
-	{
-		pos = g_malloc0(sizeof (struct MenuPos));
+	//if (!pos)
+	//{
+	//	pos = g_malloc0(sizeof (struct MenuPos));
 
-		gtk_object_set_data_by_id_full(G_OBJECT(ifactory->widget),
-					       quark_user_menu_pos, pos, g_free_func);
-	}
+	//	gtk_object_set_data_by_id_full(G_OBJECT(ifactory->widget),
+	//					       quark_user_menu_pos, pos, g_free_func);
+	//}
 	pos->x = x;
 	pos->y = y;
 
@@ -542,15 +457,16 @@ void util_item_factory_popup_with_data(GtkUIManager * ifactory,
 		gtk_object_set_data_by_id_full(G_OBJECT (ifactory),
 					       quark_popup_data,
 					       data, destroy);
-		gtk_signal_connect(G_OBJECT(ifactory->widget),
+		g_signal_connect(G_OBJECT(ifactory->widget),
 				   "selection-done",
 				   GTK_SIGNAL_FUNC(util_menu_delete_popup_data),
 				   ifactory);
 	}
 
-	gtk_menu_popup(GTK_MENU(ifactory->widget), NULL, NULL,
-		       (GtkMenuPositionFunc) util_menu_position,
-		       pos, mouse_button, time);
+//	gtk_menu_popup(GTK_MENU(ifactory->widget), NULL, NULL,
+//		       (GtkMenuPositionFunc) util_menu_position,
+//		       pos, mouse_button, time);
+#endif
 }
 
 void util_item_factory_popup(GtkUIManager * ifactory, guint x, guint y,
@@ -585,6 +501,7 @@ static void util_add_url_callback(GtkWidget *w, GtkWidget *entry)
 
 GtkWidget* util_create_add_url_window(gchar *caption, GCallback ok_func, GCallback enqueue_func)
 {
+#if 0
 	GtkWidget *win, *vbox, *bbox, *ok, *enqueue, *cancel, *combo;
 	
 	win = gtk_window_new(GTK_WINDOW_DIALOG);
@@ -599,8 +516,8 @@ GtkWidget* util_create_add_url_window(gchar *caption, GCallback ok_func, GCallba
 	combo = gtk_combo_new();
 	if(cfg.url_history)
 		gtk_combo_set_popdown_strings(GTK_COMBO(combo), cfg.url_history);
-	gtk_signal_connect(G_OBJECT(GTK_COMBO(combo)->entry), "activate", util_add_url_callback, GTK_COMBO(combo)->entry);
-	gtk_signal_connect(G_OBJECT(GTK_COMBO(combo)->entry), "activate", ok_func, GTK_COMBO(combo)->entry);
+	g_signal_connect(G_OBJECT(GTK_COMBO(combo)->entry), "activate", util_add_url_callback, GTK_COMBO(combo)->entry);
+	g_signal_connect(G_OBJECT(GTK_COMBO(combo)->entry), "activate", ok_func, GTK_COMBO(combo)->entry);
 	gtk_box_pack_start(GTK_BOX(vbox), combo, FALSE, FALSE, 0);
 	gtk_window_set_focus(GTK_WINDOW(win), GTK_COMBO(combo)->entry);
 	gtk_entry_set_text(GTK_ENTRY(GTK_COMBO(combo)->entry), "");
@@ -612,10 +529,10 @@ GtkWidget* util_create_add_url_window(gchar *caption, GCallback ok_func, GCallba
 	gtk_button_box_set_spacing(GTK_BUTTON_BOX(bbox), 5);
 	
 	ok = gtk_button_new_with_label(_("Ok"));
-	gtk_signal_connect(G_OBJECT(ok), "clicked", util_add_url_callback, GTK_COMBO(combo)->entry);
-	gtk_signal_connect(G_OBJECT(ok), "clicked", ok_func, GTK_COMBO(combo)->entry);
+	g_signal_connect(G_OBJECT(ok), "clicked", util_add_url_callback, GTK_COMBO(combo)->entry);
+	g_signal_connect(G_OBJECT(ok), "clicked", ok_func, GTK_COMBO(combo)->entry);
 	
-	GTK_WIDGET_SET_FLAGS(ok, GTK_CAN_DEFAULT);
+	gtk_widget_set_can_default(ok, TRUE);
 	gtk_window_set_default(GTK_WINDOW(win), ok);
 	gtk_box_pack_start(GTK_BOX(bbox), ok, FALSE, FALSE, 0);
 	gtk_widget_show(ok);
@@ -624,16 +541,16 @@ GtkWidget* util_create_add_url_window(gchar *caption, GCallback ok_func, GCallba
 	{
 		/* I18N note: "Enqueue" here means "Add to playlist" */
 		enqueue = gtk_button_new_with_label(_("Enqueue"));
-		gtk_signal_connect(G_OBJECT(enqueue), "clicked", util_add_url_callback, GTK_COMBO(combo)->entry);
-		gtk_signal_connect(G_OBJECT(enqueue), "clicked", enqueue_func, GTK_COMBO(combo)->entry);
-		GTK_WIDGET_SET_FLAGS(enqueue, GTK_CAN_DEFAULT);
+		g_signal_connect(G_OBJECT(enqueue), "clicked", util_add_url_callback, GTK_COMBO(combo)->entry);
+		g_signal_connect(G_OBJECT(enqueue), "clicked", enqueue_func, GTK_COMBO(combo)->entry);
+		gtk_widget_set_can_default(enqueue, TRUE);
 		gtk_box_pack_start(GTK_BOX(bbox), enqueue, FALSE, FALSE, 0);
 		gtk_widget_show(enqueue);
 	}
 	
 	cancel = gtk_button_new_with_label(_("Cancel"));
-	gtk_signal_connect_object(G_OBJECT(cancel), "clicked", GTK_SIGNAL_FUNC(gtk_widget_destroy), G_OBJECT(win));
-	GTK_WIDGET_SET_FLAGS(cancel, GTK_CAN_DEFAULT);
+	g_signal_connect_object(G_OBJECT(cancel), "clicked", GTK_SIGNAL_FUNC(gtk_widget_destroy), G_OBJECT(win));
+	gtk_widget_set_can_default(cancel, TRUE);
 	gtk_box_pack_start(GTK_BOX(bbox), cancel, FALSE, FALSE, 0);
 	gtk_widget_show(cancel);
 	
@@ -641,20 +558,24 @@ GtkWidget* util_create_add_url_window(gchar *caption, GCallback ok_func, GCallba
 	gtk_widget_show(bbox);
 	gtk_widget_show(vbox);
 	return win;
+#endif
 }
 
 static int int_compare_func(gconstpointer a, gconstpointer b)
 {
+#if 0
 	if (GPOINTER_TO_INT(a) < GPOINTER_TO_INT(b))
 		return -1;
 	if (GPOINTER_TO_INT(a) > GPOINTER_TO_INT(b))
 		return 1;
 	else
+#endif
 		return 0;
 }
 
 static void filebrowser_changed(GtkWidget * w, GtkFileChooserDialog * filesel)
 {
+#if 0
 	gchar *current = "./", *parent = "../";
 	gchar *text = gtk_entry_get_text(GTK_ENTRY(w));
 	GList *list, *node;
@@ -682,6 +603,7 @@ static void filebrowser_changed(GtkWidget * w, GtkFileChooserDialog * filesel)
 		gtk_clist_thaw(GTK_CLIST(filesel->file_list));
 		g_list_free(list);
 	}
+#endif
 }
 
 gboolean util_filebrowser_is_dir(GtkFileChooserDialog * filesel)
@@ -721,6 +643,7 @@ gboolean util_filebrowser_is_dir(GtkFileChooserDialog * filesel)
 
 static void filebrowser_add_files(GtkFileChooserDialog * filesel)
 {
+#if 0
 	GList *sel_list = NULL, *node;
 	gchar *text, *text2, *ptr;
 	gint *clear_on_ok;
@@ -788,6 +711,7 @@ static void filebrowser_add_files(GtkFileChooserDialog * filesel)
 	}
 	g_list_free(sel_list);
 	playlistwin_update_list();
+#endif
 }
 
 static void filebrowser_ok(GtkWidget * w, GtkWidget * filesel)
@@ -808,14 +732,15 @@ static void filebrowser_add_selected_files(GtkWidget * w, gpointer data)
 	GtkFileChooserDialog *filesel = GTK_FILE_SELECTION(data);
 	
 	filebrowser_add_files(filesel);
-	gtk_clist_unselect_all(GTK_CLIST(filesel->file_list));
+	//gtk_clist_unselect_all(GTK_CLIST(filesel->file_list));
 
 	/*HACK*/
-	gtk_entry_set_text(GTK_ENTRY(filesel->selection_entry), "");
+	//gtk_entry_set_text(GTK_ENTRY(filesel->selection_entry), "");
 }
 
 static void filebrowser_add_all_files(GtkWidget * w, gpointer data)
 {
+#if 0
 	GtkFileChooserDialog *filesel = GTK_FILE_SELECTION(data);
 
 	gtk_clist_freeze(GTK_CLIST(filesel->file_list));
@@ -830,6 +755,7 @@ static void filebrowser_add_all_files(GtkWidget * w, gpointer data)
 	gtk_clist_thaw(GTK_CLIST(filesel->file_list));
 
 	gtk_entry_set_text(GTK_ENTRY(filesel->selection_entry), "");
+#endif
 }
 
 GtkWidget * util_create_filebrowser(gboolean clear_pl_on_ok)
@@ -841,30 +767,30 @@ GtkWidget * util_create_filebrowser(gboolean clear_pl_on_ok)
 	filebrowser = gtk_file_selection_new(_("Load file(s)"));
 	fb = GTK_FILE_SELECTION(filebrowser);
 		
-	gtk_clist_set_selection_mode(GTK_CLIST(fb->file_list),
-				     GTK_SELECTION_EXTENDED);
-	gtk_signal_connect(G_OBJECT(fb->selection_entry), "changed",
-			   GTK_SIGNAL_FUNC(filebrowser_changed), filebrowser);
-	gtk_signal_connect(G_OBJECT(fb->ok_button), "clicked",
-			   GTK_SIGNAL_FUNC(filebrowser_ok), filebrowser);
-	gtk_signal_connect_object(G_OBJECT(fb->cancel_button), "clicked",
-				  GTK_SIGNAL_FUNC(gtk_widget_destroy),
-				  G_OBJECT(filebrowser));
+//	gtk_clist_set_selection_mode(GTK_CLIST(fb->file_list),
+//				     GTK_SELECTION_EXTENDED);
+//	g_signal_connect(G_OBJECT(fb->selection_entry), "changed",
+//			   GTK_SIGNAL_FUNC(filebrowser_changed), filebrowser);
+//	g_signal_connect(G_OBJECT(fb->ok_button), "clicked",
+//			   GTK_SIGNAL_FUNC(filebrowser_ok), filebrowser);
+//	g_signal_connect_object(G_OBJECT(fb->cancel_button), "clicked",
+//				  GTK_SIGNAL_FUNC(gtk_widget_destroy),
+//				  G_OBJECT(filebrowser));
 
 	if (cfg.filesel_path)
 		gtk_file_selection_set_filename(fb, cfg.filesel_path);
 	bbox = gtk_hbutton_box_new();
 	gtk_button_box_set_layout(GTK_BUTTON_BOX(bbox), GTK_BUTTONBOX_END);
 	gtk_button_box_set_spacing(GTK_BUTTON_BOX(bbox), 0);
-	gtk_box_pack_end(GTK_BOX(fb->action_area), bbox, TRUE, TRUE, 0);
+//	gtk_box_pack_end(GTK_BOX(fb->action_area), bbox, TRUE, TRUE, 0);
 	add_selected  = gtk_button_new_with_label(_("Add selected files"));
 	gtk_box_pack_start(GTK_BOX(bbox), add_selected, FALSE, FALSE, 0);
-	gtk_signal_connect(G_OBJECT(add_selected), "clicked",
+	g_signal_connect(G_OBJECT(add_selected), "clicked",
 			   GTK_SIGNAL_FUNC(filebrowser_add_selected_files),
 			   filebrowser);
 	add_all = gtk_button_new_with_label(_("Add all files in directory"));
 	gtk_box_pack_start(GTK_BOX(bbox), add_all, FALSE, FALSE, 0);
-	gtk_signal_connect(G_OBJECT(add_all), "clicked",
+	g_signal_connect(G_OBJECT(add_all), "clicked",
 			   GTK_SIGNAL_FUNC(filebrowser_add_all_files),
 			   filebrowser);
 	gtk_widget_show_all(bbox);
@@ -876,9 +802,9 @@ GtkWidget * util_create_filebrowser(gboolean clear_pl_on_ok)
 	
 	label = gtk_label_new(_("Close"));
 	gtk_misc_set_alignment(GTK_MISC(label), 0.5, 0.5);
-	gtk_container_remove(GTK_CONTAINER(fb->cancel_button),
-			     gtk_container_children(GTK_CONTAINER(fb->cancel_button))->data);
-	gtk_container_add(GTK_CONTAINER(fb->cancel_button), label);
+//	gtk_container_remove(GTK_CONTAINER(fb->cancel_button),
+//			     gtk_container_children(GTK_CONTAINER(fb->cancel_button))->data);
+//	gtk_container_add(GTK_CONTAINER(fb->cancel_button), label);
 	gtk_widget_show(label);
 
 	ptr = g_malloc(sizeof (gint));
@@ -939,7 +865,7 @@ void util_set_cursor(GtkWidget *window)
 	if (!cursor)
 		cursor = gdk_cursor_new(GDK_LEFT_PTR);
 
-	gdk_window_set_cursor(window->window, cursor);
+	gdk_window_set_cursor(gtk_widget_get_window(window), cursor);
 }
 
 void util_dump_menu_rc(void)
@@ -981,4 +907,3 @@ void g_free_orig (gpointer mem)
 }
 
 #endif
-
