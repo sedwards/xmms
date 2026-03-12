@@ -11,7 +11,7 @@ void cdda_cddb_show_server_dialog(GtkWidget *w, gpointer data);
 void cdda_cddb_show_network_window(GtkWidget *w, gpointer data);
 void cdda_cddb_set_server(gchar *new_server);
 
-static void cdda_configurewin_ok_cb(GtkWidget * w, gpointer data)
+static void cdda_configure.ac_ok_cb(GtkWidget * w, gpointer data)
 {
 	ConfigFile *cfgfile;
 	gchar *tmp;
@@ -254,7 +254,7 @@ void cdda_configure(void)
 	gtk_box_pack_start(GTK_BOX(vbox), bbox, FALSE, FALSE, 0);
 
 	ok = gtk_button_new_with_label(_("Ok"));
-	gtk_signal_connect(GTK_OBJECT(ok), "clicked", GTK_SIGNAL_FUNC(cdda_configurewin_ok_cb), NULL);
+	gtk_signal_connect(GTK_OBJECT(ok), "clicked", GTK_SIGNAL_FUNC(cdda_configure.ac_ok_cb), NULL);
 	GTK_WIDGET_SET_FLAGS(ok, GTK_CAN_DEFAULT);
 	gtk_box_pack_start(GTK_BOX(bbox), ok, TRUE, TRUE, 0);
 	gtk_widget_grab_default(ok);

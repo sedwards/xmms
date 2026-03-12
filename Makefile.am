@@ -1,4 +1,10 @@
-SUBDIRS = intl libxmms xmms Output Input Effect General Visualization wmxmms gnomexmms po
+ACLOCAL_AMFLAGS = -I m4
+
+#xmms_LDADD = $(GTK_LIBS)
+
+xmms_LDADD = $(GTK_LIBS) -framework Cocoa
+
+SUBDIRS = libxmms xmms Output Input Effect General Visualization wmxmms gnomexmms po
 
 bin_SCRIPTS = xmms-config
 

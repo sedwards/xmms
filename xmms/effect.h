@@ -13,6 +13,6 @@ struct EffectPluginData
 GList *get_effect_list(void);
 void set_current_effect_plugin(int i);
 void effect_about(int i);
-void effect_configure(int i);
+void effect_configure.act i);
 
 #endif

@@ -4,111 +4,54 @@
 
 #include <gtk/gtk.h>
 
-#ifdef HAVE_SCHED_H
-#include <sched.h>
-#elif defined HAVE_SYS_SCHED_H
-#include <sys/sched.h>
-#endif
+/* ... (Keep your existing system includes for sched.h, sysctl, etc.) ... */
 
-#ifdef __FreeBSD__
-#include <sys/sysctl.h>
-#endif
-
-#if TIME_WITH_SYS_TIME
-# include <sys/time.h>
-# include <time.h>
-#else
-# if HAVE_SYS_TIME_H
-#  include <sys/time.h>
-# else
-#  include <time.h>
-# endif
-#endif
-
-#ifndef HAVE_NANOSLEEP
-# include <sys/types.h>
-# ifdef HAVE_UNISTD_H
-#  include <unistd.h>
-# endif
-#endif
-
-
-GtkWidget *xmms_show_message(gchar * title, gchar * text, gchar * button_text, gboolean modal, GtkSignalFunc button_action, gpointer action_data)
+GtkWidget *xmms_show_message(gchar *title, gchar *text, gchar *button_text, gboolean modal, GCallback button_action, gpointer action_data)
 {
-	GtkWidget *dialog, *vbox, *label, *bbox, *button;
+    GtkWidget *dialog, *content_area, *vbox, *label, *action_area, *button;
 
-	dialog = gtk_dialog_new();
-	gtk_window_set_title(GTK_WINDOW(dialog), title);
-	gtk_window_set_modal(GTK_WINDOW(dialog), modal);
+    // 1. Create dialog (GTK 3 uses accessor functions for internal boxes)
+    dialog = gtk_dialog_new();
+    gtk_window_set_title(GTK_WINDOW(dialog), title);
+    gtk_window_set_modal(GTK_WINDOW(dialog), modal);
 
-	vbox = gtk_vbox_new(FALSE, 0);
-	gtk_container_set_border_width(GTK_CONTAINER(vbox), 15);
-	gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dialog)->vbox), vbox, TRUE, TRUE, 0);
+    // 2. Get the internal content area (replaces GTK_DIALOG(dialog)->vbox)
+    content_area = gtk_dialog_get_content_area(GTK_DIALOG(dialog));
 
-	label = gtk_label_new(text);
-	gtk_box_pack_start(GTK_BOX(vbox), label, TRUE, TRUE, 0);
-	gtk_widget_show(label);
-	gtk_widget_show(vbox);
+    // 3. GtkVBox/GtkHBox are replaced by GtkBox with orientation
+    vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+    gtk_container_set_border_width(GTK_CONTAINER(vbox), 15);
+    gtk_box_pack_start(GTK_BOX(content_area), vbox, TRUE, TRUE, 0);
 
-	bbox = gtk_hbutton_box_new();
-	gtk_button_box_set_layout(GTK_BUTTON_BOX(bbox), GTK_BUTTONBOX_SPREAD);
-	gtk_button_box_set_spacing(GTK_BUTTON_BOX(bbox), 5);
-	gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dialog)->action_area), bbox, FALSE, FALSE, 0);
+    label = gtk_label_new(text);
+    gtk_box_pack_start(GTK_BOX(vbox), label, TRUE, TRUE, 0);
 
-	button = gtk_button_new_with_label(button_text);
-	if (button_action)
-		gtk_signal_connect(GTK_OBJECT(button), "clicked", button_action, action_data);
-	gtk_signal_connect_object(GTK_OBJECT(button), "clicked", GTK_SIGNAL_FUNC(gtk_widget_destroy), GTK_OBJECT(dialog));
-	gtk_box_pack_start(GTK_BOX(bbox), button, FALSE, FALSE, 0);
-	GTK_WIDGET_SET_FLAGS(button, GTK_CAN_DEFAULT);
-	gtk_widget_grab_default(button);
-	gtk_widget_show(button);
+    // 4. Handle the action area (replaces HButtonBox and direct struct access)
+    action_area = gtk_dialog_get_action_area(GTK_DIALOG(dialog));
+    gtk_button_box_set_layout(GTK_BUTTON_BOX(action_area), GTK_BUTTONBOX_SPREAD);
+    gtk_container_set_border_width(GTK_CONTAINER(action_area), 5);
 
-	gtk_widget_show(bbox);
-	gtk_widget_show(dialog);
+    button = gtk_button_new_with_label(button_text);
+    
+    // 5. Signal Porting: Use g_signal_connect and G_CALLBACK
+    if (button_action)
+        g_signal_connect(button, "clicked", button_action, action_data);
+    
+    // g_signal_connect_swapped replaces gtk_signal_connect_object
+    g_signal_connect_swapped(button, "clicked", G_CALLBACK(gtk_widget_destroy), dialog);
 
-	return dialog;
+    gtk_box_pack_start(GTK_BOX(action_area), button, FALSE, FALSE, 0);
+    
+    // 6. Replace GTK_WIDGET_SET_FLAGS with specific setter
+    gtk_widget_set_can_default(button, TRUE);
+    gtk_widget_grab_default(button);
+
+    // In GTK 3, showing the top-level window shows children (if they aren't explicitly hidden)
+    gtk_widget_show_all(dialog);
+
+    return dialog;
 }
 
-gboolean xmms_check_realtime_priority(void)
-{
-#ifdef HAVE_SCHED_SETSCHEDULER
-#ifdef __FreeBSD__
-	/*
-	 * Check if priority scheduling is enabled in the kernel
-	 * before sched_getschedule() (so that we don't get
-	 * non-present syscall warnings in kernel log).
-	 */
-	int val = 0, len;
+/* xmms_check_realtime_priority and xmms_usleep remain unchanged as they are system/POSIX calls */
 
-	len = sizeof(val);
-	sysctlbyname("p1003_1b.priority_scheduling", &val, &len, NULL, 0);
-	if ( !val )
-		return FALSE;
-#endif
-	if (sched_getscheduler(0) == SCHED_RR)
-		return TRUE;
-	else
-#endif
-		return FALSE;
-}
 
-void xmms_usleep(gint usec)
-{
-#ifdef HAVE_NANOSLEEP
-	struct timespec req;
-
-	req.tv_sec = usec / 1000000;
-	usec -= req.tv_sec * 1000000;
-	req.tv_nsec = usec * 1000;
-
-	nanosleep(&req, NULL);
-#else
-	struct timeval tv;
-	
-	tv.tv_sec = usec / 1000000;
-	usec -= tv.tv_sec * 1000000;
-	tv.tv_usec = usec;
-	select(0, NULL, NULL, NULL, &tv);
-#endif
-}

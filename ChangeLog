@@ -39,7 +39,7 @@ Sun Jan  6 22:54:05 CET 2002  Håvard Kvålen  <havardk@xmms.org>
 
 Sun Jan  6 02:21:26 CET 2002  Thomas Nilsson <thomas@xmms.org>
 
-	* configure.in, Input/cdaudio/cdaudio.c: Added
+	* configure.ac, Input/cdaudio/cdaudio.c: Added
 	--with-cdda-device, --with-cdda-dir.
 
 Sun Jan  6 02:01:20 CET 2002  Håvard Kvålen  <havardk@xmms.org>
@@ -158,7 +158,7 @@ Mon Dec 17 23:24:27 CET 2001  Håvard Kvålen  <havardk@xmms.org>
 
 Mon Dec 17 01:54:13 CET 2001  Håvard Kvålen  <havardk@xmms.org>
 
-	* configure.in: Added a check for vorbis_packet_blocksize().  You
+	* configure.ac: Added a check for vorbis_packet_blocksize().  You
 	need vorbis 1.0rc1 or newer to compile the vorbis plugin.
 
 	* Input/vorbis/vcedit.[ch]: Update to latest version by Michael
@@ -166,7 +166,7 @@ Mon Dec 17 01:54:13 CET 2001  Håvard Kvålen  <havardk@xmms.org>
 
 Sun Dec 16 23:44:40 CET 2001  Håvard Kvålen  <havardk@xmms.org>
 
-	* configure.in: Actually use zlib if it's available.
+	* configure.ac: Actually use zlib if it's available.
 
 	* Input/mpg123/id3.c, Input/mpg123/id3.h,
 	Input/mpg123/id3_frame.c, Input/mpg123/id3_frame_content.c,
@@ -191,7 +191,7 @@ Fri Dec  7 13:06:44 CET 2001  Thomas Nilsson <thomas@xmms.org>
 
 Tue Dec  4 20:04:46 CET 2001  Håvard Kvålen  <havardk@xmms.org>
 
-	* libxmms/configure.in: Increment libtool version.
+	* libxmms/configure.ac: Increment libtool version.
 
 	* xmms/playlistwin.c, xmms/playlist.[ch]: Added reading of
 	playlist info for selection.
@@ -244,7 +244,7 @@ Sun Dec  2 23:22:55 CET 2001  Håvard Kvålen  <havardk@xmms.org>
 	* Input/mpg123/http.c (mpg123_http_get_title): Use the entire url
 	if the basename is empty.
 
-	* configure.in: Don't add "-m486" to CFLAGS as it annoys people
+	* configure.ac: Don't add "-m486" to CFLAGS as it annoys people
 	who want to set it to something else.
 
 Sat Dec  1 17:57:32 CET 2001  Håvard Kvålen  <havardk@xmms.org>
@@ -295,7 +295,7 @@ Thu Nov 29 21:13:32 CET 2001  Håvard Kvålen  <havardk@xmms.org>
 
 	* xmms/about.c (translators): Added another translator.
 
-	* configure.in: Always set HAVE_MIKMOD, fixes a problem with
+	* configure.ac: Always set HAVE_MIKMOD, fixes a problem with
 	--disable-mikmod.  Set symbol prefix for NetBSD and OpenBSD.
 
 	* README: Fixed a syntax error in a command. 
@@ -329,7 +329,7 @@ Wed Nov 14 23:01:29 CET 2001  Håvard Kvålen  <havardk@xmms.org>
 
 Wed Nov  7 01:25:51 CET 2001  Håvard Kvålen  <havardk@xmms.org>
 
-	* configure.in (ALL_LINGUAS): New language: Thai (th).
+	* configure.ac (ALL_LINGUAS): New language: Thai (th).
 
 Wed Nov  7 00:15:45 CET 2001  Håvard Kvålen  <havardk@xmms.org>
 
@@ -400,7 +400,7 @@ Tue Sep 18 21:10:01 CEST 2001  Håvard Kvålen  <havardk@xmms.org>
 
 	* Input/tonegen/tonegen.c (play_loop): Fixed a bad inaccuracy.
 
-	* configure.in (ALL_LINGUAS): New translations: Basque (eu), 
+	* configure.ac (ALL_LINGUAS): New translations: Basque (eu), 
 	Tajik (tg), Vietnamese (vi).
 
 	* Output/OSS/audio.c, Output/OSS/convert.c: Remove a couple of
@@ -429,11 +429,11 @@ Thu Sep  6 18:36:10 CEST 2001  Håvard Kvålen  <havardk@xmms.org>
 
 	* xmms/about.c (translators): Added a couple of translators.
 
-	* configure.in: Don't touch Makefile.in.
+	* configure.ac: Don't touch Makefile.in.
 	Removed the --disable-gnome flag, use --without-gnome instead.
 
-	* libxmms/configure.in, libxmms/Makefile.am: Set the libxmms
-	version number in configure.in.
+	* libxmms/configure.ac, libxmms/Makefile.am: Set the libxmms
+	version number in configure.ac.
 
 	* Output/OSS/audio.c (oss_set_audio_params): The format conversion
 	would not work after a skip or a pause.
@@ -466,7 +466,7 @@ Sun Sep  2 20:04:10 CEST 2001  Håvard Kvålen  <havardk@xmms.org>
 
 Sun Aug 26 19:24:10 CEST 2001  Håvard Kvålen  <havardk@xmms.org>
 
-	* configure.in (ALL_LINGUAS): New language Norwegian (nynorsk) (nn).
+	* configure.ac (ALL_LINGUAS): New language Norwegian (nynorsk) (nn).
 
 Sun Aug 19 20:59:05 CEST 2001  Håvard Kvålen  <havardk@xmms.org>
 
@@ -523,7 +523,7 @@ Thu Aug 16 19:50:52 CEST 2001  Thomas Nilsson  <thomas@xmms.org>
 
 Tue Aug  7 11:42:28 CEST 2001  Espen Skoglund  <esk@ira.uka.de>
 
-	* configure.in: Added check for FreeBSD newpcm driver.
+	* configure.ac: Added check for FreeBSD newpcm driver.
 
 	* Output/OSS/configure.c (oss_configure): Use different scan
 	devices string when having a newpcm driver.
@@ -578,7 +578,7 @@ Tue Jul 10 17:43:14 CEST 2001  Espen Skoglund  <esk@ira.uka.de>
 	solutions for deleting a file hierarchy.  (Note that superuser is
 	allowed to enforce an unlink() on directories in some systems.)
 
-	* configure.in: Add check for <fts.h>.
+	* configure.ac: Add check for <fts.h>.
  	
 Fri Jul  6 00:28:13 CEST 2001  Håvard Kvålen  <havardk@xmms.org>
 
@@ -595,7 +595,7 @@ Fri Jul  6 00:28:13 CEST 2001  Håvard Kvålen  <havardk@xmms.org>
 
 Thu Jul  5 14:45:14 CDT 2001  Zinx Verituse <zinx@xmms.org>
 
-	* configure.in: added --disable options for most stuff
+	* configure.ac: added --disable options for most stuff
 
 Thu Jul  5 19:32:29 CEST 2001  Thomas Nilsson  <thomas@xmms.org>
 
@@ -695,10 +695,10 @@ Sun Jun 10 16:53:59 CEST 2001  Håvard Kvålen  <havardk@xmms.org>
 	* libxmms/Makefile.am (libxmms_la_LDFLAGS): Bump the version
 	number for libxmms as we have added interfaces.
 
-	* configure.in: Fixed some places that tried to use the configure
+	* configure.ac: Fixed some places that tried to use the configure
 	cache.
 
-	* gnomexmms.1.in, wmxmms.1.in, Makefile.am, configure.in: New man
+	* gnomexmms.1.in, wmxmms.1.in, Makefile.am, configure.ac: New man
 	pages for gnomexmms and wmxmms.
 
 	* xmms.1.in: Added a "see also" section with wmxmms and gnomexmms.
@@ -719,7 +719,7 @@ Wed Jun  6 12:24:13 CEST 2001  Håvard Kvålen  <havardk@xmms.org>
 	* Output/OSS/audio.c (oss_write_audio): Fixed bug that caused
 	serious problems if we were doing samplerate conversion.
 
-	* configure.in (ALL_LINGUAS): "zh_TW.Big5" changed to zh_TW.
+	* configure.ac (ALL_LINGUAS): "zh_TW.Big5" changed to zh_TW.
 	Insert export OLD_PO_FILE_INPUT = yes into the po/Makefile to be
 	able to build with new gettext versions.
 
@@ -729,10 +729,10 @@ Wed Jun  6 12:24:13 CEST 2001  Håvard Kvålen  <havardk@xmms.org>
 
 Thu May 31 17:32:18 CET 2001  Espen Skoglund  <esk@ira.uka.de>
 
-	* configure.in: Do not compile with `-fomit-frame-pointer' when
+	* configure.ac: Do not compile with `-fomit-frame-pointer' when
 	CFLAGS contains `-g' switch.  Added AC_SUBST() for Z_LIBS.
 
-	* libxmms/configure.in: Added AM_CONFIG_HEADER().
+	* libxmms/configure.ac: Added AM_CONFIG_HEADER().
 
 	* Input/mpg123/Makefile.am: Added Z_LIBS to linker.
 
@@ -870,7 +870,7 @@ Sun Apr 15 20:39:24 EDT 2001  Håvard Kvålen  <havardk@xmms.org>
 Thu Apr 12 22:15:48 EDT 2001  Håvard Kvålen  <havardk@xmms.org>
 
 	* Input/vorbis/utf8.c, Input/vorbis/fileinfo.c,
-	Input/vorbis/vorbis.[ch], Input/vorbis/Makefile.am, configure.in:
+	Input/vorbis/vorbis.[ch], Input/vorbis/Makefile.am, configure.ac:
 	Save vorbis comments as UTF-8 if the libc can convert it.
 
 	* Output/OSS/audio.c: Handle the case where the write() return
@@ -882,7 +882,7 @@ Tue Apr 10 18:20:50 EDT 2001  Håvard Kvålen  <havardk@xmms.org>
 	crashing.
 
 	* libxmms/titlestring.c, libxmms/dirbrowser.c, xmms/i18n.h.in,
-	configure.in: Make xmms/i18n.h be generated by configure instead.
+	configure.ac: Make xmms/i18n.h be generated by configure.acstead.
 
 Tue Apr 10 12:40:23 EDT 2001  Håvard Kvålen  <havardk@xmms.org>
 
@@ -938,18 +938,18 @@ Thu Apr  5 18:42:08 EDT 2001  Håvard Kvålen  <havardk@xmms.org>
 	(vorbis_file_info_box): A bunch of global variables was
 	duplicated here.  Translate the builtin genres.
 
-	* xmms.1.in, configure.in, Makefile.am: New, minimal man page for
+	* xmms.1.in, configure.ac, Makefile.am: New, minimal man page for
 	xmms.
 
 Wed Apr  4 17:14:01 EDT 2001  Håvard Kvålen  <havardk@xmms.org>
 
-	* configure.in, acinclude.m4, acconfig.h, libxmms/configure.in,
+	* configure.ac, acinclude.m4, acconfig.h, libxmms/configure.ac,
 	libxmms/acinclude.m4: Check for sched_setscheduler and nanosleep
 	in -lrt for Tru64 Unix.  Also fixed a bug here.
 	Patch by Tim Mooney <mooney@dogbert.cc.ndsu.NoDak.edu>
 	Moved over to acinclude.m4 and some further rewriting by me.
 
-	* configure.in: Some minor cleanup in the checks for OSS headers.
+	* configure.ac: Some minor cleanup in the checks for OSS headers.
 
 	* xmms/about.c: Added the translators to the about window.  Let me
 	know if there are omissions or other errors.
@@ -969,19 +969,19 @@ Sat Mar 31 13:08:14 EST 2001  Håvard Kvålen  <havardk@xmms.org>
 
 	* xmms/input.c, xmms/util.c: Don't dereference non-lvalue arrays.
 
-	* configure.in, acinclude.m4: New test for libxml.  This should
+	* configure.ac, acinclude.m4: New test for libxml.  This should
 	fix the build problems on some Mandrake systems that has the
 	xml-config script in the libxml (non-devel) package.
 
 Thu Mar 29 13:09:33 CET 2001  Espen Skoglund  <esk@ira.uka.de>
 
-	* configure.in: Check FreeBSD gcc version against
+	* configure.ac: Check FreeBSD gcc version against
 	FreeBSD_cc_version defined in gcc rather than <sys/param.h>.
 	Thanks to FUJISHIMA Satsuki <sf@FreeBSD.org>.
 
 Sun Mar 25 17:39:19 EST 2001  Håvard Kvålen  <havardk@xmms.org>
 
-	* configure.in (ALL_LINGUAS): Added Serbian (sr).
+	* configure.ac (ALL_LINGUAS): Added Serbian (sr).
 
 	* xmms/main.c (main): Changed the text that complains about a too
 	old Gtk+ slightly.
@@ -1068,9 +1068,9 @@ Tue Mar 13 15:50:40 EST 2001  Håvard Kvålen  <havardk@xmms.org>
 	* xmms/main.c (mainwin_mr_release): Fixed a bug that prevented the
 	clutterbar doublesize toggle from working.
 
-	* configure.in (ALL_LINGUAS): New translation: Portugese (pt).
+	* configure.ac (ALL_LINGUAS): New translation: Portugese (pt).
 
-	* xmms/main.[ch], xmms/prefswin.c, xmms/Makefile.am, configure.in,
+	* xmms/main.[ch], xmms/prefswin.c, xmms/Makefile.am, configure.ac,
 	po/POTFILES.in, xmms/xmms.h: Removed the DGA support that never
 	really worked anyway.
 
@@ -1096,7 +1096,7 @@ Mon Mar 12 21:17:54 CET 2001  Espen Skoglund  <esk@ira.uka.de>
 	description string.
 
 	* Input/vorbis/configure.c (title_tag_override_cb): Cleanup.
-	(vorbis_configurewin_ok): Minor cleanup.  Removed memory leak.
+	(vorbis_configure.ac_ok): Minor cleanup.  Removed memory leak.
 	(vorbis_configure): Cleanup.  Updated title desciption string.
 
 	* Input/vorbis/vorbis.c (vorbis_generate_title): Use
@@ -1165,7 +1165,7 @@ Thu Mar  8 17:18:31 CET 2001  Espen Skoglund  <esk@ira.uka.de>
 
 Thu Mar  8 00:19:33 EST 2001  Håvard Kvålen  <havardk@xmms.org>
 
-	* configure.in, Ouput/Makefile.am, Output/solaris/*: Solaris
+	* configure.ac, Ouput/Makefile.am, Output/solaris/*: Solaris
 	plugin merged.  Thanks to John Riddoch, Santosh Salunkhe, Julian
 	Yip and others.
 
@@ -1201,7 +1201,7 @@ Thu Mar  8 00:19:33 EST 2001  Håvard Kvålen  <havardk@xmms.org>
 	works better with wm decorations on.  Hopefully it does not break
 	anything else either.
 
-	* configure.in: Fixed a test expression.
+	* configure.ac: Fixed a test expression.
 
 Wed Mar  5 08:31:41 2001  Olle Hällnäs  <olle@xmms.org>
 
@@ -1220,13 +1220,13 @@ Mon Mar  5 16:04:49 2001  Espen Skoglund  <esk@ira.uka.de>
 	
 Fri Mar  2 18:28:04 CET 2001  Håvard Kvålen  <havardk@xmms.org>
 
-	* configure.in (ALL_LINGUAS): New translation: Indonesian (id).
+	* configure.ac (ALL_LINGUAS): New translation: Indonesian (id).
 
 	* Input/mpg123/dxhead.[ch]: Whitespace changes.
 
 Thu Mar  1 18:54:55 CET 2001  Espen Skoglund  <esk@ira.uka.de>
 
-	* configure.in: Added checking for old style FreeBSD -pthread flag
+	* configure.ac: Added checking for old style FreeBSD -pthread flag
 	to gcc.  Works with both -CURRENT and older branches of FreeBSD.
  
 Sat Feb 24 12:24:15 CET 2001  Peter Alm <peter@xmms.org>
@@ -1272,13 +1272,13 @@ Thu Feb  8 16:18:20 EST 2001  Håvard Kvålen  <havardk@xmms.org>
 	* xmms/playlist.c: Don't rebuild the shuffle_list from scratch
 	when deleting entries from the playlist.
 
-	* configure.in: Added -Wpointer-arith to CFLAGS if using gcc.
+	* configure.ac: Added -Wpointer-arith to CFLAGS if using gcc.
 
-	* libxmms/configure.in: More compiler warnings if using gcc.
+	* libxmms/configure.ac: More compiler warnings if using gcc.
 
 Tue Feb  6 10:55:33 2001  Espen Skoglund  <esk@ira.uka.de>
 
-	* configure.in, xmms/main.c (main): Use srandom() or possibly
+	* configure.ac, xmms/main.c (main): Use srandom() or possibly
 	srandomdev() instead of srand().
 
 	* xmms/playlist.c (playlist_shuffle_list) (playlist_play),
@@ -1346,7 +1346,7 @@ Thu Jan 25 02:30:30 CET 2001  Håvard Kvålen  <havardk@xmms.org>
 	(main): Add check for sched_get_priority_max(). 
 	(create_popups): Cleanup.
 
-	* configure.in: Add check for sched_get_priority_max() which is
+	* configure.ac: Add check for sched_get_priority_max() which is
 	missing on OpenBSD.
 	Some other minor cleanups.
 
@@ -1373,10 +1373,10 @@ Sat Jan 20 11:22:18 CST 2001  Ryan Weaver <ryanw@infohwy.com>
 
 Fri Jan 19 17:29:31 CET 2001  Espen Skoglund  <esk@ira.uka.de>
 
-	* configure.in: Disable `-funroll-all-loops' when compiling for
+	* configure.ac: Disable `-funroll-all-loops' when compiling for
 	FreeBSD.  (Known to cause audio glitches during playback.)
 
-	* configure.in, {Plugindirs}/Makefile.am: Added environment
+	* configure.ac, {Plugindirs}/Makefile.am: Added environment
 	variable INPUT_PLUGINS and friends that can be used for manually
 	overriding which plugins to be built.  (Useful during automated
 	building of XMMS.)
@@ -1453,7 +1453,7 @@ Sun Dec 31 18:15:03 CET 2000  Håvard Kvålen  <havardk@xmms.org>
 Sat Dec 30 19:40:39 CET 2000  Espen Skoglund  <esk@ira.uka.de>
 
 	* Input/cdaudio/cdaudio.c (is_mounted), Input/cdaudio/cdaudio.h,
-	configure.in: Try to use getmntinfo() for systems that do not have
+	configure.ac: Try to use getmntinfo() for systems that do not have
 	getmntent().  (Only checked on FreeBSD.)  Thanks to Vladimir
 	Kushnir <vkushnir@Alfacom.net>.
 	
@@ -1498,7 +1498,7 @@ Thu Dec 28 15:49:31 CET 2000  Håvard Kvålen  <havardk@xmms.org>
 	* xmms/skin.c: Use mkdtemp() to create the temporary dir when
 	decompressing skins.
 
-	* configure.in: Check for mkdtemp();
+	* configure.ac: Check for mkdtemp();
 
 	* xmms/mkdtemp.c, xmms/Makefile.am: An implementation of mkdtemp()
 	for systems that are missing it.  Derived from the implementation
@@ -1544,7 +1544,7 @@ Wed Nov 29 19:11:12 CET 2000  Håvard Kvålen  <havardk@xmms.org>
 	string is.  Thanks to Chun-Chung Chen <cjj@u.washington.edu> for
 	helping to sort this out.  I'm hoping I got it right this time.
 
-	* configure.in (ALL_LINGUAS): New language: Galician (gl).
+	* configure.ac (ALL_LINGUAS): New language: Galician (gl).
 
 Tue Nov 28 00:30:31 CET 2000  Håvard Kvålen  <havardk@xmms.org>
 
@@ -1642,7 +1642,7 @@ Fri Oct 20 01:13:20 CEST 2000  Håvard Kvålen  <havardk@xmms.org>
 
 Wed Oct 18 13:36:10 CEST 2000  Håvard Kvålen  <havardk@xmms.org>
 
-	* configure.in (ALL_LINGUAS): New language: Turkish (tr).
+	* configure.ac (ALL_LINGUAS): New language: Turkish (tr).
 
 Tue Oct 17 23:38:40 CEST 2000  Håvard Kvålen  <havardk@xmms.org>
 
@@ -1650,7 +1650,7 @@ Tue Oct 17 23:38:40 CEST 2000  Håvard Kvålen  <havardk@xmms.org>
 	streaming.  It had some serious bugs, it was leaking both threads
 	and sockets.
 
-	* Input/mpg123/configure.c (mpg123_configurewin_ok): The upd
+	* Input/mpg123/configure.c (mpg123_configure.ac_ok): The upd
 	metadata streaming was not possible to disable because of a typo.
 	(mpg123_configure): Changed a string.
 
@@ -1660,7 +1660,7 @@ Mon Oct 16 03:12:37 CEST 2000  Håvard Kvålen  <havardk@xmms.org>
 
 	* xmms/util.c (util_font_load): Moved here from playlist_list.c.
 
-	* configure.in: Check for <wchar.h>.  Check for the socklen_t
+	* configure.ac: Check for <wchar.h>.  Check for the socklen_t
 	type.
 
 	* xmms/pluginenum.c: Removed workaround for the glibc bug.  Get a
@@ -1684,7 +1684,7 @@ Mon Oct  2 15:12:48 CEST 2000  Peter Alm  <peter@xmms.org>
 
 Mon Oct  2 11:36:15 CEST 2000  Espen Skoglund  <esk@ira.uka.de>
 
-	* acconfig.h, configure.in, Input/mpg123/Makefile.am,
+	* acconfig.h, configure.ac, Input/mpg123/Makefile.am,
 	Input/mpg123/configure.c, Input/mpg123/decode_i386.c,
 	Input/mpg123/layer3.c, Input/mpg123/mpg123.c, Input/mpg123/mpg123.h,
 	Input/mpg123/dct36_3dnow.s, Input/mpg123/dct64_3dnow.s,
@@ -1699,7 +1699,7 @@ Sun Oct  1 02:05:48 CEST 2000  Håvard Kvålen  <havardk@xmms.org>
 	* libxmms/util.c: Always #include sys/time.h.  This is supposed to
 	fix a build problem on OpenBSD.
 
-	* libxmms/configure.in: Added a couple of checks for header
+	* libxmms/configure.ac: Added a couple of checks for header
 	files. 
 
 	* Input/cdaudio/cdindex.c: We #included xmlmemory.h for no good
@@ -1708,7 +1708,7 @@ Sun Oct  1 02:05:48 CEST 2000  Håvard Kvålen  <havardk@xmms.org>
 
 Tue Sep 26 23:09:06 CEST 2000  Håvard Kvålen  <havardk@xmms.org>
 
-	* configure.in (ALL_LINGUAS): New languages: Azerbaijani (az),
+	* configure.ac (ALL_LINGUAS): New languages: Azerbaijani (az),
 	Italian (it).
 
 Mon Sep 25 00:12:17 CEST 2000  Håvard Kvålen  <havardk@xmms.org>
@@ -1735,7 +1735,7 @@ Tue Sep 19 16:27:00 CEST 2000  Håvard Kvålen  <havardk@xmms.org>
 
 Mon Sep 18 01:49:25 CEST 2000  Håvard Kvålen  <havardk@xmms.org>
 
-	* configure.in (ALL_LINGUAS): New language: "lv".
+	* configure.ac (ALL_LINGUAS): New language: "lv".
 
 	* Input/mpg123/common.c (read_id3v2_tag): Make sure the header
 	size is reasonable, to avoid mallocing large amounts of
@@ -1806,7 +1806,7 @@ Mon Sep 11 23:53:56 CEST 2000  Håvard Kvålen  <havardk@xmms.org>
 	playlist is cleared at the right time also if you add files with
 	the "Add files..." buttons.
 
-	* configure.in (ALL_LINGUAS): New language: "ga". "el_GR" renamed
+	* configure.ac (ALL_LINGUAS): New language: "ga". "el_GR" renamed
 	to "el".
 	Added -Wall to CFLAGS if we have gcc.
 
@@ -1832,7 +1832,7 @@ Fri Sep  1 18:41:26 CEST 2000  Håvard Kvålen  <havardk@xmms.org>
 	* libxmms/util.c (xmms_usleep): Fixed this functions for systems
 	that are lacking nanosleep().
 
-	* configure.in, Input/cdaudio/cdindex.c: Added a check for
+	* configure.ac, Input/cdaudio/cdindex.c: Added a check for
 	xmlDocGetRootElement() which older versions of libxml was
 	lacking. 
 
@@ -2012,7 +2012,7 @@ Sat Jul 29 01:28:03 CEST 2000  Håvard Kvålen  <havardk@xmms.org>
 
 	* Input/cdaudio/cdaudio.c, Output/OSS/audio.c,
 	Output/OSS/configure.c, Output/OSS/mixer.c, Output/esd/mixer.c,
-	configure.in: It is possible to set default output and mixer
+	configure.ac: It is possible to set default output and mixer
 	device for the OSS plugin from configure.
 	Patch by Adam J. Richter <adam@yggdrasil.com>.
 
@@ -2037,7 +2037,7 @@ Fri Jul 21 01:09:23 CEST 2000  Håvard Kvålen  <havardk@xmms.org>
 	enture url.
 	Patch by Dave Yearke <yearke@eng.buffalo.edu>.
 
-	* configure.in: Removed the version check for libxml.  Export
+	* configure.ac: Removed the version check for libxml.  Export
 	XML_CFLAGS.
 
 Tue Jul 19 00:54:22 CEST 2000  Olle Hällnäs  <olle@xmms.org>
@@ -2107,7 +2107,7 @@ Tue Jul 11 22:18:18 CEST 2000  Håvard Kvålen  <havardk@xmms.org>
 
 Tue Jul 11 22:07:04 CEST 2000  Håvard Kvålen  <havardk@xmms.org>
 
-	* configure.in: Don't use libxml if the major version is different
+	* configure.ac: Don't use libxml if the major version is different
 	from 1.  libxml v2 is not compatible.
 
 	* libxmms/Makefile.am: Set the path to the intl dir explicitly.
@@ -2140,7 +2140,7 @@ Sat Jul  8 02:27:38 CEST 2000  Håvard Kvålen  <havardk@xmms.org>
 
 	* General/song_change/song_change.c: Added a include.
 
-	* configure.in: Removed some incorrect AC_DEFINE's that had
+	* configure.ac: Removed some incorrect AC_DEFINE's that had
 	sneaked in, and that prevented the NLS detection from working as
 	expected.  In particular, --disable-nls should work now.
 
@@ -2211,7 +2211,7 @@ Thu Jun 29 22:24:01 GMT 2000  Chris Wilson  <jakdaw@xmms.org>
 
 Tue Jun 27 16:09:41 CEST 2000  Håvard Kvålen  <havardk@xmms.org>
 
-	* configure.in (ALL_LINGUAS): New languages: "pl", "el_GR".
+	* configure.ac (ALL_LINGUAS): New languages: "pl", "el_GR".
 
 	* gnomexmms/gnomexmms.c (main): Call setlocale().
 
@@ -2272,7 +2272,7 @@ Mon Jun 19 16:06:17 CEST 2000  Håvard Kvålen  <havardk@xmms.org>
 
 	* Released XMMS 1.2.1
 
-	* configure.in: Changed version number to 1.2.1
+	* configure.ac: Changed version number to 1.2.1
 
 Sat Jun 17 19:48:58 CEST 2000  Håvard Kvålen  <havardk@xmms.org>
 
@@ -2281,7 +2281,7 @@ Sat Jun 17 19:48:58 CEST 2000  Håvard Kvålen  <havardk@xmms.org>
 
 Sat Jun 17 18:41:49 CEST 2000  Håvard Kvålen  <havardk@xmms.org>
 
-	* configure.in (ALL_LINGUAS): New language: "eo"
+	* configure.ac (ALL_LINGUAS): New language: "eo"
 
 Sat Jun 17 14:55:09 CEST 2000  Håvard Kvålen  <havardk@xmms.org>
 
@@ -2352,7 +2352,7 @@ Tue Jun 13 14:57:04 EDT 2000  Logan Hanks  <logan@xmms.org>
 
 Mon Jun 12 15:45:56 CEST 2000  Håvard Kvålen  <havardk@xmms.org>
 
-	* configure.in: Bumped version number to 1.2.0.
+	* configure.ac: Bumped version number to 1.2.0.
 
 	* Released XMMS 1.2.0
 
@@ -2389,7 +2389,7 @@ Fri Jun  2 20:16:05 CEST 2000  Håvard Kvålen  <havardk@xmms.org>
 	* xmms/pluginenum.c: Loading of plugins ported to HP-UX.
 	Patch by: Chris Campbell <dash_ampersand@yahoo.com>
 
-	* configure.in: Give a fatal error if we can't find a working
+	* configure.ac: Give a fatal error if we can't find a working
 	pthread library.  Cleaned up the host detection.
 
 Thu Jun  1 02:45:19 CEST 2000  Derrik Pates  <dpates@dsdk12.net>
@@ -2407,7 +2407,7 @@ Thu Jun  1 02:45:19 CEST 2000  Derrik Pates  <dpates@dsdk12.net>
 	
 Wed May 31 00:40:08 CEST 2000  Håvard Kvålen  <havardk@xmms.org>
 
-	* configure.in (ALL_LINGUAS): New language: "cs"
+	* configure.ac (ALL_LINGUAS): New language: "cs"
 
 	* xmms/main.c (idle_func): Hold the GDK mutex while calling
 	mainwin_stop_pushed().
@@ -2455,10 +2455,10 @@ Mon May 22 23:28:58 CEST 2000  Håvard Kvålen  <havardk@xmms.org>
 
 Mon May 22 21:48:51 CEST 2000  Håvard Kvålen  <havardk@xmms.org>
 
-	* xmms/main.c, xmms/Makefile.am, xmms/session.[ch], configure.in:
+	* xmms/main.c, xmms/Makefile.am, xmms/session.[ch], configure.ac:
 	Reverted the "session socket" stuff.
 
-	* configure.in (ALL_LINGUAS): New languages: "af", "hu".
+	* configure.ac (ALL_LINGUAS): New languages: "af", "hu".
 
 	* xmms/util.c (util_create_add_url_window): Comment update.
 	(del_directory): Minor simplification.
@@ -2502,7 +2502,7 @@ Sat May 20 21:22:20 CEST 2000  Håvard Kvålen  <havardk@xmms.org>
 
 	* AUTHORS: Synced with about.c
 
-	* configure.in: Added check for `const'.
+	* configure.ac: Added check for `const'.
 
 	* xmms/main.c (mainwin_url_enqueue_clicked): Don't start playing on
 	enqueue. 
@@ -2518,7 +2518,7 @@ Fri May 19 13:55:32 EDT 2000  Logan Hanks  <logan@vt.edu>
 	* xmms/main.c, xmms/xmms.h:
 	Added necessary references to the new session socket code.
 
-	* configure.in:
+	* configure.ac:
 	Added --enable-session-socket option.  Unless specified, new
 	session socket code is not compiled.
 
@@ -2595,7 +2595,7 @@ Wed May  3 21:26:28 CEST 2000  Håvard Kvålen  <havardk@xmms.org>
 
 Wed May  3 14:03:10 CEST 2000  Håvard Kvålen  <havardk@xmms.org>
 
-	* configure.in: Don't set gcc-specific CFLAGS for non-gcc
+	* configure.ac: Don't set gcc-specific CFLAGS for non-gcc
 	compilers.  The --disable-user-plugin-dir option now works. 
 	Fixed a typo and changed some descriptions.
 	(ALL_LINGUAS): New languages: "es", "hr", "ro".
@@ -2624,7 +2624,7 @@ Wed Apr 12 13:43:20 CEST 2000  Håvard Kvålen  <havardk@xmms.org>
 
 Mon Apr  3 00:43:09 CEST 2000  Håvard Kvålen  <havardk@xmms.org>
 
-	* configure.in (ALL_LINGUAS): New language: "lt"
+	* configure.ac (ALL_LINGUAS): New language: "lt"
 
 	* General/song_change/song_change.c (configure): Runnning a string
 	though printf to make a '%%' look like '%' wihout breaking
@@ -2632,7 +2632,7 @@ Mon Apr  3 00:43:09 CEST 2000  Håvard Kvålen  <havardk@xmms.org>
 
 Tue Mar 28 11:25:55 CEST 2000  Håvard Kvålen  <havardk@xmms.org>
 
-	* configure.in (ALL_LINGUAS): New language: "sk"
+	* configure.ac (ALL_LINGUAS): New language: "sk"
 
 Mon Mar 27 01:58:59 CEST 2000  Håvard Kvålen  <havardk@xmms.org>
 
@@ -2648,7 +2648,7 @@ Mon Mar 20 18:59:40 CET 2000  Peter Alm  <peter@xmms.org>
 
 Sun Mar 19 02:31:15 CET 2000  Håvard Kvålen  <havardk@xmms.org>
 
-	* configure.in (ALL_LINGUAS): Added "da" and "nl".
+	* configure.ac (ALL_LINGUAS): Added "da" and "nl".
 
 Sun Mar  5 17:11:14 CET 2000  Håvard Kvålen  <havardk@xmms.org>
 
@@ -2672,7 +2672,7 @@ Sun Mar  5 13:07:56 CET 2000  Håvard Kvålen  <havardk@xmms.org>
 
 Thu Mar  2 11:03:10 CST 2000  Ryan Weaver <ryanw@xmms.org>
 
-	* configure.in: Alphabetized LINGUAS. (Personal preferences I guess).
+	* configure.ac: Alphabetized LINGUAS. (Personal preferences I guess).
 
 Thu Mar  2 09:13:33 CET 2000  Peter Alm  <peter@xmms.org>
 
@@ -2754,7 +2754,7 @@ Sat Feb 26 03:30:43 CET 2000  Håvard Kvålen  <havardk@xmms.org>
 
 Sat Feb 26 00:21:11 CET 2000  Håvard Kvålen  <havardk@xmms.org>
 
-	* configure.in (ALL_LINGUAS): New languages: "sv", "bg", "ca".
+	* configure.ac (ALL_LINGUAS): New languages: "sv", "bg", "ca".
 
 Wed Feb 23 01:18:02 CET 2000  Håvard Kvålen  <havardk@xmms.org>
 
@@ -2794,7 +2794,7 @@ Mon Feb 21 09:40:27 CST 2000  Ryan Weaver <ryanw@infohwy.com>
 Sat Feb 19 00:29:45 CET 2000  Håvard Kvålen  <havardk@xmms.org>
 
 	* Input/tonegen/tonegen.c, Input/tonegen/Makefile.am,
-	Input/Makefile.am, configure.in, po/POTFILES.in: Added a simple
+	Input/Makefile.am, configure.ac, po/POTFILES.in: Added a simple
 	sinus tonegenerator.
 
 	* Effect/voice/about.c, Effect/echo/gui.c,
@@ -2828,8 +2828,8 @@ Wed Feb 16 15:02:39 CST 2000  Ryan Weaver <ryanw@infohwy.com>
 	
 Wed Feb 16 16:19:39 CET 2000  Peter Alm  <peter@xmms.org>
 
-	* config.guess config.sub configure.in ltconfig ltmain.sh
-	libxmms/Makefile.am libxmms/configure.in po/POTFILES.in
+	* config.guess config.sub configure.ac ltconfig ltmain.sh
+	libxmms/Makefile.am libxmms/configure.ac po/POTFILES.in
 	xmms/Makefile.am xmms/dga.c xmms/dga.h xmms/fullscreen.c xmms/main.h
 	xmms/xmms.h xmms/fullscreen.h libxmms/dga.c libxmms/dga.h
 	libxmms/fullscreen.c libxmms/fullscreen.h: Moved the DGA stuff to
@@ -2857,7 +2857,7 @@ Wed Feb 16 00:55:43 CET 2000  Håvard Kvålen  <havardk@xmms.org>
 	Also added some	names. If your name should be on the list and are
 	not, please let us know.
 
-	* configure.in (ALL_LINGUAS): Added "pt_BR" translation.
+	* configure.ac (ALL_LINGUAS): Added "pt_BR" translation.
 
 	* xmms/prefswin.c (prefswin_rt_callback): Typo.
 
@@ -2880,16 +2880,16 @@ Mon Feb 14 14:14:50 CET 2000  Espen Skoglund  <esk@ira.uka.de>
  	invalid fp operations.  Plugin coders seem to be very fond of this
  	nasty behaviour.  FreeBSD people aren't.
 	
-	* configure.in, acconfig.h: New option disable-strict-fpe for
+	* configure.ac, acconfig.h: New option disable-strict-fpe for
  	turning off SIGFPE paranoia.
 
 Thu Feb 10 22:16:14 CET 2000  Håvard Kvålen  <havardk@xmms.org>
 
-	* configure.in (ALL_LINGUAS): Added "ko" translation.
+	* configure.ac (ALL_LINGUAS): Added "ko" translation.
 
 Thu Feb 10 14:14:12 CET 2000  Håvard Kvålen  <havardk@sol.no>
 
-	* configure.in (ALL_LINGUAS): Added "ru" translation.
+	* configure.ac (ALL_LINGUAS): Added "ru" translation.
 
 Thu Feb 10 00:08:05 CET 2000  Håvard Kvålen  <havardk@sol.no>
 
@@ -2904,7 +2904,7 @@ Thu Feb 10 00:08:05 CET 2000  Håvard Kvålen  <havardk@sol.no>
 	* Effect/echo_plugin/*: Merged the surround-echo plugin with the
 	echo plugin. Various cosmetic fixes. 
 
-	* Effect/surround_echo/*, configure.in, po/POTFILES.in,
+	* Effect/surround_echo/*, configure.ac, po/POTFILES.in,
 	Effect/Makefile.am: Removed the surround-echo plugin.
 
 	* Effect/voice/about.c (voice_about): Changed the about box to a
@@ -2912,12 +2912,12 @@ Thu Feb 10 00:08:05 CET 2000  Håvard Kvålen  <havardk@sol.no>
 
 Wed Feb  9 19:51:44 CET 2000  Espen Skoglund  <esk@ira.uka.de>
 
-	* configure.in (ALL_LINGUAS), po/no.po: Added preliminary "no"
+	* configure.ac (ALL_LINGUAS), po/no.po: Added preliminary "no"
  	translation.
 
 Wed Feb  9 02:14:30 CST 2000  Zinx Verituse <zinx@linuxfreak.com>
 
-	* configure.in, xmms/pluginenum.c: Added support for per-user
+	* configure.ac, xmms/pluginenum.c: Added support for per-user
 	plugin dir(s) (~/.xmms/Plugins/*)
 
 Wed Feb  9 01:10:05 CET 2000  Håvard Kvålen  <havardk@sol.no>
@@ -2947,7 +2947,7 @@ Mon Feb  7 15:35:17 CST 2000  Ryan Weaver <ryanw@infohwy.com>
 
 Mon Feb  7 14:17:29 CET 2000  Håvard Kvålen  <havardk@sol.no>
 
-	* configure.in (ALL_LINGUAS): Added "ja" translation.
+	* configure.ac (ALL_LINGUAS): Added "ja" translation.
 
 Sun Feb  6 10:47:04 CET 2000  Håvard Kvålen  <havardk@sol.no>
 
@@ -2990,7 +2990,7 @@ Wed Feb  2 14:30:17 CET 2000  Håvard Kvålen  <havardk@sol.no>
 
 Wed Feb  2 14:13:44 CET 2000  Espen Skoglund  <esk@ira.uka.de>
 
-	* configure.in: Better checking for libxml.
+	* configure.ac: Better checking for libxml.
 
 Tue Feb  1 14:12:27 CET 2000  Håvard Kvålen  <havardk@sol.no>
 
@@ -3026,7 +3026,7 @@ Mon Jan 31 09:28:20 CST 2000  Zinx Verituse <zinx@linuxfreak.com>
 
 Mon Jan 31 13:21:23 CET 2000  Olle Hällnäs <olle@xmms.org>
 
-	* configure.in: Changed version number to 1.0.1
+	* configure.ac: Changed version number to 1.0.1
 
 Mon Jan 31 11:05:21 CET 2000  Peter Alm  <peter@xmms.org>
 
@@ -3035,12 +3035,12 @@ Mon Jan 31 11:05:21 CET 2000  Peter Alm  <peter@xmms.org>
 
 Mon Jan 31 08:56:22 CET 2000  Peter Alm  <peter@xmms.org>
 
-	* xmms/configure.in: Applied OpenGL configure patch by Troy 
+	* xmms/configure.ac: Applied OpenGL configure patch by Troy 
 	Benjegerdes.
 
 Sun Jan 30 20:12:23 CET 2000  Peter Alm  <peter@xmms.org>
 		
-	* xmms/configure.in: Added -lICE to SM_LIBS
+	* xmms/configure.ac: Added -lICE to SM_LIBS
 
 	* xmms/Makefile.am: Replaced -module with -export-dynamic
 		
@@ -3061,7 +3061,7 @@ Fri Jan 28 12:14:57 CET 2000  Peter Alm  <peter@xmms.org>
 
 Thu Jan 27 21:23:56 CET 2000  Peter Alm  <peter@xmms.org>
 
-	* configure.in Input/cdread/*: Removed cdread plugin.
+	* configure.ac Input/cdread/*: Removed cdread plugin.
 	
 	* xmms/prefswin.c: The DGA warning would pop up sometimes when opening
 	the preferences box.
@@ -3153,7 +3153,7 @@ Mon Jan 17 15:15:16 CET 2000  Peter Alm  <peter@xmms.org>
 
 Fri Jan 14 11:40:21 CET 2000  Peter Alm  <peter@xmms.org>
 		
-	* configure.in Output/disk_writer/Makefile.am: Some more cleaning up.
+	* configure.ac Output/disk_writer/Makefile.am: Some more cleaning up.
 
 Fri Jan 14 09:17:06 CET 2000  Peter Alm  <peter@xmms.org>
 
@@ -3162,10 +3162,10 @@ Fri Jan 14 09:17:06 CET 2000  Peter Alm  <peter@xmms.org>
 
 Thu Jan 13 14:09:11 CET 2000  Peter Alm  <peter@xmms.org>
 
-	* configure.in xmms/sm.[ch] xmms/main.c xmms/Makefile.am: Added X11R6
+	* configure.ac xmms/sm.[ch] xmms/main.c xmms/Makefile.am: Added X11R6
 	style session managment support.
 	
-	* configure.in: Cleaned up some mistakes.
+	* configure.ac: Cleaned up some mistakes.
 
 Wed Jan 12 22:56:43 CET 2000  Peter Alm  <peter@xmms.org>
 		
@@ -3179,7 +3179,7 @@ Wed Jan 12 22:56:43 CET 2000  Peter Alm  <peter@xmms.org>
 	* Output/OSS/audio.c: The OSS plugin should be a bit nicer to the
 	driver now.
 		
-	* configure.in *Makefile.am: the configure script should treat
+	* configure.ac *Makefile.am: the configure script should treat
 	CFLAGS better now.
 		
 	* lots-of-files: XMMS should now compile without warnings with
@@ -3253,8 +3253,8 @@ Mon Dec 20 22:42:32 CST 1999  Zinx Verituse <zinx@linuxfreak.com>
 
 Mon Dec 20 03:55:02 CST 1999  Zinx Verituse <zinx@linuxfreak.com>
 
-	* configure.in
-	  libxmms/configure.in: added --disable-dga option for people with
+	* configure.ac
+	  libxmms/configure.ac: added --disable-dga option for people with
 	                        broken DGA libraries..
 
 Mon Dec 20 01:36:20 CST 1999  Zinx Verituse <zinx@linuxfreak.com>
@@ -3269,7 +3269,7 @@ Sun Dec 19 12:40:42 CST 1999  Zinx Verituse <zinx@linuxfreak.com>
 
 Sun Dec 19 10:41:46 CET 1999  Peter Alm  <peter@xmms.org>
 
-	* configure.in Makefile.am xmms.m4 xmms-config.in: Added xmms-config.
+	* configure.ac Makefile.am xmms.m4 xmms-config.in: Added xmms-config.
 	(Patch by Ben Gertzfield)
 
 Fri Dec 17 21:57:10 CST 1999  Zinx Verituse <zinx@linuxfreak.com>
@@ -3284,7 +3284,7 @@ Fri Dec 17 21:57:10 CST 1999  Zinx Verituse <zinx@linuxfreak.com>
 
 Fri Dec 17 09:18:21 CST 1999  Zinx Verituse <zinx@linuxfreak.com>
 
-	* libxmms/configure.in
+	* libxmms/configure.ac
 	  libxmms/Makefile.am
 	  libxmms/dga.c
 	  libxmms/dga.h
@@ -3318,7 +3318,7 @@ Wed Dec 15 11:12:30 CET 1999  Peter Alm  <peter@xmms.org>
 		
 Tue Dec 14 21:09:42 CET 1999  Peter Alm  <peter@xmms.org>
 
-	* acconfig.h configure.in
+	* acconfig.h configure.ac
 	  Visualization/opengl_spectrum/opengl_spectrum.c: Fixed a bug in
 	  cleanup.
 
@@ -3346,7 +3346,7 @@ Tue Dec 14 03:00:17 CST 1999  Zinx Verituse <zinx@linuxfreak.com>
 
 	* libxmms/fullscreen.c
 	  libxmms/fullscreen.h
-	  libxmms/configure.in
+	  libxmms/configure.ac
 	  libxmms/Makefile.am:  Added fullscreen support.
 
 Tue Dec 14 10:27:18 CET 1999  Peter Alm  <peter@xmms.org>
@@ -3383,7 +3383,7 @@ Tue Nov 30 13:04:48 CET 1999  Peter Alm  <peter@xmms.org>
 
 	* xmms/textbox.c: The space was read from the wrong position.
 
-	* libxmms/configure.in: Try to locate the prefix for libxmms as well 
+	* libxmms/configure.ac: Try to locate the prefix for libxmms as well 
 	now.
 
 Mon Nov 29 10:24:08 CET 1999  Peter Alm  <peter@xmms.org>	
@@ -3439,7 +3439,7 @@ Mon Nov 15 21:10:40 CET 1999  Peter Alm  <peter@xmms.org>
 Mon  8 Nov 11:12:16 MET 1999  Espen Skoglund  <esk@ira.uka.de>
 
 	* Input/mpg123/id3_frame.c (id3_decompress_frame),
-	configure.in: Compiled in support for handling compressed id3
+	configure.ac: Compiled in support for handling compressed id3
 	frames.
 
 	* Output/OSS/audio.c (oss_playing): Made a new bytes-left
@@ -3472,7 +3472,7 @@ Thu Nov 11 18:56:57 CET 1999  Peter Alm  <peter@xmms.org>
 
 Tue Nov  9 18:12:25 CET 1999  Håvard Kvålen  <havardk@sol.no>
 
-	* configure.in : Better check for libxml.
+	* configure.ac : Better check for libxml.
 
 Tue Nov  9 17:40:20 CET 1999  Håvard Kvålen  <havardk@sol.no>
 
@@ -3556,7 +3556,7 @@ Wed Nov  3 12:55:21 CET 1999  Håvard Kvålen  <havardk@sol.no>
 	* xmms/main.c (mainwin_jump_to_file): Fixed a bug that caused the
 	gui to freeze when trying to jump to file on a empty playlist.
 
-	* configure.in, xmms/cdaudio/Makefile.am, acconfig.h: Temporary
+	* configure.ac, xmms/cdaudio/Makefile.am, acconfig.h: Temporary
 	hack to make cdindex compile.
 
 1999-10-25  Espen Skoglund  <esk@ira.uka.de>
@@ -3609,7 +3609,7 @@ Thu Oct 28 21:48:20 CEST 1999  Olle Hällnäs  <olle@xmms.org>
 
 Thu Oct 28 17:19:35 CEST 1999  Willem Monsuwe  <willem@stack.nl>
 
-	* configure.in, Input/Makefile.am, Input/cdread/*:
+	* configure.ac, Input/Makefile.am, Input/cdread/*:
 	Added cdread plugin (todo: fix the _fini() hcak)
 
 Mon Oct 25 20:56:36 CEST 1999  Olle Hällnäs  <olle@xmms.org>
@@ -3658,7 +3658,7 @@ Sat Oct  9 02:35:35 CEST 1999  Håvard Kvålen  <havardk@sol.no>
 	* xmms/prefswin.c (show_prefs_window): Make sure the prefswin get
 	raised if it already is visible.
 
-	* configure.in, libxmms/configure.in, libxmms/util.c, xmms/main.c:
+	* configure.ac, libxmms/configure.ac, libxmms/util.c, xmms/main.c:
 	Added checks for both <sched.h> and <sys/sched.h>. This shoud fix
 	compiling problems on some unixes.
 
@@ -3666,7 +3666,7 @@ Sat Oct  9 02:35:35 CEST 1999  Håvard Kvålen  <havardk@sol.no>
 	default config-file. Now there is no need for every plugin to know
 	the name of the configfile.
 
-	* libxmms/configure.in: Added check for <unistd.h>.
+	* libxmms/configure.ac: Added check for <unistd.h>.
 
 	* libxmms/xmmsctrl.c: Added some #includes.
 	(xmms_remote_get_skin): It never returned anything. Fixed.
@@ -3765,7 +3765,7 @@ Sat Sep 25 11:59:30 CEST 1999  Peter Alm  <peter@xmms.org>
 
 	* libxmms/Makefile.am: util.h now gets installed.
 		
-	* configure.in libxmms/configure.in: Added a quick hack to remove a lot
+	* configure.ac libxmms/configure.ac: Added a quick hack to remove a lot
 	of silly warnings on FreeBSD.
 		
 Fri Sep 24 19:00:14 CEST 1999  CEST 1999  Peter Alm  <peter@xmms.org>
@@ -3790,7 +3790,7 @@ Thu Sep 23 23:49:49 CEST 1999  Peter Alm  <peter@xmms.org>
 
 Wed Sep 22 23:50:35 CEST 1999  Peter Alm  <peter@xmms.org>
 
-	* configure.in xmms.spec.in Makefile.am acconfig.h
+	* configure.ac xmms.spec.in Makefile.am acconfig.h
 	  Visualization/Makefile.am Visualization/opengl_spectrum/*: Added
 	example OpenGL vis plugin.
 
@@ -3851,7 +3851,7 @@ Sun Sep  5 11:29:45 CEST 1999  Peter Alm  <peter@xmms.org>
 	* xmms/skin.[ch] xmms/equalizer.c: Added equalizer shade transparency 
 	support.
 
-	* Makefile.am configure.in Input/idcin/idcin.c Input/mikmod/drv_xmms.c
+	* Makefile.am configure.ac Input/idcin/idcin.c Input/mikmod/drv_xmms.c
 	  Input/mikmod/plugin.c Input/mpg123/layer1.c Input/mpg123/layer2.c 
 	  Input/mpg123/layer3.c Input/mpg123/mpg123.c Input/wav/wav.c
 	  Visualization/* xmms/Makefile.am xmms/xmms.h xmms/fft.[ch] 
@@ -3927,7 +3927,7 @@ Mon Aug 30 15:50:41 CEST 1999  Håvard Kvålen  <havardk@sol.no>
 
 Sat Aug 28 00:25:44 CEST 1999  Håvard Kvålen  <havardk@sol.no>
 
-	* configure.in, Input/mpg123/common.c: Uses autoconf to check for
+	* configure.ac, Input/mpg123/common.c: Uses autoconf to check for
 	"inline".
 
 	* Input/mpg123/mpg123.c (decode_loop): Call set_info() even if we
@@ -4059,7 +4059,7 @@ Sun Jul 18 23:52:29 CEST 1999  Håvard Kvålen  <havardk@sol.no>
 
 Sun Jul 18 14:50:57 CEST 1999  Olle Hällnäs  <olle@xmms.org>
 
-	* configure.in, 
+	* configure.ac, 
 	Input/Makefile.am,
 	Input/idcin/*: added cin video player plugin by Tim Ferguson
 
@@ -4213,7 +4213,7 @@ Fri Jun 25 20:04:40 CEST 1999  Håvard Kvålen  <havardk@sol.no>
 	  Input/mpg123/mpg123.c: Added ID3v2 support.
 
 	* Input/mpg123/mpg123.c (init) 
-	  Input/mpg123/configure.c (mpg123_configurewin_ok)
+	  Input/mpg123/configure.c (mpg123_configure.ac_ok)
 	  (mpg123_configure) (auth_use_cb): Added configuration for
  	authentication.
 
@@ -4278,7 +4278,7 @@ Wed Jun 16 21:18:05 CEST 1999  Peter Alm <peter@xmms.org>
 	Weaver)
 
 	* gnomexmms/Makefile.am
-	  configure.in: gnomexmms.gnorba and gnomexmms.desktop now gets installed
+	  configure.ac: gnomexmms.gnorba and gnomexmms.desktop now gets installed
 	  in the correct directories.
 
 	* Input/mpg123/common.c
@@ -4300,7 +4300,7 @@ Tue Jun 15 19:24:16 CEST 1999  Peter Alm <peter@xmms.org>
 	* xmms/playlist_list.c: Fixed a seg fault when clicking in a empty
 	  playlist
   
-	* configure.in: Changed AC_CHECK_HEADER to AC_CHECK_HEADERS for 
+	* configure.ac: Changed AC_CHECK_HEADER to AC_CHECK_HEADERS for 
 	  sys/soundcard.h. (Thanks to Ryan Weaver for pointing this out)
 
 Mon Jun 14 19:11:51 CEST 1999  Peter Alm <peter@xmms.org>

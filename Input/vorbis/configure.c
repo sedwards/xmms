@@ -13,7 +13,7 @@
 #include "libxmms/util.h"
 #include "xmms/plugin.h"
 
-static GtkWidget *vorbis_configurewin = NULL;
+static GtkWidget *vorbis_configure.ac = NULL;
 static GtkWidget *vbox, *notebook;
 
 static GtkObject *streaming_size_adj, *streaming_pre_adj;
@@ -28,7 +28,7 @@ static GtkWidget *title_tag_override, *title_tag_box, *title_tag_entry, *title_d
 
 vorbis_config_t vorbis_cfg;
 
-static void vorbis_configurewin_ok(GtkWidget * widget, gpointer data)
+static void vorbis_configure.ac_ok(GtkWidget * widget, gpointer data)
 {
 	ConfigFile *cfg;
 	gchar *filename;
@@ -85,7 +85,7 @@ static void vorbis_configurewin_ok(GtkWidget * widget, gpointer data)
 	xmms_cfg_write_file(cfg, filename);
 	xmms_cfg_free(cfg);
 	g_free(filename);
-	gtk_widget_destroy(vorbis_configurewin);
+	gtk_widget_destroy(vorbis_configure.ac);
 }
 
 static void proxy_use_cb(GtkWidget * w, gpointer data)
@@ -122,7 +122,7 @@ static void streaming_save_browse_cb(GtkWidget * w, gpointer data)
 		streaming_save_dirbrowser = xmms_create_dir_browser(_("Select the directory where you want to store the Ogg Vorbis streams:"),
 								    vorbis_cfg.save_http_path, GTK_SELECTION_SINGLE, streaming_save_dirbrowser_cb);
 		gtk_signal_connect(GTK_OBJECT(streaming_save_dirbrowser), "destroy", GTK_SIGNAL_FUNC(gtk_widget_destroyed), &streaming_save_dirbrowser);
-		gtk_window_set_transient_for(GTK_WINDOW(streaming_save_dirbrowser), GTK_WINDOW(vorbis_configurewin));
+		gtk_window_set_transient_for(GTK_WINDOW(streaming_save_dirbrowser), GTK_WINDOW(vorbis_configure.ac));
 		gtk_widget_show(streaming_save_dirbrowser);
 	}
 }
@@ -165,19 +165,19 @@ void vorbis_configure(void)
 
 	gchar *temp;
 
-	if (vorbis_configurewin != NULL) {
-		gdk_window_raise(vorbis_configurewin->window);
+	if (vorbis_configure.ac != NULL) {
+		gdk_window_raise(vorbis_configure.ac->window);
 		return;
 	}
-	vorbis_configurewin = gtk_window_new(GTK_WINDOW_DIALOG);
-	gtk_signal_connect(GTK_OBJECT(vorbis_configurewin), "destroy", GTK_SIGNAL_FUNC(gtk_widget_destroyed), &vorbis_configurewin);
-	gtk_signal_connect(GTK_OBJECT(vorbis_configurewin), "destroy", GTK_SIGNAL_FUNC(configure_destroy), &vorbis_configurewin);
-	gtk_window_set_title(GTK_WINDOW(vorbis_configurewin), _("Ogg Vorbis Configuration"));
-	gtk_window_set_policy(GTK_WINDOW(vorbis_configurewin), FALSE, FALSE, FALSE);
-	gtk_container_border_width(GTK_CONTAINER(vorbis_configurewin), 10);
+	vorbis_configure.ac = gtk_window_new(GTK_WINDOW_DIALOG);
+	gtk_signal_connect(GTK_OBJECT(vorbis_configure.ac), "destroy", GTK_SIGNAL_FUNC(gtk_widget_destroyed), &vorbis_configure.ac);
+	gtk_signal_connect(GTK_OBJECT(vorbis_configure.ac), "destroy", GTK_SIGNAL_FUNC(configure_destroy), &vorbis_configure.ac);
+	gtk_window_set_title(GTK_WINDOW(vorbis_configure.ac), _("Ogg Vorbis Configuration"));
+	gtk_window_set_policy(GTK_WINDOW(vorbis_configure.ac), FALSE, FALSE, FALSE);
+	gtk_container_border_width(GTK_CONTAINER(vorbis_configure.ac), 10);
 
 	vbox = gtk_vbox_new(FALSE, 10);
-	gtk_container_add(GTK_CONTAINER(vorbis_configurewin), vbox);
+	gtk_container_add(GTK_CONTAINER(vorbis_configure.ac), vbox);
 
 	notebook = gtk_notebook_new();
 	gtk_box_pack_start(GTK_BOX(vbox), notebook, TRUE, TRUE, 0);
@@ -345,15 +345,15 @@ void vorbis_configure(void)
 	gtk_box_pack_start(GTK_BOX(vbox), bbox, FALSE, FALSE, 0);
 
 	ok = gtk_button_new_with_label(_("Ok"));
-	gtk_signal_connect(GTK_OBJECT(ok), "clicked", GTK_SIGNAL_FUNC(vorbis_configurewin_ok), NULL);
+	gtk_signal_connect(GTK_OBJECT(ok), "clicked", GTK_SIGNAL_FUNC(vorbis_configure.ac_ok), NULL);
 	GTK_WIDGET_SET_FLAGS(ok, GTK_CAN_DEFAULT);
 	gtk_box_pack_start(GTK_BOX(bbox), ok, TRUE, TRUE, 0);
 	gtk_widget_grab_default(ok);
 
 	cancel = gtk_button_new_with_label(_("Cancel"));
-	gtk_signal_connect_object(GTK_OBJECT(cancel), "clicked", GTK_SIGNAL_FUNC(gtk_widget_destroy), GTK_OBJECT(vorbis_configurewin));
+	gtk_signal_connect_object(GTK_OBJECT(cancel), "clicked", GTK_SIGNAL_FUNC(gtk_widget_destroy), GTK_OBJECT(vorbis_configure.ac));
 	GTK_WIDGET_SET_FLAGS(cancel, GTK_CAN_DEFAULT);
 	gtk_box_pack_start(GTK_BOX(bbox), cancel, TRUE, TRUE, 0);
 
-	gtk_widget_show_all(vorbis_configurewin);
+	gtk_widget_show_all(vorbis_configure.ac);
 }

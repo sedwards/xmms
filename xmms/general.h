@@ -11,7 +11,7 @@ GList *get_general_list(void);
 GList *get_general_enabled_list(void);
 void enable_general_plugin(int i, gboolean enable);
 void general_about(int i);
-void general_configure(int i);
+void general_configure.act i);
 gboolean general_enabled(int i);
 gchar *general_stringify_enabled_list(void);
 void general_enable_from_stringified_list(gchar * list);

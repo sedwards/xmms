@@ -15,7 +15,7 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
-
+#if 0
 #if defined(HAVE_CONFIG_H)
 #include "config.h"
 #endif
@@ -343,3 +343,4 @@ GtkWidget *xmms_create_dir_browser(gchar * title, gchar * current_path, GtkSelec
 
 	return window;
 }
+#endif

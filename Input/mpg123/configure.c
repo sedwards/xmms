@@ -3,7 +3,7 @@
 #include "libxmms/dirbrowser.h"
 #include "libxmms/titlestring.h"
 
-static GtkWidget *mpg123_configurewin = NULL;
+static GtkWidget *mpg123_configure.ac = NULL;
 static GtkWidget *vbox, *notebook;
 static GtkWidget *decode_vbox, *decode_hbox1;
 static GtkWidget *decode_res_frame, *decode_res_vbox, *decode_res_16, *decode_res_8;
@@ -41,7 +41,7 @@ int support_3dnow(void)
 }
 #endif
 
-static void mpg123_configurewin_ok(GtkWidget * widget, gpointer data)
+static void mpg123_configure.ac_ok(GtkWidget * widget, gpointer data)
 {
 	ConfigFile *cfg;
 	gchar *filename;
@@ -147,7 +147,7 @@ static void mpg123_configurewin_ok(GtkWidget * widget, gpointer data)
 	xmms_cfg_write_file(cfg, filename);
 	xmms_cfg_free(cfg);
 	g_free(filename);
-	gtk_widget_destroy(mpg123_configurewin);
+	gtk_widget_destroy(mpg123_configure.ac);
 }
 
 #ifdef USE_3DNOW
@@ -231,7 +231,7 @@ static void streaming_save_browse_cb(GtkWidget * w, gpointer data)
 		streaming_save_dirbrowser = xmms_create_dir_browser(_("Select the directory where you want to store the MPEG streams:"),
 								    mpg123_cfg.save_http_path, GTK_SELECTION_SINGLE, streaming_save_dirbrowser_cb);
 		gtk_signal_connect(GTK_OBJECT(streaming_save_dirbrowser), "destroy", GTK_SIGNAL_FUNC(gtk_widget_destroyed), &streaming_save_dirbrowser);
-		gtk_window_set_transient_for(GTK_WINDOW(streaming_save_dirbrowser), GTK_WINDOW(mpg123_configurewin));
+		gtk_window_set_transient_for(GTK_WINDOW(streaming_save_dirbrowser), GTK_WINDOW(mpg123_configure.ac));
 		gtk_widget_show(streaming_save_dirbrowser);
 	}
 }
@@ -275,21 +275,21 @@ void mpg123_configure(void)
 
 	gchar *temp;
 
-	if (mpg123_configurewin != NULL)
+	if (mpg123_configure.ac != NULL)
 	{
-		gdk_window_raise(mpg123_configurewin->window);
+		gdk_window_raise(mpg123_configure.ac->window);
 		return;
 	}
-	mpg123_configurewin = gtk_window_new(GTK_WINDOW_DIALOG);
-	gtk_signal_connect(GTK_OBJECT(mpg123_configurewin), "destroy", GTK_SIGNAL_FUNC(gtk_widget_destroyed), &mpg123_configurewin);
-	gtk_signal_connect(GTK_OBJECT(mpg123_configurewin), "destroy", GTK_SIGNAL_FUNC(configure_destroy), &mpg123_configurewin);
-	gtk_window_set_title(GTK_WINDOW(mpg123_configurewin), _("MPG123 Configuration"));
-	gtk_window_set_policy(GTK_WINDOW(mpg123_configurewin), FALSE, FALSE, FALSE);
-	/*  gtk_window_set_position(GTK_WINDOW(mpg123_configurewin), GTK_WIN_POS_MOUSE); */
-	gtk_container_border_width(GTK_CONTAINER(mpg123_configurewin), 10);
+	mpg123_configure.ac = gtk_window_new(GTK_WINDOW_DIALOG);
+	gtk_signal_connect(GTK_OBJECT(mpg123_configure.ac), "destroy", GTK_SIGNAL_FUNC(gtk_widget_destroyed), &mpg123_configure.ac);
+	gtk_signal_connect(GTK_OBJECT(mpg123_configure.ac), "destroy", GTK_SIGNAL_FUNC(configure_destroy), &mpg123_configure.ac);
+	gtk_window_set_title(GTK_WINDOW(mpg123_configure.ac), _("MPG123 Configuration"));
+	gtk_window_set_policy(GTK_WINDOW(mpg123_configure.ac), FALSE, FALSE, FALSE);
+	/*  gtk_window_set_position(GTK_WINDOW(mpg123_configure.ac), GTK_WIN_POS_MOUSE); */
+	gtk_container_border_width(GTK_CONTAINER(mpg123_configure.ac), 10);
 
 	vbox = gtk_vbox_new(FALSE, 10);
-	gtk_container_add(GTK_CONTAINER(mpg123_configurewin), vbox);
+	gtk_container_add(GTK_CONTAINER(mpg123_configure.ac), vbox);
 
 	notebook = gtk_notebook_new();
 	gtk_box_pack_start(GTK_BOX(vbox), notebook, TRUE, TRUE, 0);
@@ -631,15 +631,15 @@ void mpg123_configure(void)
 	gtk_box_pack_start(GTK_BOX(vbox), bbox, FALSE, FALSE, 0);
 
 	ok = gtk_button_new_with_label(_("Ok"));
-	gtk_signal_connect(GTK_OBJECT(ok), "clicked", GTK_SIGNAL_FUNC(mpg123_configurewin_ok), NULL);
+	gtk_signal_connect(GTK_OBJECT(ok), "clicked", GTK_SIGNAL_FUNC(mpg123_configure.ac_ok), NULL);
 	GTK_WIDGET_SET_FLAGS(ok, GTK_CAN_DEFAULT);
 	gtk_box_pack_start(GTK_BOX(bbox), ok, TRUE, TRUE, 0);
 	gtk_widget_grab_default(ok);
 
 	cancel = gtk_button_new_with_label(_("Cancel"));
-	gtk_signal_connect_object(GTK_OBJECT(cancel), "clicked", GTK_SIGNAL_FUNC(gtk_widget_destroy), GTK_OBJECT(mpg123_configurewin));
+	gtk_signal_connect_object(GTK_OBJECT(cancel), "clicked", GTK_SIGNAL_FUNC(gtk_widget_destroy), GTK_OBJECT(mpg123_configure.ac));
 	GTK_WIDGET_SET_FLAGS(cancel, GTK_CAN_DEFAULT);
 	gtk_box_pack_start(GTK_BOX(bbox), cancel, TRUE, TRUE, 0);
 
-	gtk_widget_show_all(mpg123_configurewin);
+	gtk_widget_show_all(mpg123_configure.ac);
 }

@@ -41,7 +41,7 @@ void output_about(int i)
 		out->about();
 }
 
-void output_configure(int i)
+void output_configure.act i)
 {
 	OutputPlugin *out = (OutputPlugin *) g_list_nth(op_data->output_list, i)->data;
 	if (out && out->configure)
