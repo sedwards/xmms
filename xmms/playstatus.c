@@ -20,7 +20,7 @@
 void playstatus_draw(Widget * w)
 {
 	PlayStatus *ps = (PlayStatus *) w;
-	GdkPixmap *obj;
+	cairo_surface_t *obj;
 
 	obj = ps->ps_widget.parent;
 
@@ -56,7 +56,7 @@ void playstatus_set_status(PlayStatus * ps, PStatus status)
 	draw_widget(ps);
 }
 
-PlayStatus *create_playstatus(GList ** wlist, GdkPixmap * parent, GdkGC * gc, gint x, gint y)
+PlayStatus *create_playstatus(GList ** wlist, cairo_surface_t * parent, cairo_t * gc, gint x, gint y)
 {
 	PlayStatus *ps;
 

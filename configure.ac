@@ -62,12 +62,15 @@ PKG_PROG_PKG_CONFIG
 
 PKG_CHECK_MODULES([GLIB], [glib-2.0 >= 2.40])
 PKG_CHECK_MODULES([GTK], [gtk+-3.0 >= 3.0])
+PKG_CHECK_MODULES([CAIRO], [cairo >= 1.18])
 
 AC_SUBST(GLIB_CFLAGS)
 AC_SUBST(GLIB_LIBS)
+AC_SUBST(CAIRO_LIBS)
 
 AC_SUBST(GTK_CFLAGS)
 AC_SUBST(GTK_LIBS)
+AC_SUBST(CAIRO_LIBS)
 
 AC_CHECK_HEADERS([
 unistd.h
@@ -182,6 +185,7 @@ AC_CONFIG_SUBDIRS([libxmms])
 AC_CONFIG_FILES([
 Makefile
 xmms/Makefile
+xmms/defskin/Makefile
 Input/Makefile
 Output/Makefile
 Effect/Makefile

@@ -105,6 +105,19 @@ void handle_motion_cb(GList * wlist, GtkWidget * widget, GdkEventMotion * event)
 	}
 }
 
+void draw_widget_list(GList *wlist, cairo_t *cr, gboolean *redraw, gboolean force) {
+    for (GList *l = wlist; l != NULL; l = l->next) {
+        Widget *w = (Widget *)l->data;
+        if (w->visible && (w->redraw || force)) {
+            // Call the new internal draw signature we discussed
+            w->draw(w, cr); 
+            w->redraw = FALSE;
+        }
+    }
+}
+
+
+/*
 void draw_widget_list(GList * wlist, gboolean * redraw, gboolean force)
 {
 	/*
@@ -128,8 +141,9 @@ void draw_widget_list(GList * wlist, gboolean * redraw, gboolean force)
 		wl = wl->next;
 	}
 }
+*/
 
-void widget_list_change_pixmap(GList * wlist, GdkPixmap * pixmap)
+void widget_list_change_pixmap(GList * wlist, cairo_surface_t * pixmap)
 {
 	GList *wl;
 

@@ -20,7 +20,7 @@
 void tbutton_draw(Widget * w)
 {
 	TButton *button = (TButton *) w;
-	GdkPixmap *obj;
+	cairo_surface_t *obj;
 
 	obj = button->tb_widget.parent;
 
@@ -111,7 +111,7 @@ void tbutton_motion_cb(GtkWidget * widget, GdkEventMotion * event, TButton * but
 	}
 }
 
-TButton *create_tbutton(GList ** wlist, GdkPixmap * parent, GdkGC * gc, gint x, gint y, gint w, gint h,
+TButton *create_tbutton(GList ** wlist, cairo_surface_t * parent, cairo_t * gc, gint x, gint y, gint w, gint h,
 			gint nux, gint nuy, gint pux, gint puy, gint nsx, gint nsy, gint psx, gint psy,
 			void (*cb) (gboolean), SkinIndex si)
 {

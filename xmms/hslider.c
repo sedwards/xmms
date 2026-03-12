@@ -35,7 +35,7 @@ gint hslider_get_position(HSlider * hs)
 void hslider_draw(Widget * w)
 {
 	HSlider *hs = (HSlider *) w;
-	GdkPixmap *obj;
+	cairo_surface_t *obj;
 
 	obj = hs->hs_widget.parent;
 
@@ -130,7 +130,7 @@ void hslider_button_release_cb(GtkWidget * w, GdkEventButton * event, gpointer d
 	}
 }
 
-HSlider *create_hslider(GList ** wlist, GdkPixmap * parent, GdkGC * gc, gint x,
+HSlider *create_hslider(GList ** wlist, cairo_surface_t * parent, cairo_t * gc, gint x,
 			gint y, gint w, gint h,	gint knx, gint kny, gint kpx,
 			gint kpy, gint kw, gint kh, gint fh, gint fo, gint min,
 			gint max, gint(*fcb) (gint), void (*mcb) (gint),

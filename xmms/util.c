@@ -19,7 +19,6 @@
  */
 #include "xmms.h"
 #include <gdk/gdkprivate.h>
-#include <X11/Xlib.h>
 #include <sys/ipc.h>
 #include <ctype.h>
 #ifdef HAVE_FTS_H
@@ -165,9 +164,9 @@ void del_directory(const char *dirname)
 #endif /* !HAVE_FTS_H */
 }
 
-GdkImage *create_dblsize_image(GdkImage * img)
+GtkImage *create_dblsize_image(GtkImage * img)
 {
-	GdkImage *dblimg;
+	GtkImage *dblimg;
 	register guint x, y;
 
 	/*
@@ -477,7 +476,7 @@ static void util_menu_delete_popup_data(GtkObject *object,
  */
 
 void util_item_factory_popup_with_data(GtkItemFactory * ifactory,
-				       gpointer data, GtkDestroyNotify destroy,
+				       gpointer data, GDestroyNotify destroy,
 				       guint x, guint y,
 				       guint mouse_button, guint32 time)
 {

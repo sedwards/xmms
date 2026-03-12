@@ -23,7 +23,7 @@ void playlistslider_draw(Widget * w)
 {
 	PlaylistSlider *ps = (PlaylistSlider *) w;
 	SkinIndex src;
-	GdkPixmap *obj;
+	cairo_surface_t *obj;
 	gint y;
 
 	if (get_playlist_length() > ps->ps_list->pl_num_visible)
@@ -121,7 +121,7 @@ void playlistslider_motion_cb(GtkWidget * widget, GdkEventMotion * event, Playli
 	}
 }
 
-PlaylistSlider *create_playlistslider(GList ** wlist, GdkPixmap * parent, GdkGC * gc, gint x, gint y, gint h, PlayList_List * list)
+PlaylistSlider *create_playlistslider(GList ** wlist, cairo_surface_t * parent, cairo_t * gc, gint x, gint y, gint h, PlayList_List * list)
 {
 	PlaylistSlider *ps;
 

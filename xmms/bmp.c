@@ -17,6 +17,7 @@
  */
 #include "xmms.h"
 
+#if 0
 typedef struct tagRGBQUAD
 {
 	guchar rgbBlue;
@@ -31,7 +32,7 @@ RGBQuad;
 #define BI_RLE4       2L
 #define BI_BITFIELDS  3L
 
-static GdkGC *bmp_gc = NULL;
+static cairo_t *bmp_gc = NULL;
 
 int read_le_short(FILE * file, guint16 * ret)
 {
@@ -64,7 +65,7 @@ static void read_16b_rgb(guint8 *input, gint input_size, guint8 *output, guint32
 static void read_24b_rgb(guint8 *input, gint input_size, guint8 *output, guint32 w, guint32 h);
 
 
-GdkPixmap *read_bmp(gchar * filename)
+cairo_surface_t *read_bmp(gchar * filename)
 {
 	FILE *file;
 	gchar type[2];
@@ -74,7 +75,7 @@ GdkPixmap *read_bmp(gchar * filename)
 	struct stat statbuf;
 
 	RGBQuad rgb_quads[256];
-	GdkPixmap *ret;
+	cairo_surface_t *ret;
 
 	if (stat(filename, &statbuf) == -1)
 		return NULL;
@@ -517,3 +518,5 @@ static void read_24b_rgb(guint8 *input, gint input_size, guint8 *output, guint32
 		input += padding;
 	}
 }
+#endif
+

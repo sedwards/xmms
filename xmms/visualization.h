@@ -20,6 +20,9 @@
 #ifndef VISUALIZATION_H
 #define VISUALIZATION_H
 
+/* Visualization Plugins should be ported to Cococa anyway */
+
+
 struct VisPluginData
 {
 	GList *vis_list;
@@ -32,7 +35,7 @@ GList *get_vis_enabled_list(void);
 void enable_vis_plugin(int i, gboolean enable);
 void vis_disable_plugin(VisPlugin *vp);
 void vis_about(int i);
-void vis_configure.act i);
+//void vis_configure.act i);
 void vis_playback_start(void);
 void vis_playback_stop(void);
 gboolean vis_enabled(int i);

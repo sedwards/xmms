@@ -23,11 +23,11 @@
 
 GtkWidget *playlistwin;
 static GtkWidget *playlistwin_url_window = NULL;
-GtkItemFactory *playlistwin_sort_menu, *playlistwin_sub_menu, *playlistwin_popup_menu;
+GtkActionEntry *playlistwin_sort_menu, *playlistwin_sub_menu, *playlistwin_popup_menu;
 
-GdkPixmap *playlistwin_bg;
+cairo_surface_t *playlistwin_bg;
 GdkBitmap *playlistwin_mask = NULL;
-GdkGC *playlistwin_gc;
+cairo_t *playlistwin_gc;
 gboolean playlistwin_focus = FALSE, playlistwin_resizing = FALSE;
 gint playlistwin_resize_x, playlistwin_resize_y, playlistwin_move_x, playlistwin_move_y;
 
@@ -70,7 +70,7 @@ enum
 	PLAYLISTWIN_SORT_RANDOMIZE, PLAYLISTWIN_SORT_REVERSE
 };
 
-GtkItemFactoryEntry playlistwin_sort_menu_entries[] =
+GtkActionEntryEntry playlistwin_sort_menu_entries[] =
 {
 	{N_("/Sort List"), NULL, NULL, 0, "<Branch>"},
 	{N_("/Sort List/By Title"), NULL, playlistwin_sort_menu_callback, PLAYLISTWIN_SORT_BYTITLE, "<Item>"},
@@ -96,7 +96,7 @@ enum
 	PLAYLISTWIN_REMOVE_DEAD_FILES, PLAYLISTWIN_PHYSICALLY_DELETE
 };
 
-GtkItemFactoryEntry playlistwin_sub_menu_entries[] =
+GtkActionEntryEntry playlistwin_sub_menu_entries[] =
 {
 	{N_("/Remove Dead Files"), NULL, playlistwin_sub_menu_callback, PLAYLISTWIN_REMOVE_DEAD_FILES, "<Item>"},
 	{N_("/Physically Delete Files"), NULL, playlistwin_sub_menu_callback, PLAYLISTWIN_PHYSICALLY_DELETE, "<Item>"},
@@ -108,7 +108,7 @@ static const int playlistwin_sub_menu_entries_num =
 
 void playlistwin_popup_menu_callback(gpointer cb_data, guint action, GtkWidget * w);
 
-GtkItemFactoryEntry playlistwin_popup_menu_entries[] =
+GtkActionEntryEntry playlistwin_popup_menu_entries[] =
 {
 	{N_("/View File Info"), NULL, playlistwin_popup_menu_callback, MISC_FILEINFO, "<Item>"},
 	{N_("/-"), NULL, NULL, 0, "<Separator>"},
@@ -282,7 +282,7 @@ void playlistwin_update_list(void)
 void playlistwin_create_mask(void)
 {
 	GdkBitmap *tmp;
-	GdkGC *gc;
+	cairo_t *gc;
 	GdkColor pattern;
 
 	if (cfg.show_wm_decorations)
@@ -419,7 +419,7 @@ void playlistwin_inverse_selection(void)
 static void playlistwin_resize(int width, int height)
 {
 	gint bx, by, nw, nh;
-	GdkPixmap *oldbg;
+	cairo_surface_t *oldbg;
 	gboolean dummy;
 
 	bx = (width - 275) / 25;
@@ -781,7 +781,7 @@ void playlistwin_popup_handler(gint item)
 		/* Misc button */
 		case MISC_SORT: {
 			gint x, y;
-			GtkItemFactory *f;
+			GtkActionEntry *f;
 			playlistwin_set_sensitive_sortmenu();
 			gdk_window_get_pointer(NULL, &x, &y, NULL);
 			f = GTK_ITEM_FACTORY(playlistwin_sort_menu);

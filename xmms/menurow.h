@@ -39,6 +39,6 @@ typedef struct
 }
 MenuRow;
 
-MenuRow *create_menurow(GList ** wlist, GdkPixmap * parent, GdkGC * gc, gint x, gint y, gint nx, gint ny, gint sx, gint sy, void (*ccb) (MenuRowItem), void (*rcb) (MenuRowItem), SkinIndex si);
+MenuRow *create_menurow(GList ** wlist, cairo_surface_t * parent, cairo_t * gc, gint x, gint y, gint nx, gint ny, gint sx, gint sy, void (*ccb) (MenuRowItem), void (*rcb) (MenuRowItem), SkinIndex si);
 
 #endif

@@ -418,7 +418,7 @@ void vis_set_window(Vis * vis, GdkWindow * window)
 	vis->vs_window = window;
 }
 
-Vis *create_vis(GList ** wlist, GdkPixmap * parent, GdkWindow * window, GdkGC * gc, gint x, gint y, gint width, gboolean doublesize)
+Vis *create_vis(GList ** wlist, cairo_surface_t * parent, GdkWindow * window, cairo_t * gc, gint x, gint y, gint width, gboolean doublesize)
 {
 	Vis *vis;
 

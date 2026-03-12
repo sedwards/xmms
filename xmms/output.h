@@ -29,7 +29,10 @@ GList *get_output_list(void);
 OutputPlugin *get_current_output_plugin(void);
 void set_current_output_plugin(int i);
 void output_about(int i);
-void output_configure.act i);
+
+// PORT
+//void output_configure.act i);
+
 void output_get_volume(int *l, int *r);
 void output_set_volume(int l, int r);
 

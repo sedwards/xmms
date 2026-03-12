@@ -19,10 +19,7 @@
  */
 #include "xmms.h"
 
-#include <gdk/gdkx.h>
 #include <gdk/gdk.h>
-#include <X11/Xlib.h>
-#include <X11/Xatom.h>
 #include <getopt.h>
 #include <signal.h>
 #include <ctype.h>
@@ -35,14 +32,15 @@
 #include "libxmms/xmmsctrl.h"
 #include "libxmms/util.h"
 #include "libxmms/dirbrowser.h"
-#include "xmms_mini.xpm"
+
+#include <cairo.h>
 
 GtkWidget *mainwin, *mainwin_url_window = NULL, *mainwin_dir_browser = NULL;
 GtkWidget *mainwin_jtt = NULL, *mainwin_jtf = NULL;
-GtkItemFactory *mainwin_options_menu, *mainwin_songname_menu, *mainwin_vis_menu;
-GtkItemFactory *mainwin_general_menu;
-GdkPixmap *mainwin_bg = NULL, *mainwin_bg_dblsize;
-GdkGC *mainwin_gc;
+GtkActionEntry *mainwin_options_menu, *mainwin_songname_menu, *mainwin_vis_menu;
+GtkActionEntry *mainwin_general_menu;
+cairo_surface_t *mainwin_bg = NULL, *mainwin_bg_dblsize;
+cairo_t *mainwin_gc;
 
 GtkAccelGroup *mainwin_accel;
 
@@ -80,14 +78,10 @@ static gboolean mainwin_force_redraw = FALSE;
 static gchar *mainwin_title_text = NULL;
 static gboolean mainwin_info_text_locked = FALSE;
 
-#if 0
-/* For x11r5 session management */
-static gchar **restart_argv;
-static gint restart_argc;
-#endif
-
 Vis *active_vis;
-static GdkBitmap *nullmask;
+
+static cairo_surface_t *nullmask;
+
 static gint balance;
 gboolean pposition_broken = FALSE;
 
@@ -120,27 +114,54 @@ enum
 	MAINWIN_OPT_EQWS, MAINWIN_OPT_DOUBLESIZE, MAINWIN_OPT_EASY_MOVE
 };
 
-GtkItemFactoryEntry mainwin_options_menu_entries[] =
-{
-	{N_("/Preferences"), "<control>P", mainwin_options_menu_callback, MAINWIN_OPT_PREFS, "<Item>"},
-	{N_("/Skin Browser"), "<alt>S", mainwin_options_menu_callback, MAINWIN_OPT_SKIN, "<Item>"},
-	{N_("/Reload skin"), "F5", mainwin_options_menu_callback, MAINWIN_OPT_RELOADSKIN, "<Item>"},
-	{N_("/-"), NULL, NULL, 0, "<Separator>"},
-	{N_("/Repeat"), "R", mainwin_options_menu_callback, MAINWIN_OPT_REPEAT, "<ToggleItem>"},
-	{N_("/Shuffle"), "S", mainwin_options_menu_callback, MAINWIN_OPT_SHUFFLE, "<ToggleItem>"},
-	{N_("/No Playlist Advance"), "<control>N", mainwin_options_menu_callback, MAINWIN_OPT_NPA, "<ToggleItem>"},
-	{N_("/-"), NULL, NULL, 0, "<Separator>"},
-	{N_("/Time Elapsed"), "<control>E", mainwin_options_menu_callback, MAINWIN_OPT_TELAPSED, "<RadioItem>"},
-	{N_("/Time Remaining"), "<control>R", mainwin_options_menu_callback, MAINWIN_OPT_TREMAINING, "/Time Elapsed"},
-	{N_("/-"), NULL, NULL, 0, "<Separator>"},
-	{N_("/Always On Top"), "<control>A", mainwin_options_menu_callback, MAINWIN_OPT_ALWAYS, "<ToggleItem>"},
-	{N_("/Sticky"), "<control>S", mainwin_options_menu_callback, MAINWIN_OPT_STICKY, "<ToggleItem>"},
-	{N_("/WindowShade Mode"), "<control>W", mainwin_options_menu_callback, MAINWIN_OPT_WS, "<ToggleItem>"},
-	{N_("/Playlist WindowShade Mode"), "<control><shift>W", mainwin_options_menu_callback, MAINWIN_OPT_PWS, "<ToggleItem>"},
-	{N_("/Equalizer WindowShade Mode"), "<control><alt>W", mainwin_options_menu_callback, MAINWIN_OPT_EQWS, "<ToggleItem>"},
-	{N_("/DoubleSize"), "<control>D", mainwin_options_menu_callback, MAINWIN_OPT_DOUBLESIZE, "<ToggleItem>"},
-	{N_("/Easy Move"), "<control>E", mainwin_options_menu_callback, MAINWIN_OPT_EASY_MOVE, "<ToggleItem>"},
+/* static const GtkActionEntry entries[] = {
+  /* Name,     Stock ID,    Label,    Accel,     Tooltip,  Callback */
+
+/* Standard clickable items */
+static const GtkActionEntry main_entries[] = {
+    { "Preferences", NULL, N_("Preferences"), "<control>P", NULL, G_CALLBACK(mainwin_options_menu_callback) },
+    { "SkinBrowser", NULL, N_("Skin Browser"), "<alt>S", NULL, G_CALLBACK(mainwin_options_menu_callback) },
+    { "ReloadSkin",  NULL, N_("Reload skin"), "F5", NULL, G_CALLBACK(mainwin_options_menu_callback) }
 };
+
+/* Toggle items (Repeat, Shuffle, etc.) */
+static const GtkToggleActionEntry toggle_entries[] = {
+    { "Repeat",      NULL, N_("Repeat"), "R", NULL, G_CALLBACK(mainwin_options_menu_callback), FALSE },
+    { "Shuffle",     NULL, N_("Shuffle"), "S", NULL, G_CALLBACK(mainwin_options_menu_callback), FALSE },
+    { "NoAdvance",   NULL, N_("No Playlist Advance"), "<control>N", NULL, G_CALLBACK(mainwin_options_menu_callback), FALSE },
+    { "AlwaysOnTop", NULL, N_("Always On Top"), "<control>A", NULL, G_CALLBACK(mainwin_options_menu_callback), FALSE },
+    { "Sticky",      NULL, N_("Sticky"), "<control>S", NULL, G_CALLBACK(mainwin_options_menu_callback), FALSE },
+    { "WSMode",      NULL, N_("WindowShade Mode"), "<control>W", NULL, G_CALLBACK(mainwin_options_menu_callback), FALSE },
+    { "PWSMode",     NULL, N_("Playlist WindowShade"), "<control><shift>W", NULL, G_CALLBACK(mainwin_options_menu_callback), FALSE },
+    { "EQWSMode",    NULL, N_("Equalizer WindowShade"), "<control><alt>W", NULL, G_CALLBACK(mainwin_options_menu_callback), FALSE },
+    { "DoubleSize",  NULL, N_("DoubleSize"), "<control>D", NULL, G_CALLBACK(mainwin_options_menu_callback), FALSE },
+    { "EasyMove",    NULL, N_("Easy Move"), "<control>E", NULL, G_CALLBACK(mainwin_options_menu_callback), FALSE }
+};
+
+/* Radio items (Time Elapsed vs Remaining) */
+static const GtkRadioActionEntry radio_entries[] = {
+    { "TimeElapsed",   NULL, N_("Time Elapsed"), "<control>E", NULL, MAINWIN_OPT_TELAPSED },
+    { "TimeRemaining", NULL, N_("Time Remaining"), "<control>R", NULL, MAINWIN_OPT_TREMAINING }
+};
+
+
+GtkActionGroup *action_group = gtk_action_group_new("MenuActions");
+
+/* Add standard entries */
+gtk_action_group_add_actions(action_group, main_entries, 
+                             G_N_ELEMENTS(main_entries), NULL);
+
+/* Add toggle entries */
+gtk_action_group_add_toggle_actions(action_group, toggle_entries, 
+                                    G_N_ELEMENTS(toggle_entries), NULL);
+
+/* Add radio entries (the '0' is the initial starting value) */
+gtk_action_group_add_radio_actions(action_group, radio_entries, 
+                                   G_N_ELEMENTS(radio_entries), 0, 
+                                   G_CALLBACK(mainwin_options_menu_callback), NULL);
+
+
+
 
 static gint mainwin_options_menu_entries_num = 
 	sizeof(mainwin_options_menu_entries) / 
@@ -153,13 +174,31 @@ enum
 	MAINWIN_SONGNAME_FILEINFO, MAINWIN_SONGNAME_JTF, MAINWIN_SONGNAME_JTT, MAINWIN_SONGNAME_SCROLL
 };
 
-GtkItemFactoryEntry mainwin_songname_menu_entries[] =
-{
-	{N_("/File Info"), "<control>3", mainwin_songname_menu_callback, MAINWIN_SONGNAME_FILEINFO, "<Item>"},
-	{N_("/Jump To File"), "J", mainwin_songname_menu_callback, MAINWIN_SONGNAME_JTF, "<Item>"},
-	{N_("/Jump To Time"), "<control>J", mainwin_songname_menu_callback, MAINWIN_SONGNAME_JTT, "<Item>"},
-	{N_("/Autoscroll Songname"), NULL, mainwin_songname_menu_callback, MAINWIN_SONGNAME_SCROLL, "<ToggleItem>"},
+/* Standard clickable items */
+static const GtkActionEntry songname_entries[] = {
+    /* Name, Stock ID, Label, Accel, Tooltip, Callback */
+    { "FileInfo", NULL, N_("_File Info"), "<control>3", NULL, G_CALLBACK(mainwin_songname_menu_callback) },
+    { "JumpToFile", NULL, N_("_Jump To File"), "J", NULL, G_CALLBACK(mainwin_songname_menu_callback) },
+    { "JumpToTime", NULL, N_("_Jump To Time"), "<control>J", NULL, G_CALLBACK(mainwin_songname_menu_callback) }
 };
+
+/* The Toggle item */
+static const GtkToggleActionEntry songname_toggle_entries[] = {
+    /* Name, Stock ID, Label, Accel, Tooltip, Callback, Is_Active */
+    { "Autoscroll", NULL, N_("_Autoscroll Songname"), NULL, NULL, G_CALLBACK(mainwin_songname_menu_callback), FALSE }
+};
+
+void mainwin_songname_menu_callback(GtkAction *action, gpointer user_data) {
+    const gchar *name = gtk_action_get_name(action);
+
+    if (g_strcmp0(name, "FileInfo") == 0) {
+        // Equivalent to MAINWIN_SONGNAME_FILEINFO
+    } else if (g_strcmp0(name, "JumpToFile") == 0) {
+        // Equivalent to MAINWIN_SONGNAME_JTF
+    } 
+    /* ... and so on ... */
+}
+
 
 static gint mainwin_songname_menu_entries_num = 
 	sizeof(mainwin_songname_menu_entries) / 
@@ -180,7 +219,8 @@ enum
 	MAINWIN_VIS_PLUGINS
 };
 
-GtkItemFactoryEntry mainwin_vis_menu_entries[] =
+/*
+GtkActionEntryEntry mainwin_vis_menu_entries[] =
 {
 	{N_("/Visualization Mode"), NULL, NULL, 0, "<Branch>"},
 	{N_("/Visualization Mode/Analyzer"), NULL, mainwin_vis_menu_callback, MAINWIN_VIS_ANALYZER, "<RadioItem>"},
@@ -221,6 +261,50 @@ GtkItemFactoryEntry mainwin_vis_menu_entries[] =
 	{N_("/Peaks Falloff/Fastest"), NULL, mainwin_vis_menu_callback, MAINWIN_VIS_PFALLOFF_FASTEST, "/Peaks Falloff/Slowest"},
 	{N_("/Visualization plugins"), "<control>V", mainwin_vis_menu_callback, MAINWIN_VIS_PLUGINS, "<Item>"}
 };
+*/
+
+/* Standard Clickable Items */
+static const GtkActionEntry vis_entries[] = {
+    { "VisPlugins", NULL, N_("Visualization plugins"), "<control>V", NULL, G_CALLBACK(mainwin_vis_menu_callback) }
+};
+
+/* Toggle Items */
+static const GtkToggleActionEntry vis_toggle_entries[] = {
+    { "AnalyzerPeaks", NULL, N_("Peaks"), NULL, NULL, G_CALLBACK(mainwin_vis_menu_callback), FALSE }
+};
+
+/* Radio Groups - Each group needs a unique name and shares a callback */
+static const GtkRadioActionEntry vis_mode_entries[] = {
+    { "VisAnalyzer", NULL, N_("Analyzer"), NULL, NULL, MAINWIN_VIS_ANALYZER },
+    { "VisScope",    NULL, N_("Scope"),    NULL, NULL, MAINWIN_VIS_SCOPE },
+    { "VisOff",      NULL, N_("Off"),      NULL, NULL, MAINWIN_VIS_OFF }
+};
+
+static const GtkRadioActionEntry analyzer_mode_entries[] = {
+    { "AnalyzerNormal", NULL, N_("Normal"),         NULL, NULL, MAINWIN_VIS_ANALYZER_NORMAL },
+    { "AnalyzerFire",   NULL, N_("Fire"),           NULL, NULL, MAINWIN_VIS_ANALYZER_FIRE },
+    { "AnalyzerVLines", NULL, N_("Vertical Lines"), NULL, NULL, MAINWIN_VIS_ANALYZER_VLINES }
+};
+
+static const GtkRadioActionEntry analyzer_style_entries[] = {
+    { "AnalyzerLines", NULL, N_("Lines"), NULL, NULL, MAINWIN_VIS_ANALYZER_LINES },
+    { "AnalyzerBars",  NULL, N_("Bars"),  NULL, NULL, MAINWIN_VIS_ANALYZER_BARS }
+};
+
+//...... More to port
+
+GtkActionGroup *ag = gtk_action_group_new("VisActions");
+
+gtk_action_group_add_actions(ag, vis_entries, G_N_ELEMENTS(vis_entries), NULL);
+gtk_action_group_add_toggle_actions(ag, vis_toggle_entries, G_N_ELEMENTS(vis_toggle_entries), NULL);
+
+/* Register Radio Groups */
+gtk_action_group_add_radio_actions(ag, vis_mode_entries, G_N_ELEMENTS(vis_mode_entries), 
+                                   0, G_CALLBACK(mainwin_vis_menu_callback), NULL);
+gtk_action_group_add_radio_actions(ag, analyzer_mode_entries, G_N_ELEMENTS(analyzer_mode_entries), 
+                                   0, G_CALLBACK(mainwin_vis_menu_callback), NULL);
+// ... etc ...
+
 
 static gint mainwin_vis_menu_entries_num = 
 	sizeof(mainwin_vis_menu_entries) / 
@@ -263,7 +347,7 @@ enum
 
 void mainwin_general_menu_callback(gpointer cb_data, guint action, GtkWidget * w);
 
-GtkItemFactoryEntry mainwin_general_menu_entries[] =
+GtkActionEntryEntry mainwin_general_menu_entries[] =
 {
 	{N_("/About XMMS"), NULL, mainwin_general_menu_callback, MAINWIN_GENERAL_ABOUT, "<Item>"},
 	{N_("/-"), NULL, NULL, 0, "<Separator>"},
@@ -918,7 +1002,7 @@ void draw_mainwin_titlebar(int focus)
 
 void draw_main_window(gboolean force)
 {
-	GdkImage *img, *img2;
+	GtkImage *img, *img2;
 	GList *wl;
 	Widget *w;
 	gboolean redraw;
@@ -2194,7 +2278,7 @@ void mainwin_real_show(void)
 
 void mainwin_real_hide(void)
 {
-	GdkGC *gc;
+	cairo_t *gc;
 	GdkColor pattern;
 
 /*  	if (!cfg.player_visible) */
@@ -2693,7 +2777,7 @@ void create_popups(void)
 
 static void mainwin_set_icon (GtkWidget *win)
 {
-	static GdkPixmap *icon;
+	static cairo_surface_t *icon;
 	static GdkBitmap *mask;
 	Atom icon_atom;
 	glong data[2];
@@ -3264,7 +3348,7 @@ void check_pposition(void)
 {	
 	GtkWidget *window;
 	GdkBitmap *mask;
-	GdkGC *gc;
+	cairo_t *gc;
 	GdkColor pattern;
 
 	window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
@@ -3290,79 +3374,6 @@ void check_pposition(void)
 	while (g_main_iteration(FALSE))
 		;
 }
-
-#if 0
-
-static GdkFilterReturn save_yourself_filter(GdkXEvent *xevent, GdkEvent *event, gpointer data)
-{
-	Atom save_yourself, protocols;
-
-	save_yourself = gdk_atom_intern("WM_SAVE_YOURSELF", FALSE);
-	protocols = gdk_atom_intern("WM_PROTOCOLS", FALSE);
-
-	if (((XEvent*)xevent)->type == ClientMessage)
-	{
-		XClientMessageEvent *cme = (XClientMessageEvent*) xevent;
-		if (cme->message_type == protocols && 
-		    (Atom) cme->data.l[0] == save_yourself)
-		{
-			save_config();
-			XSetCommand(GDK_DISPLAY(),
-				    GDK_WINDOW_XWINDOW(mainwin->window),
-				    restart_argv, restart_argc);
-			return GDK_FILTER_REMOVE;
-		}
-	}
-	
-	return GDK_FILTER_CONTINUE;
-}
-
-static void enable_x11r5_session_management(int argc, char **argv)
-{
-	/*
-	 * X11R5 Session Management 
-	 *
-	 * Most of xmms' options does not make sense when we are
-	 * restarted, so we drop them all.
-	 */
-	
-	GdkAtom save_yourself;
-	Atom *temp, *temp2;
-	gint i, n;
-
-	restart_argc = 1;
-	restart_argv = g_malloc(sizeof (gchar *));
-	restart_argv[0] = g_strdup(argv[0]);
-	
-	XSetCommand(GDK_DISPLAY(), GDK_WINDOW_XWINDOW(mainwin->window),
-		    restart_argv, restart_argc);
-	save_yourself = gdk_atom_intern("WM_SAVE_YOURSELF", FALSE);
-
-	/*
-	 * It would be easier if we could call gdk_add_client_message_filter()
-	 * here but GDK only allows one filter per message and want's to
-	 * filter "WM_PROTOCOLS" itself.
-	 */
-	gdk_window_add_filter(mainwin->window, save_yourself_filter, NULL);
-	if (XGetWMProtocols(GDK_DISPLAY(), GDK_WINDOW_XWINDOW(mainwin->window), &temp, &n))
-	{
-		for (i = 0; i < n; i++)
-			if (temp[i] == save_yourself)
-				return;
-		temp2 = g_new(Atom, n + 1);
-		for (i = 0; i < n; i++)
-			temp2[i] = temp[i];
-		temp2[i] = save_yourself;
-		XSetWMProtocols(GDK_DISPLAY(), GDK_WINDOW_XWINDOW(mainwin->window), temp2, n + 1);
-		if (n > 0)
-			XFree(temp);
-		g_free(temp2);
-	}
-	else
-		XSetWMProtocols(GDK_DISPLAY(), GDK_WINDOW_XWINDOW(mainwin->window), &save_yourself, 1);
-}
-
-#endif
 
 
 int main(int argc, char **argv)

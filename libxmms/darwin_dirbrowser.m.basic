@@ -1,0 +1,17 @@
+void xmms_create_dir_browser(const char *title,
+                             const char *path,
+                             DirSelectHandler handler)
+{
+    NSOpenPanel *panel = [NSOpenPanel openPanel];
+    panel.canChooseFiles = NO;
+    panel.canChooseDirectories = YES;
+    panel.allowsMultipleSelection = NO;
+
+    if([panel runModal] == NSModalResponseOK)
+    {
+        NSURL *url = panel.URL;
+        if(handler)
+            handler((char*)url.path.UTF8String);
+    }
+}
+

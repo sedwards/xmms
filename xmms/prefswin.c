@@ -368,7 +368,7 @@ void prefswin_apply_cb(GtkWidget * w, gpointer data)
 
 void prefswin_font_browse_ok(GtkWidget * w, gpointer data)
 {
-	GtkFontSelectionDialog *fontsel = GTK_FONT_SELECTION_DIALOG(data);
+	PangoFontDescriptionSelectionDialog *fontsel = GTK_FONT_SELECTION_DIALOG(data);
 	gchar *fontname;
 
 	fontname = gtk_font_selection_dialog_get_font_name(fontsel);
@@ -396,7 +396,7 @@ void prefswin_font_browse_cb(GtkWidget * w, gpointer data)
 
 void prefswin_mainwin_font_browse_ok(GtkWidget * w, gpointer data)
 {
-	GtkFontSelectionDialog *fontsel = GTK_FONT_SELECTION_DIALOG(data);
+	PangoFontDescriptionSelectionDialog *fontsel = GTK_FONT_SELECTION_DIALOG(data);
 	gchar *fontname;
 
 	fontname = gtk_font_selection_dialog_get_font_name(fontsel);

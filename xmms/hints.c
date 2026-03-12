@@ -17,10 +17,6 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
-#include <X11/Xlib.h>
-#include <X11/Xmd.h>
-#include <X11/Xatom.h>
-#include <gdk/gdkx.h>
 #include <gdk/gdkprivate.h>
 #include "xmms.h"
 

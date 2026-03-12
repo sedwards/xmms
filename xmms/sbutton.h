@@ -26,7 +26,7 @@ typedef struct
 }
 SButton;
 
-SButton *create_sbutton(GList ** wlist, GdkPixmap * parent, GdkGC * gc, gint x, gint y, gint w, gint h, void (*cb) (void));
+SButton *create_sbutton(GList ** wlist, cairo_surface_t * parent, cairo_t * gc, gint x, gint y, gint w, gint h, void (*cb) (void));
 void free_sbutton(SButton * b);
 
 #endif

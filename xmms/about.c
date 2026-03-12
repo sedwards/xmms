@@ -206,7 +206,7 @@ static GtkWidget* generate_credit_list(const char *text[], gboolean sec_space)
 void show_about_window(void)
 {
 	static GtkWidget *about_window = NULL;
-	static GdkPixmap *xmms_logo_pmap = NULL, *xmms_logo_mask = NULL;
+	static cairo_surface_t *xmms_logo_pmap = NULL, *xmms_logo_mask = NULL;
 
 	GtkWidget *about_vbox, *about_notebook;
 	GtkWidget *about_credits_logo_box, *about_credits_logo_frame;

@@ -28,7 +28,7 @@ void number_set_number(Number * nu, int number)
 void number_draw(Widget * w)
 {
 	Number *nu = (Number *) w;
-	GdkPixmap *obj;
+	cairo_surface_t *obj;
 
 	obj = nu->nu_widget.parent;
 
@@ -41,7 +41,7 @@ void number_draw(Widget * w)
 				 90, 0, nu->nu_widget.x, nu->nu_widget.y, 9, 13);
 }
 
-Number *create_number(GList ** wlist, GdkPixmap * parent, GdkGC * gc, gint x, gint y, SkinIndex si)
+Number *create_number(GList ** wlist, cairo_surface_t * parent, cairo_t * gc, gint x, gint y, SkinIndex si)
 {
 	Number *nu;
 

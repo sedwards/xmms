@@ -31,8 +31,8 @@ static GtkWidget *equalizerwin_configure_window = NULL;
 
 static GtkWidget *eqconfwin_options_eqdf_entry, *eqconfwin_options_eqef_entry;
 
-GdkPixmap *equalizerwin_bg, *equalizerwin_bg_dblsize;
-GdkGC *equalizerwin_gc;
+cairo_surface_t *equalizerwin_bg, *equalizerwin_bg_dblsize;
+cairo_t *equalizerwin_gc;
 
 GList *equalizerwin_wlist = NULL;
 
@@ -46,7 +46,7 @@ static EqGraph *equalizerwin_graph;
 static EqSlider *equalizerwin_preamp, *equalizerwin_bands[10];
 static HSlider *equalizerwin_volume, *equalizerwin_balance;
 
-static GtkItemFactory *equalizerwin_presets_menu;
+static GtkActionEntry *equalizerwin_presets_menu;
 
 gboolean equalizerwin_focus = FALSE;
 
@@ -74,7 +74,7 @@ enum
 	EQUALIZER_PRESETS_DELETE_AUTOPRESET, EQUALIZER_PRESETS_CONFIGURE
 };
 
-GtkItemFactoryEntry equalizerwin_presets_menu_entries[] =
+GtkActionEntry equalizerwin_presets_menu_entries[] =
 {
 	{N_("/Load"), NULL, NULL, 0, "<Branch>"},
 	{N_("/Load/Preset"), NULL, equalizerwin_presets_menu_cb, EQUALIZER_PRESETS_LOAD_PRESET, "<Item>"},
@@ -210,7 +210,7 @@ void equalizerwin_auto_pushed(gboolean toggled)
 
 void draw_equalizer_window(gboolean force)
 {
-	GdkImage *img, *img2;
+	GtkImage *img, *img2;
 	GList *wl;
 	Widget *w;
 	gboolean redraw;

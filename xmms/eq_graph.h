@@ -24,6 +24,6 @@ typedef struct
 }
 EqGraph;
 
-EqGraph *create_eqgraph(GList ** wlist, GdkPixmap * parent, GdkGC * gc, gint x, gint y);
+EqGraph *create_eqgraph(GList ** wlist, cairo_surface_t * parent, cairo_t * gc, gint x, gint y);
 
 #endif

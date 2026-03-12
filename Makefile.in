@@ -197,7 +197,7 @@ DIST_SUBDIRS = $(SUBDIRS)
 am__DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/config.h.in \
 	$(top_srcdir)/intl/Makefile.in ABOUT-NLS AUTHORS COPYING \
 	ChangeLog INSTALL NEWS README TODO acconfig.h compile \
-	config.guess config.sub depcomp install-sh ltmain.sh missing \
+	config.guess config.sub install-sh ltmain.sh missing \
 	mkinstalldirs
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 distdir = $(PACKAGE)-$(VERSION)
@@ -253,6 +253,8 @@ AUTOCONF = @AUTOCONF@
 AUTOHEADER = @AUTOHEADER@
 AUTOMAKE = @AUTOMAKE@
 AWK = @AWK@
+CAIRO_CFLAGS = @CAIRO_CFLAGS@
+CAIRO_LIBS = @CAIRO_LIBS@
 CC = @CC@
 CCDEPMODE = @CCDEPMODE@
 CFLAGS = @CFLAGS@

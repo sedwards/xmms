@@ -18,19 +18,22 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 #include "xmms.h"
-#include "defskin/main.xpm"
-#include "defskin/cbuttons.xpm"
-#include "defskin/titlebar.xpm"
-#include "defskin/shufrep.xpm"
-#include "defskin/text.xpm"
-#include "defskin/volume.xpm"
-#include "defskin/monoster.xpm"
-#include "defskin/playpaus.xpm"
-#include "defskin/nums_ex.xpm"
-#include "defskin/posbar.xpm"
-#include "defskin/pledit.xpm"
-#include "defskin/eqmain.xpm"
-#include "defskin/eq_ex.xpm"
+
+/*
+#include "defskin/main.png"
+#include "defskin/cbuttons.png"
+#include "defskin/titlebar.png"
+#include "defskin/shufrep.png"
+#include "defskin/text.png"
+#include "defskin/volume.png"
+#include "defskin/monoster.png"
+#include "defskin/playpaus.png"
+#include "defskin/nums_ex.png"
+#include "defskin/posbar.png"
+#include "defskin/pledit.png"
+#include "defskin/eqmain.png"
+#include "defskin/eq_ex.png"
+*/
 
 #include <ctype.h>
 
@@ -84,7 +87,7 @@ static void setup_skin_masks(void)
 static GdkBitmap *create_default_mask(GdkWindow * parent, gint w, gint h)
 {
 	GdkBitmap *ret;
-	GdkGC *gc;
+	cairo_t *gc;
 	GdkColor pattern;
 
 	ret = gdk_pixmap_new(parent, w, h, 1);
@@ -105,6 +108,8 @@ static void load_def_pixmap(SkinPixmap *skinpixmap, gchar **skindata)
 
 static void skin_query_color(GdkColormap *cm, GdkColor *c)
 {
+// POrting using Coca
+/*
 	XColor xc = {0};
 	
 	xc.pixel = c->pixel;
@@ -112,6 +117,7 @@ static void skin_query_color(GdkColormap *cm, GdkColor *c)
 	c->red = xc.red;
 	c->green = xc.green;
 	c->blue = xc.blue;
+*/
 }
 
 static glong skin_calc_luminance(GdkColor *c)
@@ -119,14 +125,14 @@ static glong skin_calc_luminance(GdkColor *c)
 	return (0.212671 * c->red + 0.715160 * c->green + 0.072169 * c->blue);
 }
 
-static void skin_get_textcolors(GdkPixmap *text, GdkColor *bgc, GdkColor *fgc)
+static void skin_get_textcolors(cairo_surface_t *text, GdkColor *bgc, GdkColor *fgc)
 {
 	/*
 	 * Try to extract reasonable background and foreground colors
 	 * from the font pixmap
 	 */
 	
-	GdkImage *gi;
+	GtkImage *gi;
 	GdkColormap *cm;
 	int i;
 
@@ -307,7 +313,7 @@ GdkBitmap *skin_create_transparent_mask(const gchar * path, const gchar * file, 
 	gchar *filename;
 
 	GdkBitmap *mask = NULL;
-	GdkGC *gc = NULL;
+	cairo_t *gc = NULL;
 	GdkColor pattern;
 	GdkPoint *gpoints;
 
@@ -418,8 +424,8 @@ void load_skin_viscolor(const gchar * path, const gchar * file)
 
 static void skin_numbers_generate_dash(SkinPixmap *numbers)
 {
-	GdkGC *gc;
-	GdkPixmap *pixmap;
+	cairo_t *gc;
+	cairo_surface_t *pixmap;
 
 	if (numbers->pixmap == NULL ||
 	    numbers->current_width < 99)
@@ -831,12 +837,12 @@ int skin_get_id(void)
 	return skin_current_num;
 }
 
-void skin_draw_pixmap(GdkDrawable *drawable, GdkGC *gc, SkinIndex si,
+void skin_draw_pixmap(GdkDrawable *drawable, cairo_t *gc, SkinIndex si,
 		      gint xsrc, gint ysrc, gint xdest, gint ydest,
 		      gint width, gint height)
 {
 	SkinPixmap *pixmap = get_skin_pixmap(si);
-	GdkPixmap *tmp;
+	cairo_surface_t *tmp;
 
 	if (pixmap->pixmap != NULL)
 	{
@@ -853,11 +859,12 @@ void skin_draw_pixmap(GdkDrawable *drawable, GdkGC *gc, SkinIndex si,
 	gdk_draw_pixmap(drawable, gc, tmp, xsrc, ysrc, xdest, ydest, width, height);
 }
 
+/*
 void skin_get_eq_spline_colors(guint32 (*colors)[19])
 {
 	gint i;
-	GdkPixmap *pixmap;
-	GdkImage *img;
+	cairo_surface_t *pixmap;
+	GtkImage *img;
 
 	if (skin->eqmain.pixmap != NULL &&
 	    skin->eqmain.current_width >= 116 &&
@@ -873,3 +880,4 @@ void skin_get_eq_spline_colors(guint32 (*colors)[19])
 
 	gdk_image_destroy(img);
 }
+*/

@@ -1,15 +1,15 @@
 EXTRA_DIST = \
-cbuttons.xpm \
-eqmain.xpm \
-main.xpm \
-monoster.xpm \
-numbers.xpm \
-nums_ex.xpm \
-playpaus.xpm \
-pledit.xpm \
-posbar.xpm \
-shufrep.xpm \
-text.xpm \
-titlebar.xpm \
-volume.xpm \
-eq_ex.xpm
+cbuttons.png \
+eqmain.png \
+main.png \
+monoster.png \
+numbers.png \
+nums_ex.png \
+playpaus.png \
+pledit.png \
+posbar.png \
+shufrep.png \
+text.png \
+titlebar.png \
+volume.png \
+eq_ex.png

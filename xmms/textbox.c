@@ -27,8 +27,8 @@ static void textbox_draw(Widget * w)
 {
 	TextBox *tb = (TextBox *) w;
 	gint cw;
-	GdkPixmap *obj;
-	GdkPixmap *src;
+	cairo_surface_t *obj;
+	cairo_surface_t *src;
 
 	if (tb->tb_text &&
 	    (!tb->tb_pixmap_text ||
@@ -163,7 +163,7 @@ void textbox_set_text(TextBox * tb, gchar * text)
 static void textbox_generate_xfont_pixmap(TextBox * tb, gchar *pixmaptext)
 {
 	gint length, i;
-	GdkGC *gc, *maskgc;
+	cairo_t *gc, *maskgc;
 	GdkColor *c, pattern;
 	GdkBitmap *mask;
 
@@ -332,7 +332,7 @@ static void textbox_generate_pixmap(TextBox * tb)
 {
 	gint length, i, x, y, wl;
 	gchar *pixmaptext;
-	GdkGC *gc;
+	cairo_t *gc;
 
 	if (tb->tb_pixmap)
 		gdk_pixmap_unref(tb->tb_pixmap);
@@ -495,7 +495,7 @@ void textbox_set_xfont(TextBox *tb, gboolean use_xfont, gchar *fontname)
 		tb->tb_widget.height = tb->tb_nominal_height;
 }
 
-TextBox *create_textbox(GList ** wlist, GdkPixmap * parent, GdkGC * gc, gint x, gint y, gint w, gboolean allow_scroll, SkinIndex si)
+TextBox *create_textbox(GList ** wlist, cairo_surface_t * parent, cairo_t * gc, gint x, gint y, gint w, gboolean allow_scroll, SkinIndex si)
 {
 	TextBox *tb;
 

@@ -21,7 +21,7 @@
 typedef struct
 {
 	GtkWidget *window;
-	GdkGC *gc;
+	cairo_t *gc;
 	gint num_items;
 	gint *nx, *ny;
 	gint *sx, *sy;

@@ -34,7 +34,7 @@ typedef struct
 }
 HSlider;
 
-HSlider *create_hslider(GList ** wlist, GdkPixmap * parent, GdkGC * gc, gint x, gint y, gint w, gint h,
+HSlider *create_hslider(GList ** wlist, cairo_surface_t * parent, cairo_t * gc, gint x, gint y, gint w, gint h,
 		   gint knx, gint kny, gint kpx, gint kpy, gint kw, gint kh,
 		    gint fh, gint fo, gint min, gint max, gint(*fcb) (gint),
 		      void (*mcb) (gint), void (*rcb) (gint), SkinIndex si);

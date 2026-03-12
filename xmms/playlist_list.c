@@ -22,7 +22,6 @@
 #ifdef HAVE_WCHAR_H
 #include <wchar.h>
 #endif
-#include <X11/Xatom.h>
 
 static GdkFont *playlist_list_font = NULL;
 
@@ -365,13 +364,13 @@ void playlist_list_draw_string(PlayList_List *pl, GdkFont *font, gint line, gint
 }
 
 #if 0
-static GdkPixmap *get_transparency_pixmap()
+static cairo_surface_t *get_transparency_pixmap()
 {
 	Atom prop, type; 
 	int format;
 	unsigned long length, after;
 	unsigned char *data;
-	static GdkPixmap *retval = NULL;
+	static cairo_surface_t *retval = NULL;
 	
 	if(retval)
 		return retval;
@@ -393,8 +392,8 @@ static GdkPixmap *get_transparency_pixmap()
 void playlist_list_draw(Widget * w)
 {
 	PlayList_List *pl = (PlayList_List *) w;
-	GdkGC *gc;
-	GdkPixmap *obj;
+	cairo_t *gc;
+	cairo_surface_t *obj;
 	gint width, height;
 	gchar *text, *title;
 	gint i, tw, max_first;
@@ -485,7 +484,7 @@ void playlist_list_draw(Widget * w)
 	}
 }
 
-PlayList_List *create_playlist_list(GList ** wlist, GdkPixmap * parent, GdkGC * gc, gint x, gint y, gint w, gint h)
+PlayList_List *create_playlist_list(GList ** wlist, cairo_surface_t * parent, cairo_t * gc, gint x, gint y, gint w, gint h)
 {
 	PlayList_List *pl;
 
