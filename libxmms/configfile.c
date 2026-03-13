@@ -25,6 +25,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include "configfile.h"
+#include "util.h"
 
 static ConfigSection *xmms_cfg_create_section(ConfigFile * cfg, gchar * name);
 static ConfigLine *xmms_cfg_create_string(ConfigSection * section, gchar * key, gchar * value);
@@ -98,7 +99,7 @@ gchar * xmms_cfg_get_default_filename(void)
 {
 	static gchar *filename = NULL;
 	if (!filename)
-		filename = g_strconcat(g_get_home_dir(), "/.xmms/config", NULL);
+		filename = g_strconcat(xmms_get_config_dir(), "/config", NULL);
 	return filename;
 }
 
@@ -118,6 +119,14 @@ gboolean xmms_cfg_write_file(ConfigFile * cfg, gchar * filename)
 	GList *section_list, *line_list;
 	ConfigSection *section;
 	ConfigLine *line;
+
+    /* Ensure directory exists before writing */
+    gchar *dir = g_path_get_dirname(filename);
+    if (g_mkdir_with_parents(dir, 0755) != 0)
+    {
+        /* We could log an error here, but let's try to proceed */
+    }
+    g_free(dir);
 
 	if (!(file = fopen(filename, "w")))
 		return FALSE;

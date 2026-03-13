@@ -58,7 +58,7 @@ typedef struct
 	gint analyzer_falloff, peaks_falloff;
 	gint playlist_position;
 	gint pause_between_songs_time;
-	gboolean pause_between_songs, show_wm_decorations;
+	gboolean pause_between_songs, show_wm_decorations, save_config_on_quit;
 	gint mouse_change;
 	gboolean playlist_transparent;
 	gchar *gentitle_format;

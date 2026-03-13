@@ -16,6 +16,8 @@ GtkWidget *xmms_show_message(gchar *title,
 
 gboolean xmms_check_realtime_priority(void);
 void xmms_usleep(gint usec);
+char *xmms_get_config_dir(void);
+char *xmms_color_to_hex(GdkColor *color);
 
 #ifdef __cplusplus
 }

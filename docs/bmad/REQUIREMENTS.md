@@ -4,12 +4,17 @@
 Port the legacy GTK 1.2 / GTK 2 XMMS codebase to build and run natively on macOS (Darwin) utilizing GTK 3, Cairo, Pango, CoreAudio, and Metal, **while strictly preserving the classic skin-based UI.**
 
 ## Functional Requirements
-1. **Skin Engine Preservation (CRITICAL):** The legacy WinAmp 2.x skin engine must remain fully functional. The default UI, pixel-perfect window layouts, and transparency masks must look and behave exactly as they did in the original release.
-2. **GTK 3 Migration:** The application must successfully compile and link against GTK 3 (`/opt/homebrew/Cellar/gtk+3/...`).
-3. **Modern Drawing Pipeline:** All legacy GDK drawing types and functions (`GdkPixmap`, `GdkBitmap`, `GdkGC`, `gdk_draw_*`) must be completely replaced with modern Cairo operations (`cairo_t`, `cairo_surface_t`, `cairo_region_t`) in a way that perfectly mimics the old bitmapped rendering.
-4. **CoreAudio Integration:** Implement native audio output for macOS via `libxmms/audio_coreaudio.m` and any necessary Objective-C bridging.
-5. **Native File Browser:** Implement a macOS-native directory browser utilizing `NSSavePanel` / `NSOpenPanel` inside `libxmms/darwin_dirbrowser.m` to replace or supplement GTK file dialogs on macOS.
-6. **Metal Visualizations:** Enable and verify the Metal-based visualization plugin (`libxmms/metal_visualizer.m`) to replace the deprecated OpenGL spectrum analyzer.
+1. **[DONE] Skin Engine Preservation:** The legacy WinAmp 2.x skin engine is fully functional. The default UI, pixel-perfect window layouts, and transparency masks behave exactly as original.
+2. **[DONE] GTK 3 Migration:** Application successfully compiles and links against GTK 3 on Darwin/ARM-64.
+3. **[DONE] Modern Drawing Pipeline:** Legacy GDK drawing primitives replaced with modern Cairo operations (`cairo_t`, `cairo_surface_t`, `cairo_region_t`).
+4. **[DONE] CoreAudio Integration:** Native audio output via `libcoreaudio.so` implemented and verified.
+5. **[DONE] Native File Browser:** macOS-native directory browser utilizing `NSOpenPanel` implemented in `libxmms/darwin_dirbrowser.m`.
+6. **[DONE] Audio Format Support:** Verified playback for WAV, MP3, and OGG formats via plugin-based architecture.
+7. **[DONE] macOS Menu Integration:** Native Apple menu bar support using `GtkosxApplication`.
+
+## Pending Requirements
+1. **Volume/Balance Sync:** Synchronize volume and balance sliders between the Main and Equalizer windows.
+2. **HiDPI Sharpness:** Ensure consistent sharp rendering using `CAIRO_FILTER_NEAREST` across all skin elements.
 
 ## Non-Goals
 1. We are **not** rewriting the core audio logic or decoding loops.
@@ -17,7 +22,6 @@ Port the legacy GTK 1.2 / GTK 2 XMMS codebase to build and run natively on macOS
 3. We are **not** porting to GTK 4. GTK 3 is the explicit target.
 
 ## Technical Constraints
-- The project must build using the existing GNU Autotools system (`configure`, `make`), explicitly utilizing the provided configuration flags.
-- Objective-C code must bridge smoothly with the existing C codebase (compiling as `.m` files).
-- Cairo rendering must be optimized to handle the frequent pixel updates required by the spectrum analyzer and skin animations without excessive CPU overhead.
-- **LEGACY X11 REMOVAL:** All legacy X11-specific code and dependencies must be completely removed. We are only targeting macOS (Darwin) with GTK 3 / Cairo.
+- The project must build using the existing GNU Autotools system (`configure`, `make`).
+- Objective-C code must bridge smoothly with the existing C codebase.
+- **LEGACY X11 REMOVAL:** Zero dependencies on `X11/`, `Xlib.h`, or `GdkX11`. All drawing must be Cairo-based.

@@ -58,6 +58,107 @@ const GtkTargetEntry _xmms_drop_types[] = {
 /* Global Config and State */
 Config cfg;
 gboolean mainwin_focus = TRUE;
+
+void load_config(void)
+{
+    ConfigFile *cfgfile = xmms_cfg_open_default_file();
+    
+    /* Set defaults */
+    cfg.player_x = -1;
+    cfg.player_y = -1;
+    cfg.playlist_x = -1;
+    cfg.playlist_y = -1;
+    cfg.equalizer_x = -1;
+    cfg.equalizer_y = -1;
+    cfg.playlist_width = 275;
+    cfg.playlist_height = 116;
+    cfg.doublesize = FALSE;
+    cfg.player_shaded = FALSE;
+    cfg.playlist_shaded = FALSE;
+    cfg.equalizer_shaded = FALSE;
+    cfg.playlist_visible = TRUE;
+    cfg.equalizer_visible = TRUE;
+    cfg.shuffle = FALSE;
+    cfg.repeat = FALSE;
+    cfg.timer_mode = 0;
+    cfg.vis_type = 0;
+    cfg.filesel_path = g_strdup(g_get_home_dir());
+    cfg.save_window_position = TRUE;
+    cfg.save_config_on_quit = TRUE;
+
+    if (cfgfile) {
+        xmms_cfg_read_int(cfgfile, "xmms", "player_x", &cfg.player_x);
+        xmms_cfg_read_int(cfgfile, "xmms", "player_y", &cfg.player_y);
+        xmms_cfg_read_int(cfgfile, "xmms", "playlist_x", &cfg.playlist_x);
+        xmms_cfg_read_int(cfgfile, "xmms", "playlist_y", &cfg.playlist_y);
+        xmms_cfg_read_int(cfgfile, "xmms", "equalizer_x", &cfg.equalizer_x);
+        xmms_cfg_read_int(cfgfile, "xmms", "equalizer_y", &cfg.equalizer_y);
+        xmms_cfg_read_int(cfgfile, "xmms", "playlist_width", &cfg.playlist_width);
+        xmms_cfg_read_int(cfgfile, "xmms", "playlist_height", &cfg.playlist_height);
+        xmms_cfg_read_boolean(cfgfile, "xmms", "doublesize", &cfg.doublesize);
+        xmms_cfg_read_boolean(cfgfile, "xmms", "player_shaded", &cfg.player_shaded);
+        xmms_cfg_read_boolean(cfgfile, "xmms", "playlist_visible", &cfg.playlist_visible);
+        xmms_cfg_read_boolean(cfgfile, "xmms", "equalizer_visible", &cfg.equalizer_visible);
+        xmms_cfg_read_boolean(cfgfile, "xmms", "shuffle", &cfg.shuffle);
+        xmms_cfg_read_boolean(cfgfile, "xmms", "repeat", &cfg.repeat);
+        xmms_cfg_read_string(cfgfile, "xmms", "filesel_path", &cfg.filesel_path);
+        xmms_cfg_read_boolean(cfgfile, "xmms", "save_config_on_quit", &cfg.save_config_on_quit);
+        xmms_cfg_free(cfgfile);
+    }
+}
+
+void save_config(void)
+{
+    ConfigFile *cfgfile = xmms_cfg_new();
+    
+    /* Update positions from current window state */
+    if (mainwin) gtk_window_get_position(GTK_WINDOW(mainwin), &cfg.player_x, &cfg.player_y);
+    if (playlistwin) gtk_window_get_position(GTK_WINDOW(playlistwin), &cfg.playlist_x, &cfg.playlist_y);
+    if (equalizerwin) gtk_window_get_position(GTK_WINDOW(equalizerwin), &cfg.equalizer_x, &cfg.equalizer_y);
+
+    xmms_cfg_write_int(cfgfile, "xmms", "player_x", cfg.player_x);
+    xmms_cfg_write_int(cfgfile, "xmms", "player_y", cfg.player_y);
+    xmms_cfg_write_int(cfgfile, "xmms", "playlist_x", cfg.playlist_x);
+    xmms_cfg_write_int(cfgfile, "xmms", "playlist_y", cfg.playlist_y);
+    xmms_cfg_write_int(cfgfile, "xmms", "equalizer_x", cfg.equalizer_x);
+    xmms_cfg_write_int(cfgfile, "xmms", "equalizer_y", cfg.equalizer_y);
+    xmms_cfg_write_int(cfgfile, "xmms", "playlist_width", cfg.playlist_width);
+    xmms_cfg_write_int(cfgfile, "xmms", "playlist_height", cfg.playlist_height);
+    xmms_cfg_write_boolean(cfgfile, "xmms", "doublesize", cfg.doublesize);
+    xmms_cfg_write_boolean(cfgfile, "xmms", "player_shaded", cfg.player_shaded);
+    xmms_cfg_write_boolean(cfgfile, "xmms", "playlist_visible", cfg.playlist_visible);
+    xmms_cfg_write_boolean(cfgfile, "xmms", "equalizer_visible", cfg.equalizer_visible);
+    xmms_cfg_write_boolean(cfgfile, "xmms", "shuffle", cfg.shuffle);
+    xmms_cfg_write_boolean(cfgfile, "xmms", "repeat", cfg.repeat);
+    xmms_cfg_write_string(cfgfile, "xmms", "filesel_path", cfg.filesel_path);
+    xmms_cfg_write_boolean(cfgfile, "xmms", "save_config_on_quit", cfg.save_config_on_quit);
+    
+    xmms_cfg_write_default_file(cfgfile);
+    xmms_cfg_free(cfgfile);
+}
+
+static gboolean periodic_save_timer(gpointer data)
+{
+    if (cfg.save_window_position) {
+        /* Only save window positions periodically */
+        if (mainwin) gtk_window_get_position(GTK_WINDOW(mainwin), &cfg.player_x, &cfg.player_y);
+        if (playlistwin) gtk_window_get_position(GTK_WINDOW(playlistwin), &cfg.playlist_x, &cfg.playlist_y);
+        if (equalizerwin) gtk_window_get_position(GTK_WINDOW(equalizerwin), &cfg.equalizer_x, &cfg.equalizer_y);
+        
+        save_config();
+    }
+    return TRUE;
+}
+
+void mainwin_quit_cb(void) 
+{ 
+    xmms_log("Quitting XMMS..."); 
+    if (cfg.save_config_on_quit) {
+        save_config();
+    }
+    gtk_main_quit(); 
+}
+
 GList *mainwin_wlist = NULL;
 Vis *active_vis;
 
@@ -103,7 +204,6 @@ void mainwin_pl_pushed(gboolean toggled)
 }
 void mainwin_shuffle_pushed(gboolean toggled) { xmms_log("Shuffle toggled: %d", toggled); cfg.shuffle = toggled; }
 void mainwin_repeat_pushed(gboolean toggled) { xmms_log("Repeat toggled: %d", toggled); cfg.repeat = toggled; }
-void mainwin_quit_cb(void) { xmms_log("Quitting XMMS"); gtk_main_quit(); }
 
 void mainwin_vis_set_type(InputVisType mode) { cfg.vis_type = mode; }
 
@@ -531,6 +631,12 @@ int main(int argc, char *argv[])
 	gtk_init(&argc, &argv);
     xmms_log("XMMS Starting main...");
 
+    /* Ensure config directory exists before we do anything else */
+    g_mkdir_with_parents(xmms_get_config_dir(), 0755);
+
+    load_config();
+    xmms_log("Config loaded.");
+
 	init_skins();
     xmms_log("Skins initialized.");
     
@@ -547,9 +653,52 @@ int main(int argc, char *argv[])
     xmms_log("Equalizer window created.");
     
     mainwin_set_info_text();
-	mainwin_show(TRUE);
 
+    /* Show windows first, THEN move them. 
+       This often works better with modern window managers/GTK on macOS. */
+    mainwin_show(TRUE);
+    if (cfg.playlist_visible) playlistwin_real_show();
+    if (cfg.equalizer_visible) equalizerwin_real_show();
+
+    /* Center windows on first run or if requested */
+    if (cfg.player_x == -1 || cfg.player_y == -1) {
+        GdkDisplay *display = gdk_display_get_default();
+        GdkMonitor *monitor = gdk_display_get_primary_monitor(display);
+        if (monitor) {
+            GdkRectangle geo;
+            gdk_monitor_get_geometry(monitor, &geo);
+            
+            gint win_w = 275, win_h = 116;
+            if (cfg.doublesize) { win_w *= 2; win_h *= 2; }
+            
+            cfg.player_x = geo.x + (geo.width - win_w) / 2;
+            cfg.player_y = geo.y + (geo.height - (win_h + 116 + 116)) / 2;
+            
+            cfg.playlist_x = cfg.player_x;
+            cfg.playlist_y = cfg.player_y + win_h;
+            
+            cfg.equalizer_x = cfg.player_x;
+            cfg.equalizer_y = cfg.playlist_y + 116;
+            
+            xmms_log("First run: Centering windows at %d, %d (Monitor: %dx%d)", cfg.player_x, cfg.player_y, geo.width, geo.height);
+        }
+    }
+
+    if (cfg.player_x != -1) {
+        gtk_window_move(GTK_WINDOW(mainwin), cfg.player_x, cfg.player_y);
+    }
+    if (cfg.playlist_visible && cfg.playlist_x != -1) {
+        gtk_window_move(GTK_WINDOW(playlistwin), cfg.playlist_x, cfg.playlist_y);
+    }
+    if (cfg.equalizer_visible && cfg.equalizer_x != -1) {
+        gtk_window_move(GTK_WINDOW(equalizerwin), cfg.equalizer_x, cfg.equalizer_y);
+    }
+
+    /* 100ms UI update timer */
     g_timeout_add(100, mainwin_update_timer, NULL);
+    
+    /* 3-minute periodic save timer (180,000 ms) */
+    g_timeout_add(180000, periodic_save_timer, NULL);
 
     xmms_log("Entering gtk_main()...");
 	gtk_main();

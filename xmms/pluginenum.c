@@ -122,13 +122,13 @@ void init_plugins(void)
 
 
 #ifndef DISABLE_USER_PLUGIN_DIR
-	dir = g_strconcat(g_get_home_dir(), "/.xmms/Plugins", NULL);
+	dir = g_strconcat(xmms_get_config_dir(), "/Plugins", NULL);
 	scan_plugins(dir);
 	g_free(dir);
 
 	while (plugin_dir_list[dirsel])
 	{
-		dir = g_strconcat(g_get_home_dir(), "/.xmms/Plugins/",
+		dir = g_strconcat(xmms_get_config_dir(), "/Plugins/",
 				  plugin_dir_list[dirsel++], NULL);
 		scan_plugins(dir);
 		g_free(dir);

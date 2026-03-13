@@ -30,8 +30,8 @@ Kernel configured for up to 10 processors.
 Processor type: arm64e (ARM64E)
 Processors active: 0 1 2 3 4 5 6 7 8 9
 Primary memory available: 16.00 gigabytes
-Default processor set: 735 tasks, 3016 threads, 10 processors
-Load average: 1.70, Mach factor: 8.29
+Default processor set: 768 tasks, 3256 threads, 10 processors
+Load average: 1.65, Mach factor: 8.34
 /bin/machine           = unknown
 /usr/bin/oslevel       = unknown
 /bin/universe          = unknown
@@ -491,7 +491,7 @@ configure:14894: checking for iconv_open
 configure:14894: gcc -o conftest -g -O2   conftest.c  >&5
 Undefined symbols for architecture arm64:
   "_iconv_open", referenced from:
-      _main in conftest-a570ef.o
+      _main in conftest-320b9d.o
 ld: symbol(s) not found for architecture arm64
 clang: error: linker command failed with exit code 1 (use -v to see invocation)
 configure:14894: $? = 1

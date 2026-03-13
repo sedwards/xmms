@@ -84,3 +84,23 @@ void xmms_usleep(gint usec)
 
 	nanosleep(&req, NULL);
 }
+
+char *xmms_get_config_dir(void)
+{
+	static char *config_dir = NULL;
+	if (!config_dir)
+	{
+#ifdef __APPLE__
+		config_dir = g_strconcat(g_get_home_dir(), "/Library/XMMS", NULL);
+#else
+		config_dir = g_strconcat(g_get_home_dir(), "/.xmms", NULL);
+#endif
+	}
+	return config_dir;
+}
+
+char *xmms_color_to_hex(GdkColor *color)
+{
+    if (!color) return g_strdup("#000000");
+    return g_strdup_printf("#%02X%02X%02X", color->red >> 8, color->green >> 8, color->blue >> 8);
+}

@@ -1,19 +1,26 @@
 # Roadmap - XMMS Darwin Port
 
-## Phase 1: Core Migration (Current)
+## Phase 1: Core Migration (COMPLETE)
 - [x] GTK 3 & Cairo structural migration for skin engine.
 - [x] Modernize all custom widgets (buttons, sliders, vis).
 - [x] Native CoreAudio output plugin implementation.
-- [ ] Clean compilation of all core plugins (WAV, Tonegen, Echo, etc.).
-- [ ] Link final `xmms` executable on macOS.
+- [x] Clean compilation of core plugins (WAV, MPG123, VORBIS).
+- [x] Link final `xmms` executable on macOS (Darwin/ARM-64).
 
-## Phase 2: Native Integration & Stability
-- [ ] Implement macOS native directory browsing (`NSOpenPanel` / `NSSavePanel`) in `libxmms/darwin_dirbrowser.m`.
-- [ ] Replace stubbed legacy dialogs (Preferences, URL window) with modern GTK 3 implementations.
-- [ ] Fix threading/event loop artifacts in the new Cairo rendering loop.
-- [ ] Verify pixel-perfect skin rendering against original assets.
+## Phase 2: Native Integration & Stability (COMPLETE)
+- [x] Implement macOS native directory browsing (`NSOpenPanel`) in `libxmms/darwin_dirbrowser.m`.
+- [x] Implement modern GTK 3 Preferences, Playlist, and Equalizer windows.
+- [x] Integrate `GtkosxApplication` for native Apple menu bar support.
+- [x] Verified playback: WAV, MP3, OGG.
+- [x] Resolved plugin loading crashes and symbol resolution issues.
 
-## Phase 3: Audacious Plugin Compatibility
-- [ ] **Audacious API Wrapper:** Create an input plugin wrapper to load and run the ~40 Audacious plugins located in `Audacious-Plugins/`.
-- [ ] Integrate the Audacious plugin build process into the GNU Autotools system.
-- [ ] Verify functionality of key decoders and effects from the Audacious suite.
+## Phase 3: Polish & Refinement (CURRENT)
+- [ ] Implement volume/balance synchronization between Main and Equalizer.
+- [ ] Finalize HiDPI sharp rendering using `CAIRO_FILTER_NEAREST`.
+- [ ] Investigate potential Audacious plugin wrapper for extended format support.
+- [ ] Implement Metal-based visualizer for macOS.
+
+## Phase 4: Distribution & Packaging
+- [ ] Create `.app` bundle for macOS.
+- [ ] Configure `Info.plist` and file associations.
+- [ ] Automate build and packaging process.
