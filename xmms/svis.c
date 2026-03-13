@@ -153,7 +153,7 @@ void svis_clear(SVis * svis)
     draw_widget(svis);
 }
 
-SVis *create_svis(GList ** wlist, cairo_surface_t * parent, cairo_t * gc, gint x, gint y)
+SVis *create_svis(GList ** wlist, cairo_surface_t * parent, gint x, gint y)
 {
 	SVis *svis;
 

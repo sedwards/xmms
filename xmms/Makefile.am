@@ -5,8 +5,8 @@ xmmsincludedir = $(includedir)/xmms
 bin_PROGRAMS = xmms
 
 xmms_LDFLAGS = -export-dynamic
-xmms_LDADD = $(GTK_LIBS)  @PTHREAD_LIBS@ @SM_LIBS@ @VM_LIBS@ \
-@POSIX_LIBS@ $(top_builddir)/libxmms/libxmms.la @INTLLIBS@
+xmms_LDADD = $(GTK_LIBS)  @PTHREAD_LIBS@ \
+$(top_builddir)/libxmms/libxmms.la
 
 INCLUDES = @GTK_CFLAGS@ @XMMS_DEFINES@ -I$(top_builddir)/intl
 

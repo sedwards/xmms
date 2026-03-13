@@ -20,6 +20,7 @@
 
 #include "xmms/i18n.h"
 #include <gtk/gtk.h>
+#include "xmms/gtk3_compat.h"
 #include <stdio.h>
 #include <string.h>
 
@@ -135,22 +136,29 @@ static gint disk_open(AFormat fmt, gint rate, gint nch)
 	title = xmms_remote_get_playlist_file(ctrlsocket_get_session_id(), pos);
 	if (title != NULL && (temp = strrchr(title, '.')) != NULL)
 		*temp = '\0';
-	if (title == NULL || strlen(g_basename(title)) == 0)
+
+	temp = title ? g_path_get_basename(title) : NULL;
+	if (title == NULL || strlen(temp) == 0)
 	{
+		g_free(temp);
 		g_free(title);
 		/* No filename, lets try title instead */
 		title = xmms_remote_get_playlist_title(ctrlsocket_get_session_id(), pos);
 		while (title != NULL && (temp = strchr(title, '/')) != NULL)
 			*temp = '-';
 
-		if (title == NULL || strlen(g_basename(title)) == 0)
+		temp = title ? g_path_get_basename(title) : NULL;
+		if (title == NULL || strlen(temp) == 0)
 		{
+			g_free(temp);
 			g_free(title);
 			/* No title either.  Just set it to something. */
 			title = g_strdup_printf("xmms-%d", pos);
+			temp = g_path_get_basename(title);
 		}
 	}
-	filename = g_strdup_printf("%s/%s.wav", file_path, g_basename(title));
+	filename = g_strdup_printf("%s/%s.wav", file_path, temp);
+	g_free(temp);
 	g_free(title);
 
 	output_file = fopen(filename, "wb");

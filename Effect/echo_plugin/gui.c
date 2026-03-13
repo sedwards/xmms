@@ -1,5 +1,6 @@
 #include "xmms/i18n.h"
 #include <gtk/gtk.h>
+#include "gtk3_compat.h"
 #include "libxmms/util.h"
 #include "libxmms/configfile.h"
 #include "echo.h"
@@ -30,9 +31,9 @@ void echo_about(void)
 static void apply_changes(void)
 {
 	ConfigFile *cfg;
-	echo_delay = GTK_ADJUSTMENT(echo_delay_adj)->value;
-	echo_feedback = GTK_ADJUSTMENT(echo_feedback_adj)->value;
-	echo_volume = GTK_ADJUSTMENT(echo_volume_adj)->value;
+	echo_delay = gtk_adjustment_value(echo_delay_adj);
+	echo_feedback = gtk_adjustment_value(echo_feedback_adj);
+	echo_volume = gtk_adjustment_value(echo_volume_adj);
 	echo_surround_enable =
 		gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(surround_btn));
 

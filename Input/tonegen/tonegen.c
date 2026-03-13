@@ -20,6 +20,7 @@
 #include "xmms/plugin.h"
 #include "xmms/i18n.h"
 #include "libxmms/util.h"
+#include "xmms/gtk3_compat.h"
 #include "config.h"
 #include <glib.h>
 #include <stdlib.h>
@@ -47,13 +48,13 @@ static void tone_about(void)
 	static GtkWidget *box;
 	box = xmms_show_message(
 		_("About Tone Generator"),
-		_("Sinus tone generator by Håvard Kvålen <havardk@xmms.org>\n"
+		_("Sinus tone generator by Hï¿½vard Kvï¿½len <havardk@xmms.org>\n"
 		  "Modified by Daniel J. Peng <danielpeng@bigfoot.com>\n\n"
 		  "To use it, add a URL: tone://frequency1;frequency2;frequency3;...\n"
 		  "e.g. tone://2000;2005 to play a 2000Hz tone and a 2005Hz tone"),
 		_("Ok"), FALSE, NULL, NULL);
 	gtk_signal_connect(GTK_OBJECT(box), "destroy",
-			   gtk_widget_destroyed, &box);
+			   GTK_SIGNAL_FUNC(gtk_widget_destroyed), &box);
 }
 
 static int tone_is_our_file(char *filename)

@@ -33,6 +33,6 @@ void vis_clear_data(Vis * vis);
 void vis_set_doublesize(Vis * vis, gboolean doublesize);
 void vis_clear(Vis * vis);
 void vis_set_window(Vis * vis, GdkWindow * window);
-Vis *create_vis(GList ** wlist, cairo_surface_t * parent, GdkWindow * window, cairo_t * gc, gint x, gint y, gint width, gboolean doublesize);
+Vis *create_vis(GList ** wlist, cairo_surface_t * parent, GdkWindow * window, gint x, gint y, gint width, gboolean doublesize);
 
 #endif

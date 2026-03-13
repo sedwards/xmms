@@ -3,6 +3,7 @@
 #include "xmms/i18n.h"
 #include <xmms/plugin.h>
 #include <gtk/gtk.h>
+#include "gtk3_compat.h"
 #include "libxmms/util.h"
 #include "libxmms/configfile.h"
 

@@ -77,7 +77,7 @@ static void pbutton_motion_cb(GtkWidget * widget, GdkEventMotion * event, PButto
 	}
 }
 
-PButton *create_pbutton(GList ** list, cairo_surface_t * parent, gint x, gint y, gint width, gint height, gint xsrc, gint ysrc, SkinIndex si, void (*callback) (void))
+PButton *create_pbutton(GList ** list, cairo_surface_t * parent, gint x, gint y, gint width, gint height, gint nx, gint ny, gint px, gint py, void (*callback) (void), SkinIndex si)
 {
 	PButton *b;
 
@@ -92,14 +92,34 @@ PButton *create_pbutton(GList ** list, cairo_surface_t * parent, gint x, gint y,
 	b->pb_widget.button_release_cb = (void (*) (GtkWidget *, GdkEventButton *, gpointer)) pbutton_button_release_cb;
 	b->pb_widget.motion_cb = (void (*) (GtkWidget *, GdkEventMotion *, gpointer)) pbutton_motion_cb;
 	b->pb_widget.draw = (void (*) (void *, cairo_t *)) pbutton_draw;
-	b->pb_nx = xsrc;
-	b->pb_ny = ysrc;
-	b->pb_px = xsrc + width;
-	b->pb_py = ysrc;
+	b->pb_nx = nx;
+	b->pb_ny = ny;
+	b->pb_px = px;
+	b->pb_py = py;
 	b->si = si;
 	b->callback = callback;
 
 	add_widget(list, b);
 
 	return b;
+}
+
+void pbutton_set_button_data(PButton *b, gint nx, gint ny, gint px, gint py)
+{
+    if (nx != -1) b->pb_nx = nx;
+    if (ny != -1) b->pb_ny = ny;
+    if (px != -1) b->pb_px = px;
+    if (py != -1) b->pb_py = py;
+    draw_widget(b);
+}
+
+void pbutton_set_skin_index(PButton *b, SkinIndex si)
+{
+    b->si = si;
+    draw_widget(b);
+}
+
+void pbutton_set_skin_index1(PButton *b, SkinIndex si)
+{
+    pbutton_set_skin_index(b, si);
 }

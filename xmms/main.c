@@ -1,6 +1,21 @@
 #include "xmms.h"
 #include <cairo.h>
 
+/* Global Configuration and State */
+Config cfg;
+GList *disabled_iplugins = NULL;
+GList *dock_window_list = NULL;
+gboolean pposition_broken = FALSE;
+int bitrate, frequency, numchannels;
+VisType active_vis = VIS_OFF;
+
+/* DND Types (Matching dnd.h) */
+const GtkTargetEntry _xmms_drop_types[] = {
+    {"text/uri-list", 0, 0},
+    {"_NETSCAPE_URL", 0, 1},
+    {"text/plain", 0, 2}
+};
+
 GtkWidget *mainwin, *mainwin_url_window = NULL, *mainwin_dir_browser = NULL;
 GtkWidget *mainwin_jtt = NULL, *mainwin_jtf = NULL;
 GtkItemFactory *mainwin_options_menu, *mainwin_songname_menu, *mainwin_vis_menu, *mainwin_general_menu;
@@ -32,8 +47,6 @@ void mainwin_set_shape_mask(void)
 
 void draw_main_window(gboolean force)
 {
-	GList *wl;
-	Widget *w;
 	gboolean redraw;
     cairo_t *cr;
 
@@ -46,7 +59,6 @@ void draw_main_window(gboolean force)
 	if (force)
 	{
 		skin_draw_pixmap(cr, SKIN_MAIN, 0, 0, 0, 0, 275, cfg.player_shaded ? 14 : 116);
-		/* TODO: draw_mainwin_titlebar(mainwin_focus); */
 		draw_widget_list(mainwin_wlist, cr, &redraw, TRUE);
 	}
 	else
@@ -94,10 +106,10 @@ static void mainwin_create_gtk(void)
 	else
 		gtk_widget_set_size_request(mainwin, 275, cfg.player_shaded ? 14 : 116);
 
+	mainwin_accel = gtk_accel_group_new();
 	gtk_window_add_accel_group(GTK_WINDOW(mainwin), mainwin_accel);
 
 	g_signal_connect(mainwin, "draw", G_CALLBACK(mainwin_draw_cb), NULL);
-    /* TODO: Connect other signals using g_signal_connect */
 
 	mainwin_set_shape_mask();
 }
@@ -106,10 +118,9 @@ void mainwin_create(void)
 {
 	mainwin_bg = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, 275, 116);
 	mainwin_create_gtk();
-	/* mainwin_create_widgets(); - STUB */
 }
 
-/* Rest of the file stubs or minimal implementation to allow building */
+/* Stubs and Minimal Implementations */
 void mainwin_show(gboolean show) { if (show) gtk_widget_show(mainwin); else gtk_widget_hide(mainwin); }
 void mainwin_set_info_text(void) {}
 void mainwin_set_song_info(gint rate, gint freq, gint nch) {}
@@ -120,3 +131,47 @@ void mainwin_shuffle_pushed(gboolean toggled) {}
 void mainwin_repeat_pushed(gboolean toggled) {}
 void mainwin_real_show(void) { gtk_widget_show(mainwin); }
 void mainwin_real_hide(void) { gtk_widget_hide(mainwin); }
+void mainwin_quit_cb(void) { gtk_main_quit(); }
+void mainwin_eject_pushed(void) {}
+void mainwin_play_pushed(void) {}
+void mainwin_stop_pushed(void) {}
+void mainwin_vis_set_type(InputVisType mode) { cfg.vis_type = mode; }
+void mainwin_set_always_on_top(gboolean always) { cfg.always_on_top = always; hint_set_always(always); }
+void mainwin_set_volume_slider(gint percent) {}
+void mainwin_set_balance_slider(gint percent) {}
+void mainwin_adjust_volume_motion(gint v) {}
+void mainwin_adjust_volume_release(void) {}
+void mainwin_adjust_balance_motion(gint b) {}
+void mainwin_adjust_balance_release(void) {}
+void mainwin_set_balance_diff(gint diff) {}
+void mainwin_disable_seekbar(void) {}
+
+/* Equalizer Stubs */
+void equalizerwin_load_auto_preset(gchar * filename) {}
+void equalizerwin_presets_menu_cb(gpointer cb_data, guint action, GtkWidget * w) {}
+
+/* Entry Point */
+int main(int argc, char **argv)
+{
+    gtk_init(&argc, &argv);
+    
+    /* Initialize default config */
+    memset(&cfg, 0, sizeof(Config));
+    cfg.player_visible = TRUE;
+    cfg.playlist_width = 275;
+    cfg.playlist_height = 116;
+    cfg.player_visible = TRUE;
+    cfg.snap_distance = 10;
+    
+    init_skins();
+    mainwin_create();
+    
+    gtk_widget_show_all(mainwin);
+    gtk_main();
+    return 0;
+}
+
+/* Dummy for missing symbols */
+void xmms_create_dir_browser(void) {}
+gchar * xmms_get_gentitle_format(void) { return "%p - %t"; }
+void xmms_usleep(unsigned long usec) { usleep(usec); }

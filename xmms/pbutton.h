@@ -27,6 +27,9 @@ typedef struct
 	gboolean pressed, inside;
 } PButton;
 
-PButton *create_pbutton(GList ** list, cairo_surface_t * parent, gint x, gint y, gint width, gint height, gint xsrc, gint ysrc, SkinIndex si, void (*callback) (void));
+void pbutton_set_button_data(PButton *b, gint nx, gint ny, gint px, gint py);
+void pbutton_set_skin_index(PButton *b, SkinIndex si);
+void pbutton_set_skin_index1(PButton *b, SkinIndex si);
+PButton *create_pbutton(GList ** list, cairo_surface_t * parent, gint x, gint y, gint width, gint height, gint nx, gint ny, gint px, gint py, void (*callback) (void), SkinIndex si);
 
 #endif

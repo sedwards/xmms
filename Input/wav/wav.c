@@ -19,6 +19,7 @@
 #include "libxmms/util.h"
 #include "libxmms/titlestring.h"
 #include "xmms/i18n.h"
+#include "xmms/gtk3_compat.h"
 
 InputPlugin wav_ip =
 {
@@ -185,7 +186,7 @@ static int is_our_file(char *filename)
 static gchar *get_title(gchar *filename)
 {
 	TitleInput *input;
-	gchar *temp, *ext, *title;
+	gchar *temp, *ext, *title, *base;
 
 	XMMS_NEW_TITLEINPUT(input);
 
@@ -193,14 +194,16 @@ static gchar *get_title(gchar *filename)
 	ext = strrchr(temp, '.');
 	if (ext)
 		*ext = '\0';
-	input->file_name = g_basename(temp);
-	input->file_ext = ext ? ext+1 : NULL;
+	base = g_path_get_basename(temp);
+	input->file_name = base;
+	input->file_ext = ext ? ext + 1 : NULL;
 	input->file_path = temp;
 
 	title = xmms_get_titlestring(xmms_get_gentitle_format(), input);
-	if ( title == NULL )
+	if (title == NULL)
 		title = g_strdup(input->file_name);
 
+	g_free(base);
 	g_free(temp);
 	g_free(input);
 

@@ -5,3 +5,4 @@ Makefile.la
 */.deps/
 *.la
 *.libs
+.deps

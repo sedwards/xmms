@@ -1,0 +1,70 @@
+#ifndef _PLUGIN_H_INCLUDED_
+#define _PLUGIN_H_INCLUDED_
+
+#include <QtCore/QList>
+
+namespace GlobalHotkeys
+{
+
+/*
+ * Values in this enum must not be changed and must start with 0.
+ * New events must always be added at the end (but before Event::Max).
+ * The int values are used in the configuration and shared with the GTK plugin.
+ * All values except for Event::Max must be present in event_desc map.
+ */
+enum class Event
+{
+    PrevTrack = 0,
+    Play,
+    Pause,
+    Stop,
+    NextTrack,
+
+    Forward,
+    Backward,
+    Mute,
+    VolumeUp,
+    VolumeDown,
+    JumpToFile,
+    ToggleWindow,
+    ShowAOSD,
+
+    ToggleRepeat,
+    ToggleShuffle,
+    ToggleStop,
+
+    Raise,
+
+    PrevAlbum,
+    NextAlbum,
+
+    Max
+};
+
+struct HotkeyConfiguration
+{
+    unsigned key, mask;
+    Event event;
+};
+
+struct PluginConfig
+{
+    /* keyboard */
+    QList<HotkeyConfiguration> hotkeys_list;
+};
+
+extern unsigned int numlock_mask;
+extern unsigned int scrolllock_mask;
+extern unsigned int capslock_mask;
+
+void load_config();
+void save_config();
+PluginConfig * get_config();
+bool handle_keyevent(Event event);
+
+void grab_keys();
+void ungrab_keys();
+
+} /* namespace GlobalHotkeys */
+
+#endif

@@ -147,6 +147,35 @@ AC_CHECK_LIB([z], [inflate],
 
 AC_SUBST([Z_LIBS])
 
+INPUT_PLUGINS="wav tonegen"
+OUTPUT_PLUGINS="disk_writer"
+if test "x$enable_macos_audio" = "xyes"; then
+  OUTPUT_PLUGINS="$OUTPUT_PLUGINS darwin"
+fi
+EFFECT_PLUGINS="echo_plugin stereo_plugin voice"
+GENERAL_PLUGINS="song_change"
+VISUALIZATION_PLUGINS="sanalyzer blur_scope"
+
+AC_SUBST(INPUT_PLUGINS)
+AC_SUBST(OUTPUT_PLUGINS)
+AC_SUBST(EFFECT_PLUGINS)
+AC_SUBST(GENERAL_PLUGINS)
+AC_SUBST(VISUALIZATION_PLUGINS)
+
+INPUT_PLUGIN_DIR="Input"
+OUTPUT_PLUGIN_DIR="Output"
+EFFECT_PLUGIN_DIR="Effect"
+GENERAL_PLUGIN_DIR="General"
+VISUALIZATION_PLUGIN_DIR="Visualization"
+ARCH_DEFINES=""
+
+AC_SUBST(INPUT_PLUGIN_DIR)
+AC_SUBST(OUTPUT_PLUGIN_DIR)
+AC_SUBST(EFFECT_PLUGIN_DIR)
+AC_SUBST(GENERAL_PLUGIN_DIR)
+AC_SUBST(VISUALIZATION_PLUGIN_DIR)
+AC_SUBST(ARCH_DEFINES)
+
 case "$host_os" in
   darwin*)
     have_oss=no
@@ -187,10 +216,20 @@ Makefile
 xmms/Makefile
 xmms/defskin/Makefile
 Input/Makefile
+Input/wav/Makefile
+Input/tonegen/Makefile
 Output/Makefile
+Output/disk_writer/Makefile
+Output/darwin/Makefile
 Effect/Makefile
+Effect/echo_plugin/Makefile
+Effect/stereo_plugin/Makefile
+Effect/voice/Makefile
 General/Makefile
+General/song_change/Makefile
 Visualization/Makefile
+Visualization/sanalyzer/Makefile
+Visualization/blur_scope/Makefile
 po/Makefile.in
 intl/Makefile
 ])

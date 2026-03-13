@@ -28,6 +28,6 @@ typedef struct
 void svis_timeout_func(SVis * svis, guchar * data);
 void svis_clear_data(SVis * svis);
 void svis_clear(SVis * svis);
-SVis *create_svis(GList ** wlist, cairo_surface_t * parent, cairo_t * gc, gint x, gint y);
+SVis *create_svis(GList ** wlist, cairo_surface_t * parent, gint x, gint y);
 
 #endif

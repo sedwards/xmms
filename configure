@@ -663,6 +663,17 @@ XMMS_DEFINES
 plugindir
 HAVE_OSS_FALSE
 HAVE_OSS_TRUE
+ARCH_DEFINES
+VISUALIZATION_PLUGIN_DIR
+GENERAL_PLUGIN_DIR
+EFFECT_PLUGIN_DIR
+OUTPUT_PLUGIN_DIR
+INPUT_PLUGIN_DIR
+VISUALIZATION_PLUGINS
+GENERAL_PLUGINS
+EFFECT_PLUGINS
+OUTPUT_PLUGINS
+INPUT_PLUGINS
 Z_LIBS
 HAVE_OPENGL_FALSE
 HAVE_OPENGL_TRUE
@@ -15064,6 +15075,35 @@ fi
 
 
 
+INPUT_PLUGINS="wav tonegen"
+OUTPUT_PLUGINS="disk_writer"
+if test "x$enable_macos_audio" = "xyes"; then
+  OUTPUT_PLUGINS="$OUTPUT_PLUGINS darwin"
+fi
+EFFECT_PLUGINS="echo_plugin stereo_plugin voice"
+GENERAL_PLUGINS="song_change"
+VISUALIZATION_PLUGINS="sanalyzer blur_scope"
+
+
+
+
+
+
+
+INPUT_PLUGIN_DIR="Input"
+OUTPUT_PLUGIN_DIR="Output"
+EFFECT_PLUGIN_DIR="Effect"
+GENERAL_PLUGIN_DIR="General"
+VISUALIZATION_PLUGIN_DIR="Visualization"
+ARCH_DEFINES=""
+
+
+
+
+
+
+
+
 case "$host_os" in
   darwin*)
     have_oss=no
@@ -15121,7 +15161,7 @@ PLUGIN_LDFLAGS='-module -avoid-version -export-symbols-regex "get_.plugin_info"'
 subdirs="$subdirs libxmms"
 
 
-ac_config_files="$ac_config_files Makefile xmms/Makefile xmms/defskin/Makefile Input/Makefile Output/Makefile Effect/Makefile General/Makefile Visualization/Makefile po/Makefile.in intl/Makefile"
+ac_config_files="$ac_config_files Makefile xmms/Makefile xmms/defskin/Makefile Input/Makefile Input/wav/Makefile Input/tonegen/Makefile Output/Makefile Output/disk_writer/Makefile Output/darwin/Makefile Effect/Makefile Effect/echo_plugin/Makefile Effect/stereo_plugin/Makefile Effect/voice/Makefile General/Makefile General/song_change/Makefile Visualization/Makefile Visualization/sanalyzer/Makefile Visualization/blur_scope/Makefile po/Makefile.in intl/Makefile"
 
 
 cat >confcache <<\_ACEOF
@@ -16176,10 +16216,20 @@ do
     "xmms/Makefile") CONFIG_FILES="$CONFIG_FILES xmms/Makefile" ;;
     "xmms/defskin/Makefile") CONFIG_FILES="$CONFIG_FILES xmms/defskin/Makefile" ;;
     "Input/Makefile") CONFIG_FILES="$CONFIG_FILES Input/Makefile" ;;
+    "Input/wav/Makefile") CONFIG_FILES="$CONFIG_FILES Input/wav/Makefile" ;;
+    "Input/tonegen/Makefile") CONFIG_FILES="$CONFIG_FILES Input/tonegen/Makefile" ;;
     "Output/Makefile") CONFIG_FILES="$CONFIG_FILES Output/Makefile" ;;
+    "Output/disk_writer/Makefile") CONFIG_FILES="$CONFIG_FILES Output/disk_writer/Makefile" ;;
+    "Output/darwin/Makefile") CONFIG_FILES="$CONFIG_FILES Output/darwin/Makefile" ;;
     "Effect/Makefile") CONFIG_FILES="$CONFIG_FILES Effect/Makefile" ;;
+    "Effect/echo_plugin/Makefile") CONFIG_FILES="$CONFIG_FILES Effect/echo_plugin/Makefile" ;;
+    "Effect/stereo_plugin/Makefile") CONFIG_FILES="$CONFIG_FILES Effect/stereo_plugin/Makefile" ;;
+    "Effect/voice/Makefile") CONFIG_FILES="$CONFIG_FILES Effect/voice/Makefile" ;;
     "General/Makefile") CONFIG_FILES="$CONFIG_FILES General/Makefile" ;;
+    "General/song_change/Makefile") CONFIG_FILES="$CONFIG_FILES General/song_change/Makefile" ;;
     "Visualization/Makefile") CONFIG_FILES="$CONFIG_FILES Visualization/Makefile" ;;
+    "Visualization/sanalyzer/Makefile") CONFIG_FILES="$CONFIG_FILES Visualization/sanalyzer/Makefile" ;;
+    "Visualization/blur_scope/Makefile") CONFIG_FILES="$CONFIG_FILES Visualization/blur_scope/Makefile" ;;
     "po/Makefile.in") CONFIG_FILES="$CONFIG_FILES po/Makefile.in" ;;
     "intl/Makefile") CONFIG_FILES="$CONFIG_FILES intl/Makefile" ;;
 

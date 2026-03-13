@@ -32,6 +32,8 @@ typedef struct {
     gconstpointer extra_data;
 } GtkItemFactoryEntry;
 
+#define GTK_ITEM_FACTORY(x) ((GtkItemFactory*)(x))
+
 //typedef void (*GtkTranslateFunc) (const gchar *path, gpointer func_data);
 
 GtkItemFactory* gtk_item_factory_new(GType container_type, const gchar *path, GtkAccelGroup *accel_group);

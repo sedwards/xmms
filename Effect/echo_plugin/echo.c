@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <gtk/gtk.h>
+#include "gtk3_compat.h"
 #include "libxmms/configfile.h"
 #include "echo.h"
 #include "xmms/i18n.h"
