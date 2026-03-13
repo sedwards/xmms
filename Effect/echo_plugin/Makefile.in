@@ -243,6 +243,8 @@ GLIB_LIBS = @GLIB_LIBS@
 GREP = @GREP@
 GTK_CFLAGS = @GTK_CFLAGS@
 GTK_LIBS = @GTK_LIBS@
+GTK_MAC_CFLAGS = @GTK_MAC_CFLAGS@
+GTK_MAC_LIBS = @GTK_MAC_LIBS@
 INPUT_PLUGINS = @INPUT_PLUGINS@
 INPUT_PLUGIN_DIR = @INPUT_PLUGIN_DIR@
 INSTALL = @INSTALL@
@@ -365,7 +367,7 @@ echo.c \
 echo.h \
 gui.c
 
-INCLUDES = @GTK_CFLAGS@ -I$(top_builddir)/intl -I$(top_srcdir)/xmms
+AM_CPPFLAGS = @GTK_CFLAGS@ -I$(top_srcdir)/xmms -I$(top_builddir)/intl
 all: all-am
 
 .SUFFIXES:

@@ -16,6 +16,7 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 #include "xmms.h"
+#include "log.h"
 
 static void pbutton_draw(PButton * button, cairo_t *cr)
 {
@@ -55,8 +56,10 @@ static void pbutton_button_release_cb(GtkWidget * widget, GdkEventButton * event
 		b->pressed = FALSE;
 		if (inside_widget(event->x, event->y, b))
 		{
-			if (b->callback)
+			if (b->callback) {
+                xmms_log("Button callback triggered.");
 				b->callback();
+            }
 		}
 		draw_widget(b);
 	}

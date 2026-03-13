@@ -1,12 +1,13 @@
 AC_PREREQ([2.72])
 
 AC_INIT([libxmms],[3.0.2],[xmms-devel@xmms.org])
+AC_CANONICAL_HOST
 
 AC_MSG_NOTICE([XMMS modernized build system])
     
 AC_MSG_CHECKING([for macOS])
-case "$host_os" in
-  darwin*)
+case "$host" in
+  *darwin*)
     HAVE_MACOS=yes
     ;;
   *)  

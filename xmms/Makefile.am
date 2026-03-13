@@ -54,7 +54,8 @@ xmms.h \
 getopt.c getopt1.c getopt.h \
 urldecode.c urldecode.h \
 dnd.h \
-mkdtemp.c
+mkdtemp.c \
+log.c log.h
 
 EXTRA_DIST= xmms_logo.xpm xmms_mini.xpm xmms.desktop xmms.wmconfig
 

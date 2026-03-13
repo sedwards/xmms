@@ -19,6 +19,7 @@
 
 void number_set_number(Number * nu, int number)
 {
+    if (!nu) return;
 	if (number == nu->nu_number)
 		return;
 	nu->nu_number = number;

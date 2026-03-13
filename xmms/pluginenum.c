@@ -18,6 +18,7 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 #include "xmms.h"
+#include "log.h"
 
 #ifdef HPUX
 # include <dl.h>
@@ -38,7 +39,11 @@
 
 gchar *plugin_dir_list[] =
 {
-	PLUGIN_DIR,
+    "Input",
+    "Output",
+    "Effect",
+    "General",
+    "Visualization",
 	NULL
 };
 
@@ -121,16 +126,6 @@ void init_plugins(void)
 	scan_plugins(dir);
 	g_free(dir);
 
-	/*
-	 * Having directories below ~/.xmms/Plugins is depreciated and
-	 * might be removed at some point.
-	 */
-
-	/*
-	 * This is in a separate loop so if the user puts them in the
-	 * wrong dir we'll still get them in the right order (home dir
-	 * first)                                                - Zinx
-	 */
 	while (plugin_dir_list[dirsel])
 	{
 		dir = g_strconcat(g_get_home_dir(), "/.xmms/Plugins/",
@@ -172,12 +167,8 @@ void init_plugins(void)
 	while (node)
 	{
 		op = (OutputPlugin *) node->data;
-		/*
-		 * Only test basename to avoid problems when changing
-		 * prefix.  We will only see one plugin with the same
-		 * basename, so this is usually what the user want.
-		 */
-		if (!strcmp(g_basename(cfg.outputplugin),
+		if (cfg.outputplugin && op->filename &&
+            !strcmp(g_basename(cfg.outputplugin),
 			    g_basename(op->filename)))
 			op_data->current_output_plugin = op;
 		if (op->init)
@@ -189,7 +180,8 @@ void init_plugins(void)
 	while (node)
 	{
 		ep = (EffectPlugin *) node->data;
-		if (!strcmp(cfg.effectplugin, ep->filename))
+		if (cfg.effectplugin && ep->filename && 
+            !strcmp(cfg.effectplugin, ep->filename))
 		{
 			ep_data->current_effect_plugin = ep;
 		}
@@ -202,9 +194,11 @@ void init_plugins(void)
 	while (node)
 	{
 		ip = (InputPlugin *) node->data;
-		temp = g_basename(ip->filename);
-		if (g_list_find_custom(disabled_iplugin_names, temp, d_iplist_compare))
-			disabled_iplugins = g_list_append(disabled_iplugins, ip);
+        if (ip->filename) {
+		    char *temp_base = g_basename(ip->filename);
+		    if (g_list_find_custom(disabled_iplugin_names, temp_base, d_iplist_compare))
+			    disabled_iplugins = g_list_append(disabled_iplugins, ip);
+        }
 		if (ip->init)
 			ip->init();
 		node = node->next;
@@ -223,10 +217,6 @@ void init_plugins(void)
 static void* open_dynamic_lib(char *filename)
 {
 #ifdef HPUX
-	/*
-	 * Use shl_load family of functions on HP-UX. HP-UX does not
-	 * support dlopen on 32-bit PA-RISC executables
-	 */
 	return shl_load(filename, BIND_DEFERRED, 0); 
 #else
 	return dlopen(filename, RTLD_NOW);
@@ -268,7 +258,7 @@ static void dynamic_lib_error(void)
 #ifdef HPUX
 	perror("Error loading plugin!"); 
 #else
-	fprintf(stderr, "%s\n", dlerror());
+    xmms_log("Plugin dynamic load error: %s", dlerror());
 #endif
 }
 
@@ -276,10 +266,6 @@ static int plugin_check_duplicate(char *filename)
 {
 	GList *l;
 	gchar *base_filename = g_basename(filename);
-	/*
-	 * erg.. gotta check 'em all, surely there's a better way
-	 *                                                 - Zinx
-	 */
 
 	for (l = ip_data->input_list; l; l = l->next)
 		if (!strcmp(base_filename,
@@ -327,6 +313,7 @@ void add_plugin(gchar * filename)
 	if ((gpi = find_dynamic_symbol(h, "get_iplugin_info")) != NULL)
 	{
 		InputPlugin *p = gpi();
+        xmms_log("Loaded Input plugin: %s", p->description);
 		p->handle = h;
 		p->filename = g_strdup(filename);
 		p->get_vis_type = input_get_vis_type;
@@ -339,6 +326,7 @@ void add_plugin(gchar * filename)
 	else if ((gpi = find_dynamic_symbol(h, "get_oplugin_info")) != NULL)
 	{
 		OutputPlugin *p = gpi();
+        xmms_log("Loaded Output plugin: %s", p->description);
 		p->handle = h;
 		p->filename = g_strdup(filename);
 		op_data->output_list = g_list_prepend(op_data->output_list, p);
@@ -346,6 +334,7 @@ void add_plugin(gchar * filename)
 	else if ((gpi = find_dynamic_symbol(h, "get_eplugin_info")) != NULL)
 	{
 		EffectPlugin *p = gpi();
+        xmms_log("Loaded Effect plugin: %s", p->description);
 		p->handle = h;
 		p->filename = g_strdup(filename);
 		ep_data->effect_list = g_list_prepend(ep_data->effect_list, p);
@@ -353,6 +342,7 @@ void add_plugin(gchar * filename)
 	else if ((gpi = find_dynamic_symbol(h, "get_gplugin_info")) != NULL)
 	{
 		GeneralPlugin *p = gpi();
+        xmms_log("Loaded General plugin: %s", p->description);
 		p->handle = h;
 		p->filename = g_strdup(filename);
 		p->xmms_session = ctrlsocket_get_session_id();
@@ -361,14 +351,17 @@ void add_plugin(gchar * filename)
 	else if ((gpi = find_dynamic_symbol(h, "get_vplugin_info")) != NULL)
 	{
 		VisPlugin *p = gpi();
+        xmms_log("Loaded Vis plugin: %s", p->description);
 		p->handle = h;
 		p->filename = g_strdup(filename);
 		p->xmms_session = ctrlsocket_get_session_id();
 		p->disable_plugin = vis_disable_plugin;
 		vp_data->vis_list = g_list_prepend(vp_data->vis_list, p);
 	}
-	else
+	else {
+        xmms_log("Symbol not found in %s", filename);
 		close_dynamic_lib(h);
+    }
 }
 
 void scan_plugins(char *dirname)
@@ -378,6 +371,7 @@ void scan_plugins(char *dirname)
 	struct dirent *ent;
 	struct stat statbuf;
 
+    xmms_log("Scanning for plugins in: %s", dirname);
 	dir = opendir(dirname);
 	if (!dir)
 		return;

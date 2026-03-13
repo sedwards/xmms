@@ -1,2 +1,2 @@
-ALL_PLUGINS = OSS esd disk_writer solaris darwin
+ALL_PLUGINS = OSS esd solaris darwin
 SUBDIRS = @OUTPUT_PLUGINS@

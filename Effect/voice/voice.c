@@ -16,6 +16,7 @@ EffectPlugin voice_ep =
 	voice_about,
 	NULL,
 	mod_samples,
+    NULL
 };
 
 EffectPlugin *get_eplugin_info(void)

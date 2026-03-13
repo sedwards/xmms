@@ -20,6 +20,7 @@
 
 #include "xmms/i18n.h"
 #include <gtk/gtk.h>
+#include "gtk3_compat.h"
 #include "xmms/gtk3_compat.h"
 #include <stdio.h>
 #include <string.h>

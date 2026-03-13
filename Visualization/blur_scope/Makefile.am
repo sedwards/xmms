@@ -15,4 +15,4 @@ EXTRA_DIST = blur_8.s xmms_logo.xpm
 
 libbscope_la_SOURCES =  $(COMMON_SRC) $(EXTRA_SRC)
 
-INCLUDES = @GTK_CFLAGS@ @ARCH_DEFINES@ -I$(top_builddir)/intl
+AM_CPPFLAGS = @GTK_CFLAGS@ @ARCH_DEFINES@ -I$(top_srcdir)/xmms -I$(top_builddir)/intl

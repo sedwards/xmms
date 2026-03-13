@@ -122,7 +122,7 @@ am_xmms_OBJECTS = bmp.$(OBJEXT) skin.$(OBJEXT) util.$(OBJEXT) \
 	skinwin.$(OBJEXT) prefswin.$(OBJEXT) playlistwin.$(OBJEXT) \
 	equalizer.$(OBJEXT) hints.$(OBJEXT) about.$(OBJEXT) \
 	sm.$(OBJEXT) getopt.$(OBJEXT) getopt1.$(OBJEXT) \
-	urldecode.$(OBJEXT) mkdtemp.$(OBJEXT)
+	urldecode.$(OBJEXT) mkdtemp.$(OBJEXT) log.$(OBJEXT)
 xmms_OBJECTS = $(am_xmms_OBJECTS)
 am__DEPENDENCIES_1 =
 xmms_DEPENDENCIES = $(am__DEPENDENCIES_1) \
@@ -156,7 +156,7 @@ am__depfiles_remade = ./$(DEPDIR)/about.Po ./$(DEPDIR)/bmp.Po \
 	./$(DEPDIR)/fft.Po ./$(DEPDIR)/fullscreen.Po \
 	./$(DEPDIR)/general.Po ./$(DEPDIR)/getopt.Po \
 	./$(DEPDIR)/getopt1.Po ./$(DEPDIR)/hints.Po \
-	./$(DEPDIR)/hslider.Po ./$(DEPDIR)/input.Po \
+	./$(DEPDIR)/hslider.Po ./$(DEPDIR)/input.Po ./$(DEPDIR)/log.Po \
 	./$(DEPDIR)/main.Po ./$(DEPDIR)/menurow.Po \
 	./$(DEPDIR)/mkdtemp.Po ./$(DEPDIR)/monostereo.Po \
 	./$(DEPDIR)/number.Po ./$(DEPDIR)/output.Po \
@@ -326,6 +326,8 @@ GLIB_LIBS = @GLIB_LIBS@
 GREP = @GREP@
 GTK_CFLAGS = @GTK_CFLAGS@
 GTK_LIBS = @GTK_LIBS@
+GTK_MAC_CFLAGS = @GTK_MAC_CFLAGS@
+GTK_MAC_LIBS = @GTK_MAC_LIBS@
 INPUT_PLUGINS = @INPUT_PLUGINS@
 INPUT_PLUGIN_DIR = @INPUT_PLUGIN_DIR@
 INSTALL = @INSTALL@
@@ -491,7 +493,8 @@ xmms.h \
 getopt.c getopt1.c getopt.h \
 urldecode.c urldecode.h \
 dnd.h \
-mkdtemp.c
+mkdtemp.c \
+log.c log.h
 
 EXTRA_DIST = xmms_logo.xpm xmms_mini.xpm xmms.desktop xmms.wmconfig
 xmmsinclude_HEADERS = plugin.h fullscreen.h
@@ -611,6 +614,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hints.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hslider.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/input.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/log.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/main.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/menurow.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mkdtemp.Po@am__quote@ # am--include-marker
@@ -912,6 +916,7 @@ distclean: distclean-recursive
 	-rm -f ./$(DEPDIR)/hints.Po
 	-rm -f ./$(DEPDIR)/hslider.Po
 	-rm -f ./$(DEPDIR)/input.Po
+	-rm -f ./$(DEPDIR)/log.Po
 	-rm -f ./$(DEPDIR)/main.Po
 	-rm -f ./$(DEPDIR)/menurow.Po
 	-rm -f ./$(DEPDIR)/mkdtemp.Po
@@ -1000,6 +1005,7 @@ maintainer-clean: maintainer-clean-recursive
 	-rm -f ./$(DEPDIR)/hints.Po
 	-rm -f ./$(DEPDIR)/hslider.Po
 	-rm -f ./$(DEPDIR)/input.Po
+	-rm -f ./$(DEPDIR)/log.Po
 	-rm -f ./$(DEPDIR)/main.Po
 	-rm -f ./$(DEPDIR)/menurow.Po
 	-rm -f ./$(DEPDIR)/mkdtemp.Po

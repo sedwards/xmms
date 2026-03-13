@@ -245,6 +245,8 @@ GLIB_LIBS = @GLIB_LIBS@
 GREP = @GREP@
 GTK_CFLAGS = @GTK_CFLAGS@
 GTK_LIBS = @GTK_LIBS@
+GTK_MAC_CFLAGS = @GTK_MAC_CFLAGS@
+GTK_MAC_LIBS = @GTK_MAC_LIBS@
 INPUT_PLUGINS = @INPUT_PLUGINS@
 INPUT_PLUGIN_DIR = @INPUT_PLUGIN_DIR@
 INSTALL = @INSTALL@
@@ -369,7 +371,7 @@ COMMON_SRC = blur_scope.c blur_scope.h config.c
 # endif
 EXTRA_DIST = blur_8.s xmms_logo.xpm
 libbscope_la_SOURCES = $(COMMON_SRC) $(EXTRA_SRC)
-INCLUDES = @GTK_CFLAGS@ @ARCH_DEFINES@ -I$(top_builddir)/intl
+AM_CPPFLAGS = @GTK_CFLAGS@ @ARCH_DEFINES@ -I$(top_srcdir)/xmms -I$(top_builddir)/intl
 all: all-am
 
 .SUFFIXES:

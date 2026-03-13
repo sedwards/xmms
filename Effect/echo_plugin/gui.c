@@ -81,7 +81,7 @@ void echo_configure(void)
 	table = gtk_table_new(2, 3, FALSE);
 	gtk_table_set_col_spacings(GTK_TABLE(table), 5);
 	gtk_container_set_border_width(GTK_CONTAINER(table), 5);
-	gtk_box_pack_start(GTK_BOX(GTK_DIALOG(conf_dialog)->vbox), table,
+	gtk_box_pack_start(GTK_BOX(gtk_dialog_vbox(conf_dialog)), table,
 			   TRUE, TRUE, 5);
 	gtk_widget_show(table);
 
@@ -123,13 +123,13 @@ void echo_configure(void)
 				     echo_surround_enable);
 	gtk_widget_show(surround_btn);
 	
-	gtk_box_pack_start(GTK_BOX(GTK_DIALOG(conf_dialog)->vbox), surround_btn,
+	gtk_box_pack_start(GTK_BOX(gtk_dialog_vbox(conf_dialog)), surround_btn,
 			   TRUE, TRUE, 5);
 	
 	bbox = gtk_hbutton_box_new();
 	gtk_button_box_set_layout(GTK_BUTTON_BOX(bbox), GTK_BUTTONBOX_END);
 	gtk_button_box_set_spacing(GTK_BUTTON_BOX(bbox), 5);
-	gtk_box_pack_start(GTK_BOX((GTK_DIALOG(conf_dialog)->action_area)),
+	gtk_box_pack_start(GTK_BOX((gtk_dialog_action_area(conf_dialog))),
 			   bbox, TRUE, TRUE, 0);
 
 

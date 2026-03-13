@@ -30,8 +30,8 @@ Kernel configured for up to 10 processors.
 Processor type: arm64e (ARM64E)
 Processors active: 0 1 2 3 4 5 6 7 8 9
 Primary memory available: 16.00 gigabytes
-Default processor set: 746 tasks, 3183 threads, 10 processors
-Load average: 2.83, Mach factor: 7.18
+Default processor set: 735 tasks, 3016 threads, 10 processors
+Load average: 1.70, Mach factor: 8.29
 /bin/machine           = unknown
 /usr/bin/oslevel       = unknown
 /bin/universe          = unknown
@@ -40,6 +40,8 @@ PATH: /opt/homebrew/opt/m4/bin/
 PATH: /Users/sedwards/jhbuild-installation/bin/
 PATH: /Users/sedwards/.gem/bin/
 PATH: /Users/sedwards/.local/bin/
+PATH: /opt/homebrew/bin/
+PATH: /opt/homebrew/sbin/
 PATH: /bin/
 PATH: /usr/bin/
 PATH: /usr/sbin/
@@ -48,6 +50,8 @@ PATH: /usr/local/bin/
 PATH: /Library/Frameworks/Python.framework/Versions/3.14/bin/
 PATH: /Library/Frameworks/Python.framework/Versions/3.14/bin/
 PATH: /opt/homebrew/Cellar/bison/3.8.2/bin/
+PATH: /opt/homebrew/bin/
+PATH: /opt/homebrew/sbin/
 PATH: /usr/local/bin/
 PATH: /System/Cryptexes/App/usr/bin/
 PATH: /usr/bin/
@@ -58,7 +62,6 @@ PATH: /var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin/
 PATH: /var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin/
 PATH: /var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin/
 PATH: /Library/Apple/usr/bin/
-PATH: /opt/homebrew/bin/
 PATH: /opt/homebrew/bin/flutter/bin/
 PATH: /usr/bin/
 PATH: /Users/sedwards/.pub-cache/bin/
@@ -75,417 +78,423 @@ PATH: /Users/sedwards/gtk/bin/
 ## Core tests. ##
 ## ----------- ##
 
-configure:2497: looking for aux files: ltmain.sh compile config.guess config.sub missing install-sh
-configure:2510:  trying ./
-configure:2539:   ./ltmain.sh found
-configure:2539:   ./compile found
-configure:2539:   ./config.guess found
-configure:2539:   ./config.sub found
-configure:2539:   ./missing found
-configure:2521:   ./install-sh found
-configure:2684: checking for a BSD-compatible install
-configure:2758: result: /usr/bin/install -c
-configure:2769: checking whether sleep supports fractional seconds
-configure:2785: result: yes
-configure:2788: checking filesystem timestamp resolution
-configure:2923: result: 2
-configure:2928: checking whether build environment is sane
-configure:2973: result: yes
-configure:3144: checking for a race-free mkdir -p
-configure:3187: result: mkdir -p
-configure:3194: checking for gawk
-configure:3215: found /opt/homebrew/bin/gawk
-configure:3227: result: gawk
-configure:3238: checking whether make sets $(MAKE)
-configure:3262: result: yes
-configure:3288: checking whether make supports nested variables
-configure:3307: result: yes
-configure:3321: checking xargs -n works
-configure:3337: result: yes
-configure:3422: checking whether UID '501' is supported by ustar format
-configure:3428: result: yes
-configure:3435: checking whether GID '20' is supported by ustar format
-configure:3441: result: yes
-configure:3449: checking how to create a ustar tar archive
-configure:3460: tar --version
+configure:2505: looking for aux files: ltmain.sh compile config.guess config.sub missing install-sh
+configure:2518:  trying ./
+configure:2547:   ./ltmain.sh found
+configure:2547:   ./compile found
+configure:2547:   ./config.guess found
+configure:2547:   ./config.sub found
+configure:2547:   ./missing found
+configure:2529:   ./install-sh found
+configure:2692: checking for a BSD-compatible install
+configure:2766: result: /usr/bin/install -c
+configure:2777: checking whether sleep supports fractional seconds
+configure:2793: result: yes
+configure:2796: checking filesystem timestamp resolution
+configure:2931: result: 2
+configure:2936: checking whether build environment is sane
+configure:2981: result: yes
+configure:3152: checking for a race-free mkdir -p
+configure:3195: result: mkdir -p
+configure:3202: checking for gawk
+configure:3223: found /opt/homebrew/bin/gawk
+configure:3235: result: gawk
+configure:3246: checking whether make sets $(MAKE)
+configure:3270: result: yes
+configure:3296: checking whether make supports nested variables
+configure:3315: result: yes
+configure:3329: checking xargs -n works
+configure:3345: result: yes
+configure:3430: checking whether UID '501' is supported by ustar format
+configure:3436: result: yes
+configure:3443: checking whether GID '20' is supported by ustar format
+configure:3449: result: yes
+configure:3457: checking how to create a ustar tar archive
+configure:3468: tar --version
 bsdtar 3.5.3 - libarchive 3.7.4 zlib/1.2.12 liblzma/5.4.3 bz2lib/1.0.8 
-configure:3463: $? = 0
-configure:3503: tardir=conftest.dir && eval tar --format=ustar -chf - "$tardir" >conftest.tar
-configure:3506: $? = 0
-configure:3510: tar -xf - <conftest.tar
-configure:3513: $? = 0
-configure:3515: cat conftest.dir/file
+configure:3471: $? = 0
+configure:3511: tardir=conftest.dir && eval tar --format=ustar -chf - "$tardir" >conftest.tar
+configure:3514: $? = 0
+configure:3518: tar -xf - <conftest.tar
+configure:3521: $? = 0
+configure:3523: cat conftest.dir/file
 GrepMe
-configure:3518: $? = 0
-configure:3533: result: gnutar
-configure:3566: checking build system type
-configure:3582: result: aarch64-apple-darwin24.6.0
-configure:3602: checking host system type
-configure:3617: result: aarch64-apple-darwin24.6.0
-configure:3736: XMMS modernized build system
-configure:3739: checking for macOS
-configure:3749: result: yes
-configure:3834: checking for gcc
-configure:3855: found /usr/bin/gcc
-configure:3867: result: gcc
-configure:4226: checking for C compiler version
-configure:4235: gcc --version >&5
+configure:3526: $? = 0
+configure:3541: result: gnutar
+configure:3574: checking build system type
+configure:3590: result: aarch64-apple-darwin24.6.0
+configure:3610: checking host system type
+configure:3625: result: aarch64-apple-darwin24.6.0
+configure:3744: XMMS modernized build system
+configure:3747: checking for macOS
+configure:3757: result: yes
+configure:3842: checking for gcc
+configure:3863: found /usr/bin/gcc
+configure:3875: result: gcc
+configure:4234: checking for C compiler version
+configure:4243: gcc --version >&5
 Apple clang version 17.0.0 (clang-1700.0.13.5)
 Target: arm64-apple-darwin24.6.0
 Thread model: posix
 InstalledDir: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin
-configure:4246: $? = 0
-configure:4235: gcc -v >&5
+configure:4254: $? = 0
+configure:4243: gcc -v >&5
 Apple clang version 17.0.0 (clang-1700.0.13.5)
 Target: arm64-apple-darwin24.6.0
 Thread model: posix
 InstalledDir: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin
-configure:4246: $? = 0
-configure:4235: gcc -V >&5
+configure:4254: $? = 0
+configure:4243: gcc -V >&5
 clang: error: argument to '-V' is missing (expected 1 value)
 clang: error: no input files
-configure:4246: $? = 1
-configure:4235: gcc -qversion >&5
+configure:4254: $? = 1
+configure:4243: gcc -qversion >&5
 clang: error: unknown argument '-qversion'; did you mean '--version'?
 clang: error: no input files
-configure:4246: $? = 1
-configure:4235: gcc -version >&5
+configure:4254: $? = 1
+configure:4243: gcc -version >&5
 clang: error: unknown argument '-version'; did you mean '--version'?
 clang: error: no input files
-configure:4246: $? = 1
-configure:4266: checking whether the C compiler works
-configure:4288: gcc    conftest.c  >&5
-configure:4292: $? = 0
-configure:4343: result: yes
-configure:4347: checking for C compiler default output file name
-configure:4349: result: a.out
-configure:4355: checking for suffix of executables
-configure:4362: gcc -o conftest    conftest.c  >&5
-configure:4366: $? = 0
-configure:4390: result: 
-configure:4414: checking whether we are cross compiling
-configure:4422: gcc -o conftest    conftest.c  >&5
-configure:4426: $? = 0
-configure:4433: ./conftest
-configure:4437: $? = 0
-configure:4452: result: no
-configure:4458: checking for suffix of object files
-configure:4481: gcc -c   conftest.c >&5
-configure:4485: $? = 0
-configure:4509: result: o
-configure:4513: checking whether the compiler supports GNU C
-configure:4533: gcc -c   conftest.c >&5
-configure:4533: $? = 0
-configure:4545: result: yes
-configure:4556: checking whether gcc accepts -g
-configure:4577: gcc -c -g  conftest.c >&5
-configure:4577: $? = 0
-configure:4624: result: yes
-configure:4644: checking for gcc option to enable C11 features
-configure:4659: gcc  -c -g -O2  conftest.c >&5
-configure:4659: $? = 0
-configure:4678: result: none needed
-configure:4802: checking whether gcc understands -c and -o together
-configure:4825: gcc -c conftest.c -o conftest2.o
-configure:4828: $? = 0
-configure:4825: gcc -c conftest.c -o conftest2.o
-configure:4828: $? = 0
-configure:4844: result: yes
-configure:4864: checking whether make supports the include directive
-configure:4879: make -f confmf.GNU && cat confinc.out
+configure:4254: $? = 1
+configure:4274: checking whether the C compiler works
+configure:4296: gcc    conftest.c  >&5
+configure:4300: $? = 0
+configure:4351: result: yes
+configure:4355: checking for C compiler default output file name
+configure:4357: result: a.out
+configure:4363: checking for suffix of executables
+configure:4370: gcc -o conftest    conftest.c  >&5
+configure:4374: $? = 0
+configure:4398: result: 
+configure:4422: checking whether we are cross compiling
+configure:4430: gcc -o conftest    conftest.c  >&5
+configure:4434: $? = 0
+configure:4441: ./conftest
+configure:4445: $? = 0
+configure:4460: result: no
+configure:4466: checking for suffix of object files
+configure:4489: gcc -c   conftest.c >&5
+configure:4493: $? = 0
+configure:4517: result: o
+configure:4521: checking whether the compiler supports GNU C
+configure:4541: gcc -c   conftest.c >&5
+configure:4541: $? = 0
+configure:4553: result: yes
+configure:4564: checking whether gcc accepts -g
+configure:4585: gcc -c -g  conftest.c >&5
+configure:4585: $? = 0
+configure:4632: result: yes
+configure:4652: checking for gcc option to enable C11 features
+configure:4667: gcc  -c -g -O2  conftest.c >&5
+configure:4667: $? = 0
+configure:4686: result: none needed
+configure:4810: checking whether gcc understands -c and -o together
+configure:4833: gcc -c conftest.c -o conftest2.o
+configure:4836: $? = 0
+configure:4833: gcc -c conftest.c -o conftest2.o
+configure:4836: $? = 0
+configure:4852: result: yes
+configure:4872: checking whether make supports the include directive
+configure:4887: make -f confmf.GNU && cat confinc.out
 this is the am__doit target
-configure:4882: $? = 0
-configure:4901: result: yes (GNU style)
-configure:4927: checking dependency style of gcc
-configure:5040: result: gcc3
-configure:5056: checking whether ln -s works
-configure:5060: result: yes
-configure:5067: checking whether make sets $(MAKE)
-configure:5091: result: yes
-configure:5160: checking for gcc
-configure:5181: found /usr/bin/gcc
-configure:5193: result: gcc
-configure:5218: checking for Objective C compiler version
-configure:5227: gcc --version >&5
+configure:4890: $? = 0
+configure:4909: result: yes (GNU style)
+configure:4935: checking dependency style of gcc
+configure:5048: result: gcc3
+configure:5064: checking whether ln -s works
+configure:5068: result: yes
+configure:5075: checking whether make sets $(MAKE)
+configure:5099: result: yes
+configure:5168: checking for gcc
+configure:5189: found /usr/bin/gcc
+configure:5201: result: gcc
+configure:5226: checking for Objective C compiler version
+configure:5235: gcc --version >&5
 Apple clang version 17.0.0 (clang-1700.0.13.5)
 Target: arm64-apple-darwin24.6.0
 Thread model: posix
 InstalledDir: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin
-configure:5238: $? = 0
-configure:5227: gcc -v >&5
+configure:5246: $? = 0
+configure:5235: gcc -v >&5
 Apple clang version 17.0.0 (clang-1700.0.13.5)
 Target: arm64-apple-darwin24.6.0
 Thread model: posix
 InstalledDir: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin
-configure:5238: $? = 0
-configure:5227: gcc -V >&5
+configure:5246: $? = 0
+configure:5235: gcc -V >&5
 clang: error: argument to '-V' is missing (expected 1 value)
 clang: error: no input files
-configure:5238: $? = 1
-configure:5227: gcc -qversion >&5
+configure:5246: $? = 1
+configure:5235: gcc -qversion >&5
 clang: error: unknown argument '-qversion'; did you mean '--version'?
 clang: error: no input files
-configure:5238: $? = 1
-configure:5242: checking whether the compiler supports GNU Objective C
-configure:5262: gcc -c   conftest.m >&5
-configure:5262: $? = 0
-configure:5274: result: yes
-configure:5285: checking whether gcc accepts -g
-configure:5306: gcc -c -g  conftest.m >&5
-configure:5306: $? = 0
-configure:5353: result: yes
-configure:5378: checking dependency style of gcc
-configure:5489: result: gcc3
-configure:5552: checking how to print strings
-configure:5579: result: printf
-configure:5600: checking for a sed that does not truncate output
-configure:5672: result: /opt/homebrew/bin/gsed
-configure:5690: checking for grep that handles long lines and -e
-configure:5756: result: /usr/bin/grep
-configure:5761: checking for egrep
-configure:5831: result: /usr/bin/grep -E
-configure:5838: checking for fgrep
-configure:5908: result: /usr/bin/grep -F
-configure:5945: checking for ld used by gcc
-configure:6014: result: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ld
-configure:6021: checking if the linker (/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ld) is GNU ld
-configure:6038: result: no
-configure:6050: checking for BSD- or MS-compatible name lister (nm)
-configure:6106: result: /usr/bin/nm -B
-configure:6248: checking the name lister (/usr/bin/nm -B) interface
-configure:6256: gcc -c -g -O2  conftest.c >&5
-configure:6259: /usr/bin/nm -B "conftest.o"
-configure:6262: output
+configure:5246: $? = 1
+configure:5250: checking whether the compiler supports GNU Objective C
+configure:5270: gcc -c   conftest.m >&5
+configure:5270: $? = 0
+configure:5282: result: yes
+configure:5293: checking whether gcc accepts -g
+configure:5314: gcc -c -g  conftest.m >&5
+configure:5314: $? = 0
+configure:5361: result: yes
+configure:5386: checking dependency style of gcc
+configure:5497: result: gcc3
+configure:5560: checking how to print strings
+configure:5587: result: printf
+configure:5608: checking for a sed that does not truncate output
+configure:5680: result: /opt/homebrew/bin/gsed
+configure:5698: checking for grep that handles long lines and -e
+configure:5764: result: /usr/bin/grep
+configure:5769: checking for egrep
+configure:5839: result: /usr/bin/grep -E
+configure:5846: checking for fgrep
+configure:5916: result: /usr/bin/grep -F
+configure:5953: checking for ld used by gcc
+configure:6022: result: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ld
+configure:6029: checking if the linker (/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ld) is GNU ld
+configure:6046: result: no
+configure:6058: checking for BSD- or MS-compatible name lister (nm)
+configure:6114: result: /usr/bin/nm -B
+configure:6256: checking the name lister (/usr/bin/nm -B) interface
+configure:6264: gcc -c -g -O2  conftest.c >&5
+configure:6267: /usr/bin/nm -B "conftest.o"
+configure:6270: output
 000000000000024c S _some_variable
 0000000000000000 t ltmp0
 000000000000024c s ltmp1
-configure:6270: result: BSD nm
-configure:6274: checking the maximum length of command line arguments
-configure:6407: result: 786432
-configure:6455: checking how to convert aarch64-apple-darwin24.6.0 file names to aarch64-apple-darwin24.6.0 format
-configure:6497: result: func_convert_file_noop
-configure:6504: checking how to convert aarch64-apple-darwin24.6.0 file names to toolchain format
-configure:6526: result: func_convert_file_noop
-configure:6533: checking for /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ld option to reload object files
-configure:6542: result: -r
-configure:6575: checking for file
-configure:6596: found /usr/bin/file
-configure:6609: result: file
-configure:6672: checking for objdump
-configure:6693: found /usr/bin/objdump
-configure:6705: result: objdump
-configure:6737: checking how to recognize dependent libraries
-configure:6946: result: pass_all
-configure:7037: checking for dlltool
-configure:7058: found /Users/sedwards/wine-binutils/bin/dlltool
-configure:7070: result: dlltool
-configure:7103: checking how to associate runtime and link libraries
-configure:7132: result: printf %s\n
-configure:7193: checking for ranlib
-configure:7214: found /usr/bin/ranlib
-configure:7226: result: ranlib
-configure:7303: checking for ar
-configure:7324: found /usr/bin/ar
-configure:7336: result: ar
-configure:7389: checking for archiver @FILE support
-configure:7407: gcc -c -g -O2  conftest.c >&5
-configure:7407: $? = 0
-configure:7411: ar cr libconftest.a @conftest.lst >&5
+configure:6278: result: BSD nm
+configure:6282: checking the maximum length of command line arguments
+configure:6415: result: 786432
+configure:6463: checking how to convert aarch64-apple-darwin24.6.0 file names to aarch64-apple-darwin24.6.0 format
+configure:6505: result: func_convert_file_noop
+configure:6512: checking how to convert aarch64-apple-darwin24.6.0 file names to toolchain format
+configure:6534: result: func_convert_file_noop
+configure:6541: checking for /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ld option to reload object files
+configure:6550: result: -r
+configure:6583: checking for file
+configure:6604: found /usr/bin/file
+configure:6617: result: file
+configure:6680: checking for objdump
+configure:6701: found /usr/bin/objdump
+configure:6713: result: objdump
+configure:6745: checking how to recognize dependent libraries
+configure:6954: result: pass_all
+configure:7045: checking for dlltool
+configure:7066: found /Users/sedwards/wine-binutils/bin/dlltool
+configure:7078: result: dlltool
+configure:7111: checking how to associate runtime and link libraries
+configure:7140: result: printf %s\n
+configure:7201: checking for ranlib
+configure:7222: found /usr/bin/ranlib
+configure:7234: result: ranlib
+configure:7311: checking for ar
+configure:7332: found /usr/bin/ar
+configure:7344: result: ar
+configure:7397: checking for archiver @FILE support
+configure:7415: gcc -c -g -O2  conftest.c >&5
+configure:7415: $? = 0
+configure:7419: ar cr libconftest.a @conftest.lst >&5
 ar: @conftest.lst: No such file or directory
-configure:7414: $? = 1
-configure:7435: result: no
-configure:7499: checking for strip
-configure:7520: found /usr/bin/strip
-configure:7532: result: strip
-configure:7635: checking command to parse /usr/bin/nm -B output from gcc object
-configure:7789: gcc -c -g -O2  conftest.c >&5
-configure:7792: $? = 0
-configure:7796: /usr/bin/nm -B conftest.o | /opt/homebrew/bin/gsed -n -e 's/^.*[	 ]\([ABCDGIRSTW][ABCDGIRSTW]*\)[	 ][	 ]*\([_A-Za-z][_A-Za-z0-9]*\)$/\1 \2 \2/p' | /opt/homebrew/bin/gsed '/ __gnu_lto/d' > conftest.nm
+configure:7422: $? = 1
+configure:7443: result: no
+configure:7507: checking for strip
+configure:7528: found /usr/bin/strip
+configure:7540: result: strip
+configure:7643: checking command to parse /usr/bin/nm -B output from gcc object
+configure:7797: gcc -c -g -O2  conftest.c >&5
+configure:7800: $? = 0
+configure:7804: /usr/bin/nm -B conftest.o | /opt/homebrew/bin/gsed -n -e 's/^.*[	 ]\([ABCDGIRSTW][ABCDGIRSTW]*\)[	 ][	 ]*\([_A-Za-z][_A-Za-z0-9]*\)$/\1 \2 \2/p' | /opt/homebrew/bin/gsed '/ __gnu_lto/d' > conftest.nm
 cannot find nm_test_var in conftest.nm
-configure:7789: gcc -c -g -O2  conftest.c >&5
-configure:7792: $? = 0
-configure:7796: /usr/bin/nm -B conftest.o | /opt/homebrew/bin/gsed -n -e 's/^.*[	 ]\([ABCDGIRSTW][ABCDGIRSTW]*\)[	 ][	 ]*_\([_A-Za-z][_A-Za-z0-9]*\)$/\1 _\2 \2/p' | /opt/homebrew/bin/gsed '/ __gnu_lto/d' > conftest.nm
-configure:7862: gcc -o conftest -g -O2   conftest.c conftstm.o >&5
-configure:7865: $? = 0
-configure:7904: result: ok
-configure:7951: checking for sysroot
-configure:7985: result: no
-configure:7992: checking for a working dd
-configure:8037: result: /bin/dd
-configure:8041: checking how to truncate binary pipes
-configure:8058: result: /bin/dd bs=4096 count=1
-configure:8398: checking for mt
-configure:8434: result: no
-configure:8454: checking if : is a manifest tool
-configure:8461: : '-?'
-configure:8470: result: no
-configure:8532: checking for dsymutil
-configure:8553: found /usr/bin/dsymutil
-configure:8565: result: dsymutil
-configure:8636: checking for nmedit
-configure:8657: found /usr/bin/nmedit
-configure:8669: result: nmedit
-configure:8740: checking for lipo
-configure:8761: found /usr/bin/lipo
-configure:8773: result: lipo
-configure:8844: checking for otool
-configure:8865: found /usr/bin/otool
-configure:8877: result: otool
-configure:8948: checking for otool64
-configure:8984: result: no
-configure:9029: checking for -single_module linker flag
+configure:7797: gcc -c -g -O2  conftest.c >&5
+configure:7800: $? = 0
+configure:7804: /usr/bin/nm -B conftest.o | /opt/homebrew/bin/gsed -n -e 's/^.*[	 ]\([ABCDGIRSTW][ABCDGIRSTW]*\)[	 ][	 ]*_\([_A-Za-z][_A-Za-z0-9]*\)$/\1 _\2 \2/p' | /opt/homebrew/bin/gsed '/ __gnu_lto/d' > conftest.nm
+configure:7870: gcc -o conftest -g -O2   conftest.c conftstm.o >&5
+configure:7873: $? = 0
+configure:7912: result: ok
+configure:7959: checking for sysroot
+configure:7993: result: no
+configure:8000: checking for a working dd
+configure:8045: result: /bin/dd
+configure:8049: checking how to truncate binary pipes
+configure:8066: result: /bin/dd bs=4096 count=1
+configure:8406: checking for mt
+configure:8442: result: no
+configure:8462: checking if : is a manifest tool
+configure:8469: : '-?'
+configure:8478: result: no
+configure:8540: checking for dsymutil
+configure:8561: found /usr/bin/dsymutil
+configure:8573: result: dsymutil
+configure:8644: checking for nmedit
+configure:8665: found /usr/bin/nmedit
+configure:8677: result: nmedit
+configure:8748: checking for lipo
+configure:8769: found /usr/bin/lipo
+configure:8781: result: lipo
+configure:8852: checking for otool
+configure:8873: found /usr/bin/otool
+configure:8885: result: otool
+configure:8956: checking for otool64
+configure:8992: result: no
+configure:9037: checking for -single_module linker flag
 gcc -g -O2  -o libconftest.dylib -dynamiclib -Wl,-single_module conftest.c
 ld: warning: -single_module is obsolete
-configure:9064: result: no
-configure:9069: checking for -no_fixup_chains linker flag
-configure:9088: gcc -o conftest -g -O2   -Wl,-no_fixup_chains conftest.c  >&5
-configure:9088: $? = 0
-configure:9103: result: yes
-configure:9106: checking for -exported_symbols_list linker flag
-configure:9127: gcc -o conftest -g -O2   -Wl,-exported_symbols_list,conftest.sym conftest.c  >&5
-configure:9127: $? = 0
-configure:9140: result: yes
-configure:9143: checking for -force_load linker flag
+configure:9072: result: no
+configure:9077: checking for -no_fixup_chains linker flag
+configure:9096: gcc -o conftest -g -O2   -Wl,-no_fixup_chains conftest.c  >&5
+configure:9096: $? = 0
+configure:9111: result: yes
+configure:9114: checking for -exported_symbols_list linker flag
+configure:9135: gcc -o conftest -g -O2   -Wl,-exported_symbols_list,conftest.sym conftest.c  >&5
+configure:9135: $? = 0
+configure:9148: result: yes
+configure:9151: checking for -force_load linker flag
 gcc -g -O2 -c -o conftest.o conftest.c
 ar cr libconftest.a conftest.o
 ranlib libconftest.a
 gcc -g -O2  -o conftest conftest.c -Wl,-force_load,./libconftest.a
-configure:9177: result: yes
-configure:9267: checking for stdio.h
-configure:9267: gcc -c -g -O2  conftest.c >&5
-configure:9267: $? = 0
-configure:9267: result: yes
-configure:9267: checking for stdlib.h
-configure:9267: gcc -c -g -O2  conftest.c >&5
-configure:9267: $? = 0
-configure:9267: result: yes
-configure:9267: checking for string.h
-configure:9267: gcc -c -g -O2  conftest.c >&5
-configure:9267: $? = 0
-configure:9267: result: yes
-configure:9267: checking for inttypes.h
-configure:9267: gcc -c -g -O2  conftest.c >&5
-configure:9267: $? = 0
-configure:9267: result: yes
-configure:9267: checking for stdint.h
-configure:9267: gcc -c -g -O2  conftest.c >&5
-configure:9267: $? = 0
-configure:9267: result: yes
-configure:9267: checking for strings.h
-configure:9267: gcc -c -g -O2  conftest.c >&5
-configure:9267: $? = 0
-configure:9267: result: yes
-configure:9267: checking for sys/stat.h
-configure:9267: gcc -c -g -O2  conftest.c >&5
-configure:9267: $? = 0
-configure:9267: result: yes
-configure:9267: checking for sys/types.h
-configure:9267: gcc -c -g -O2  conftest.c >&5
-configure:9267: $? = 0
-configure:9267: result: yes
-configure:9267: checking for unistd.h
-configure:9267: gcc -c -g -O2  conftest.c >&5
-configure:9267: $? = 0
-configure:9267: result: yes
-configure:9292: checking for dlfcn.h
-configure:9292: gcc -c -g -O2  conftest.c >&5
-configure:9292: $? = 0
-configure:9292: result: yes
-configure:9595: checking for objdir
-configure:9612: result: .libs
-configure:9878: checking if gcc supports -fno-rtti -fno-exceptions
-configure:9897: gcc -c -g -O2  -fno-rtti -fno-exceptions conftest.c >&5
-configure:9901: $? = 0
-configure:9915: result: yes
-configure:10288: checking for gcc option to produce PIC
-configure:10297: result: -fno-common -DPIC
-configure:10305: checking if gcc PIC flag -fno-common -DPIC works
-configure:10324: gcc -c -g -O2  -fno-common -DPIC -DPIC conftest.c >&5
-configure:10328: $? = 0
-configure:10342: result: yes
-configure:10371: checking if gcc static flag -static works
-configure:10401: result: no
-configure:10416: checking if gcc supports -c -o file.o
-configure:10438: gcc -c -g -O2  -o out/conftest2.o conftest.c >&5
-configure:10442: $? = 0
-configure:10465: result: yes
-configure:10473: checking if gcc supports -c -o file.o
-configure:10522: result: yes
-configure:10555: checking whether the gcc linker (/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ld) supports shared libraries
-configure:11839: result: yes
-configure:12081: checking dynamic linker characteristics
-configure:13465: result: darwin24.6.0 dyld
-configure:13587: checking how to hardcode library paths into programs
-configure:13612: result: immediate
-configure:14212: checking whether stripping libraries is possible
-configure:14229: result: yes
-configure:14263: checking if libtool supports shared libraries
-configure:14265: result: yes
-configure:14268: checking whether to build shared libraries
-configure:14293: result: yes
-configure:14296: checking whether to build static libraries
-configure:14300: result: yes
-configure:14398: checking for pkg-config
-configure:14421: found /opt/homebrew/bin/pkg-config
-configure:14434: result: /opt/homebrew/bin/pkg-config
-configure:14459: checking pkg-config is at least version 0.9.0
-configure:14462: result: yes
-configure:14476: checking for glib-2.0 >= 2.40
-configure:14483: $PKG_CONFIG --exists --print-errors "glib-2.0 >= 2.40"
-configure:14486: $? = 0
-configure:14500: $PKG_CONFIG --exists --print-errors "glib-2.0 >= 2.40"
-configure:14503: $? = 0
-configure:14561: result: yes
-configure:14567: checking for gtk+-3.0 >= 3.0
-configure:14574: $PKG_CONFIG --exists --print-errors "gtk+-3.0 >= 3.0"
-configure:14577: $? = 0
-configure:14591: $PKG_CONFIG --exists --print-errors "gtk+-3.0 >= 3.0"
-configure:14594: $? = 0
-configure:14652: result: yes
-configure:14658: checking for cairo >= 1.18
-configure:14665: $PKG_CONFIG --exists --print-errors "cairo >= 1.18"
-configure:14668: $? = 0
-configure:14682: $PKG_CONFIG --exists --print-errors "cairo >= 1.18"
-configure:14685: $? = 0
-configure:14743: result: yes
-configure:14756: checking for unistd.h
-configure:14756: result: yes
-configure:14762: checking for fcntl.h
-configure:14762: gcc -c -g -O2  conftest.c >&5
-configure:14762: $? = 0
-configure:14762: result: yes
-configure:14768: checking for sys/ioctl.h
-configure:14768: gcc -c -g -O2  conftest.c >&5
-configure:14768: $? = 0
-configure:14768: result: yes
-configure:14774: checking for limits.h
-configure:14774: gcc -c -g -O2  conftest.c >&5
-configure:14774: $? = 0
-configure:14774: result: yes
-configure:14780: checking for sched.h
-configure:14780: gcc -c -g -O2  conftest.c >&5
-configure:14780: $? = 0
-configure:14780: result: yes
-configure:14786: checking for wchar.h
-configure:14786: gcc -c -g -O2  conftest.c >&5
+configure:9185: result: yes
+configure:9275: checking for stdio.h
+configure:9275: gcc -c -g -O2  conftest.c >&5
+configure:9275: $? = 0
+configure:9275: result: yes
+configure:9275: checking for stdlib.h
+configure:9275: gcc -c -g -O2  conftest.c >&5
+configure:9275: $? = 0
+configure:9275: result: yes
+configure:9275: checking for string.h
+configure:9275: gcc -c -g -O2  conftest.c >&5
+configure:9275: $? = 0
+configure:9275: result: yes
+configure:9275: checking for inttypes.h
+configure:9275: gcc -c -g -O2  conftest.c >&5
+configure:9275: $? = 0
+configure:9275: result: yes
+configure:9275: checking for stdint.h
+configure:9275: gcc -c -g -O2  conftest.c >&5
+configure:9275: $? = 0
+configure:9275: result: yes
+configure:9275: checking for strings.h
+configure:9275: gcc -c -g -O2  conftest.c >&5
+configure:9275: $? = 0
+configure:9275: result: yes
+configure:9275: checking for sys/stat.h
+configure:9275: gcc -c -g -O2  conftest.c >&5
+configure:9275: $? = 0
+configure:9275: result: yes
+configure:9275: checking for sys/types.h
+configure:9275: gcc -c -g -O2  conftest.c >&5
+configure:9275: $? = 0
+configure:9275: result: yes
+configure:9275: checking for unistd.h
+configure:9275: gcc -c -g -O2  conftest.c >&5
+configure:9275: $? = 0
+configure:9275: result: yes
+configure:9300: checking for dlfcn.h
+configure:9300: gcc -c -g -O2  conftest.c >&5
+configure:9300: $? = 0
+configure:9300: result: yes
+configure:9603: checking for objdir
+configure:9620: result: .libs
+configure:9886: checking if gcc supports -fno-rtti -fno-exceptions
+configure:9905: gcc -c -g -O2  -fno-rtti -fno-exceptions conftest.c >&5
+configure:9909: $? = 0
+configure:9923: result: yes
+configure:10296: checking for gcc option to produce PIC
+configure:10305: result: -fno-common -DPIC
+configure:10313: checking if gcc PIC flag -fno-common -DPIC works
+configure:10332: gcc -c -g -O2  -fno-common -DPIC -DPIC conftest.c >&5
+configure:10336: $? = 0
+configure:10350: result: yes
+configure:10379: checking if gcc static flag -static works
+configure:10409: result: no
+configure:10424: checking if gcc supports -c -o file.o
+configure:10446: gcc -c -g -O2  -o out/conftest2.o conftest.c >&5
+configure:10450: $? = 0
+configure:10473: result: yes
+configure:10481: checking if gcc supports -c -o file.o
+configure:10530: result: yes
+configure:10563: checking whether the gcc linker (/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ld) supports shared libraries
+configure:11847: result: yes
+configure:12089: checking dynamic linker characteristics
+configure:13473: result: darwin24.6.0 dyld
+configure:13595: checking how to hardcode library paths into programs
+configure:13620: result: immediate
+configure:14220: checking whether stripping libraries is possible
+configure:14237: result: yes
+configure:14271: checking if libtool supports shared libraries
+configure:14273: result: yes
+configure:14276: checking whether to build shared libraries
+configure:14301: result: yes
+configure:14304: checking whether to build static libraries
+configure:14308: result: yes
+configure:14406: checking for pkg-config
+configure:14429: found /opt/homebrew/bin/pkg-config
+configure:14442: result: /opt/homebrew/bin/pkg-config
+configure:14467: checking pkg-config is at least version 0.9.0
+configure:14470: result: yes
+configure:14484: checking for glib-2.0 >= 2.40
+configure:14491: $PKG_CONFIG --exists --print-errors "glib-2.0 >= 2.40"
+configure:14494: $? = 0
+configure:14508: $PKG_CONFIG --exists --print-errors "glib-2.0 >= 2.40"
+configure:14511: $? = 0
+configure:14569: result: yes
+configure:14575: checking for gtk+-3.0 >= 3.0
+configure:14582: $PKG_CONFIG --exists --print-errors "gtk+-3.0 >= 3.0"
+configure:14585: $? = 0
+configure:14599: $PKG_CONFIG --exists --print-errors "gtk+-3.0 >= 3.0"
+configure:14602: $? = 0
+configure:14660: result: yes
+configure:14666: checking for cairo >= 1.18
+configure:14673: $PKG_CONFIG --exists --print-errors "cairo >= 1.18"
+configure:14676: $? = 0
+configure:14690: $PKG_CONFIG --exists --print-errors "cairo >= 1.18"
+configure:14693: $? = 0
+configure:14751: result: yes
+configure:14759: checking for gtk-mac-integration-gtk3 >= 2.0
+configure:14766: $PKG_CONFIG --exists --print-errors "gtk-mac-integration-gtk3 >= 2.0"
+configure:14769: $? = 0
+configure:14783: $PKG_CONFIG --exists --print-errors "gtk-mac-integration-gtk3 >= 2.0"
 configure:14786: $? = 0
-configure:14786: result: yes
-configure:14794: checking for mkdtemp
-configure:14794: gcc -o conftest -g -O2   conftest.c  >&5
-configure:14794: $? = 0
-configure:14794: result: yes
-configure:14800: checking for sched_get_priority_max
-configure:14800: gcc -o conftest -g -O2   conftest.c  >&5
-configure:14800: $? = 0
-configure:14800: result: yes
-configure:14806: checking for iconv_open
-configure:14806: gcc -o conftest -g -O2   conftest.c  >&5
+configure:14826: result: yes
+configure:14844: checking for unistd.h
+configure:14844: result: yes
+configure:14850: checking for fcntl.h
+configure:14850: gcc -c -g -O2  conftest.c >&5
+configure:14850: $? = 0
+configure:14850: result: yes
+configure:14856: checking for sys/ioctl.h
+configure:14856: gcc -c -g -O2  conftest.c >&5
+configure:14856: $? = 0
+configure:14856: result: yes
+configure:14862: checking for limits.h
+configure:14862: gcc -c -g -O2  conftest.c >&5
+configure:14862: $? = 0
+configure:14862: result: yes
+configure:14868: checking for sched.h
+configure:14868: gcc -c -g -O2  conftest.c >&5
+configure:14868: $? = 0
+configure:14868: result: yes
+configure:14874: checking for wchar.h
+configure:14874: gcc -c -g -O2  conftest.c >&5
+configure:14874: $? = 0
+configure:14874: result: yes
+configure:14882: checking for mkdtemp
+configure:14882: gcc -o conftest -g -O2   conftest.c  >&5
+configure:14882: $? = 0
+configure:14882: result: yes
+configure:14888: checking for sched_get_priority_max
+configure:14888: gcc -o conftest -g -O2   conftest.c  >&5
+configure:14888: $? = 0
+configure:14888: result: yes
+configure:14894: checking for iconv_open
+configure:14894: gcc -o conftest -g -O2   conftest.c  >&5
 Undefined symbols for architecture arm64:
   "_iconv_open", referenced from:
-      _main in conftest-f6e5c1.o
+      _main in conftest-a570ef.o
 ld: symbol(s) not found for architecture arm64
 clang: error: linker command failed with exit code 1 (use -v to see invocation)
-configure:14806: $? = 1
+configure:14894: $? = 1
 configure: failed program was:
 | /* confdefs.h */
 | #define PACKAGE_NAME "xmms"
@@ -508,6 +517,7 @@ configure: failed program was:
 | #define STDC_HEADERS 1
 | #define HAVE_DLFCN_H 1
 | #define LT_OBJDIR ".libs/"
+| #define HAVE_GTK_MAC 1
 | #define HAVE_UNISTD_H 1
 | #define HAVE_FCNTL_H 1
 | #define HAVE_SYS_IOCTL_H 1
@@ -548,18 +558,18 @@ configure: failed program was:
 |   ;
 |   return 0;
 | }
-configure:14806: result: no
-configure:14814: checking for pthread_create in -lpthread
-configure:14843: gcc -o conftest -g -O2   conftest.c -lpthread   >&5
-configure:14843: $? = 0
-configure:14855: result: yes
-configure:15017: checking for inflate in -lz
-configure:15046: gcc -o conftest -g -O2   conftest.c -lz   >&5
-configure:15046: $? = 0
-configure:15058: result: yes
-configure:15276: checking that generated files are newer than configure
-configure:15282: result: done
-configure:15341: creating ./config.status
+configure:14894: result: no
+configure:14902: checking for pthread_create in -lpthread
+configure:14931: gcc -o conftest -g -O2   conftest.c -lpthread   >&5
+configure:14931: $? = 0
+configure:14943: result: yes
+configure:15105: checking for inflate in -lz
+configure:15134: gcc -o conftest -g -O2   conftest.c -lz   >&5
+configure:15134: $? = 0
+configure:15146: result: yes
+configure:15368: checking that generated files are newer than configure
+configure:15374: result: done
+configure:15433: creating ./config.status
 
 ## ---------------------- ##
 ## Running config.status. ##
@@ -576,68 +586,67 @@ generated by GNU Autoconf 2.72.  Invocation command line was
 
 on sedwards-mini.local
 
-config.status:1177: creating Makefile
-config.status:1177: creating xmms/Makefile
-config.status:1177: creating xmms/defskin/Makefile
-config.status:1177: creating Input/Makefile
-config.status:1177: creating Input/wav/Makefile
-config.status:1177: creating Input/tonegen/Makefile
-config.status:1177: creating Output/Makefile
-config.status:1177: creating Output/disk_writer/Makefile
-config.status:1177: creating Output/darwin/Makefile
-config.status:1177: creating Effect/Makefile
-config.status:1177: creating Effect/echo_plugin/Makefile
-config.status:1177: creating Effect/stereo_plugin/Makefile
-config.status:1177: creating Effect/voice/Makefile
-config.status:1177: creating General/Makefile
-config.status:1177: creating General/song_change/Makefile
-config.status:1177: creating Visualization/Makefile
-config.status:1177: creating Visualization/sanalyzer/Makefile
-config.status:1177: creating Visualization/blur_scope/Makefile
-config.status:1177: creating po/Makefile.in
-config.status:1177: creating intl/Makefile
-config.status:1285: WARNING:  'intl/Makefile.in' seems to ignore the --datarootdir setting
-config.status:1177: creating config.h
-config.status:1358: config.h is unchanged
-config.status:1177: creating xmms/i18n.h
-config.status:1358: xmms/i18n.h is unchanged
-config.status:1406: executing depfiles commands
-config.status:1483: cd xmms       && sed -e '/# am--include-marker/d' Makefile         | make -f - am--depfiles
+config.status:1211: creating Makefile
+config.status:1211: creating xmms/Makefile
+config.status:1211: creating xmms/defskin/Makefile
+config.status:1211: creating Input/Makefile
+config.status:1211: creating Input/wav/Makefile
+config.status:1211: creating Input/tonegen/Makefile
+config.status:1211: creating Output/Makefile
+config.status:1211: creating Output/darwin/Makefile
+config.status:1211: creating Effect/Makefile
+config.status:1211: creating Effect/echo_plugin/Makefile
+config.status:1211: creating Effect/stereo_plugin/Makefile
+config.status:1211: creating Effect/voice/Makefile
+config.status:1211: creating General/Makefile
+config.status:1211: creating General/song_change/Makefile
+config.status:1211: creating Visualization/Makefile
+config.status:1211: creating Visualization/sanalyzer/Makefile
+config.status:1211: creating Visualization/blur_scope/Makefile
+config.status:1211: creating intl/Makefile
+config.status:1319: WARNING:  'intl/Makefile.in' seems to ignore the --datarootdir setting
+config.status:1211: creating xmms-config
+config.status:1319: WARNING:  'xmms-config.in' seems to ignore the --datarootdir setting
+config.status:1211: creating xmms.1
+config.status:1319: WARNING:  'xmms.1.in' seems to ignore the --datarootdir setting
+config.status:1211: creating config.h
+config.status:1392: config.h is unchanged
+config.status:1211: creating xmms/i18n.h
+config.status:1392: xmms/i18n.h is unchanged
+config.status:1440: executing depfiles commands
+config.status:1517: cd xmms       && sed -e '/# am--include-marker/d' Makefile         | make -f - am--depfiles
 make: Nothing to be done for `am--depfiles'.
-config.status:1488: $? = 0
-config.status:1483: cd Input/wav       && sed -e '/# am--include-marker/d' Makefile         | make -f - am--depfiles
+config.status:1522: $? = 0
+config.status:1517: cd Input/wav       && sed -e '/# am--include-marker/d' Makefile         | make -f - am--depfiles
 make: Nothing to be done for `am--depfiles'.
-config.status:1488: $? = 0
-config.status:1483: cd Input/tonegen       && sed -e '/# am--include-marker/d' Makefile         | make -f - am--depfiles
+config.status:1522: $? = 0
+config.status:1517: cd Input/tonegen       && sed -e '/# am--include-marker/d' Makefile         | make -f - am--depfiles
 make: Nothing to be done for `am--depfiles'.
-config.status:1488: $? = 0
-config.status:1483: cd Output/disk_writer       && sed -e '/# am--include-marker/d' Makefile         | make -f - am--depfiles
+config.status:1522: $? = 0
+config.status:1517: cd Output/darwin       && sed -e '/# am--include-marker/d' Makefile         | make -f - am--depfiles
 make: Nothing to be done for `am--depfiles'.
-config.status:1488: $? = 0
-config.status:1483: cd Output/darwin       && sed -e '/# am--include-marker/d' Makefile         | make -f - am--depfiles
+config.status:1522: $? = 0
+config.status:1517: cd Effect/echo_plugin       && sed -e '/# am--include-marker/d' Makefile         | make -f - am--depfiles
 make: Nothing to be done for `am--depfiles'.
-config.status:1488: $? = 0
-config.status:1483: cd Effect/echo_plugin       && sed -e '/# am--include-marker/d' Makefile         | make -f - am--depfiles
+config.status:1522: $? = 0
+config.status:1517: cd Effect/stereo_plugin       && sed -e '/# am--include-marker/d' Makefile         | make -f - am--depfiles
 make: Nothing to be done for `am--depfiles'.
-config.status:1488: $? = 0
-config.status:1483: cd Effect/stereo_plugin       && sed -e '/# am--include-marker/d' Makefile         | make -f - am--depfiles
+config.status:1522: $? = 0
+config.status:1517: cd Effect/voice       && sed -e '/# am--include-marker/d' Makefile         | make -f - am--depfiles
 make: Nothing to be done for `am--depfiles'.
-config.status:1488: $? = 0
-config.status:1483: cd Effect/voice       && sed -e '/# am--include-marker/d' Makefile         | make -f - am--depfiles
+config.status:1522: $? = 0
+config.status:1517: cd General/song_change       && sed -e '/# am--include-marker/d' Makefile         | make -f - am--depfiles
 make: Nothing to be done for `am--depfiles'.
-config.status:1488: $? = 0
-config.status:1483: cd General/song_change       && sed -e '/# am--include-marker/d' Makefile         | make -f - am--depfiles
+config.status:1522: $? = 0
+config.status:1517: cd Visualization/sanalyzer       && sed -e '/# am--include-marker/d' Makefile         | make -f - am--depfiles
 make: Nothing to be done for `am--depfiles'.
-config.status:1488: $? = 0
-config.status:1483: cd Visualization/sanalyzer       && sed -e '/# am--include-marker/d' Makefile         | make -f - am--depfiles
+config.status:1522: $? = 0
+config.status:1517: cd Visualization/blur_scope       && sed -e '/# am--include-marker/d' Makefile         | make -f - am--depfiles
 make: Nothing to be done for `am--depfiles'.
-config.status:1488: $? = 0
-config.status:1483: cd Visualization/blur_scope       && sed -e '/# am--include-marker/d' Makefile         | make -f - am--depfiles
-make: Nothing to be done for `am--depfiles'.
-config.status:1488: $? = 0
-config.status:1406: executing libtool commands
-configure:17579: === configuring in libxmms (/Users/sedwards/source/xmms/libxmms)
-configure:17640: running /bin/sh ./configure --disable-option-checking '--prefix=/Users/sedwards/source/xmms/build'  '--disable-opengl' '--enable-metal' '--enable-macos-audio' --cache-file=/dev/null --srcdir=.
+config.status:1522: $? = 0
+config.status:1440: executing libtool commands
+configure:17671: === configuring in libxmms (/Users/sedwards/source/xmms/libxmms)
+configure:17732: running /bin/sh ./configure --disable-option-checking '--prefix=/Users/sedwards/source/xmms/build'  '--disable-opengl' '--enable-metal' '--enable-macos-audio' 'PKG_CONFIG_PATH=/opt/homebrew/lib/pkgconfig:' --cache-file=/dev/null --srcdir=.
 
 ## ---------------- ##
 ## Cache variables. ##
@@ -663,6 +672,10 @@ ac_cv_env_GTK_CFLAGS_set=
 ac_cv_env_GTK_CFLAGS_value=
 ac_cv_env_GTK_LIBS_set=
 ac_cv_env_GTK_LIBS_value=
+ac_cv_env_GTK_MAC_CFLAGS_set=
+ac_cv_env_GTK_MAC_CFLAGS_value=
+ac_cv_env_GTK_MAC_LIBS_set=
+ac_cv_env_GTK_MAC_LIBS_value=
 ac_cv_env_LDFLAGS_set=
 ac_cv_env_LDFLAGS_value=
 ac_cv_env_LIBS_set=
@@ -679,8 +692,8 @@ ac_cv_env_OPENGL_LIBS_set=
 ac_cv_env_OPENGL_LIBS_value=
 ac_cv_env_PKG_CONFIG_LIBDIR_set=
 ac_cv_env_PKG_CONFIG_LIBDIR_value=
-ac_cv_env_PKG_CONFIG_PATH_set=
-ac_cv_env_PKG_CONFIG_PATH_value=
+ac_cv_env_PKG_CONFIG_PATH_set=set
+ac_cv_env_PKG_CONFIG_PATH_value=/opt/homebrew/lib/pkgconfig:
 ac_cv_env_PKG_CONFIG_set=
 ac_cv_env_PKG_CONFIG_value=
 ac_cv_env_build_alias_set=
@@ -782,6 +795,8 @@ pkg_cv_GLIB_CFLAGS='-I/opt/homebrew/Cellar/glib/2.86.4/include/glib-2.0 -I/opt/h
 pkg_cv_GLIB_LIBS='-L/opt/homebrew/Cellar/glib/2.86.4/lib -lglib-2.0 -L/opt/homebrew/opt/gettext/lib -lintl'
 pkg_cv_GTK_CFLAGS='-I/opt/homebrew/Cellar/gtk+3/3.24.51/include/gtk-3.0 -I/opt/homebrew/Cellar/pango/1.57.0_2/include/pango-1.0 -I/opt/homebrew/Cellar/libthai/0.1.30/include -I/opt/homebrew/Cellar/libdatrie/0.2.14/include -I/opt/homebrew/Cellar/harfbuzz/13.0.1/include/harfbuzz -I/opt/homebrew/Cellar/graphite2/1.3.14/include -I/opt/homebrew/Cellar/cairo/1.18.4/include -I/opt/homebrew/Cellar/cairo/1.18.4/include/cairo -I/opt/homebrew/Cellar/fontconfig/2.17.1/include -I/opt/homebrew/opt/freetype/include/freetype2 -I/opt/homebrew/Cellar/libxext/1.3.7/include -I/opt/homebrew/Cellar/xorgproto/2025.1/include -I/opt/homebrew/Cellar/libxrender/0.9.12/include -I/opt/homebrew/Cellar/libx11/1.8.13/include -I/opt/homebrew/Cellar/libxcb/1.17.0/include -I/opt/homebrew/Cellar/libxau/1.0.12/include -I/opt/homebrew/Cellar/libxdmcp/1.1.5/include -I/opt/homebrew/Cellar/pixman/0.46.4/include/pixman-1 -I/opt/homebrew/include/gdk-pixbuf-2.0 -I/opt/homebrew/opt/libpng/include/libpng16 -I/opt/homebrew/opt/libtiff/include -I/opt/homebrew/opt/zstd/include -I/opt/homebrew/Cellar/xz/5.8.2/include -I/opt/homebrew/opt/jpeg-turbo/include -I/opt/homebrew/Cellar/at-spi2-core/2.58.3/include/atk-1.0 -I/opt/homebrew/Cellar/libepoxy/1.5.10/include -I/opt/homebrew/Cellar/fribidi/1.0.16/include/fribidi -I/opt/homebrew/Cellar/glib/2.86.4/include/gio-unix-2.0 -I/opt/homebrew/Cellar/glib/2.86.4/include -I/Library/Developer/CommandLineTools/SDKs/MacOSX15.sdk/usr/include/ffi -I/opt/homebrew/Cellar/glib/2.86.4/include/glib-2.0 -I/opt/homebrew/Cellar/glib/2.86.4/lib/glib-2.0/include -I/opt/homebrew/opt/gettext/include -I/opt/homebrew/Cellar/pcre2/10.47_1/include'
 pkg_cv_GTK_LIBS='-L/opt/homebrew/Cellar/gtk+3/3.24.51/lib -lgtk-3 -lgdk-3 -Wl,-framework,Cocoa -Wl,-framework,Carbon -Wl,-framework,CoreGraphics -L/opt/homebrew/Cellar/pango/1.57.0_2/lib -lpangocairo-1.0 -lpango-1.0 -L/opt/homebrew/Cellar/harfbuzz/13.0.1/lib -lharfbuzz -L/opt/homebrew/Cellar/cairo/1.18.4/lib -lcairo-gobject -lcairo -L/opt/homebrew/lib -lgdk_pixbuf-2.0 -L/opt/homebrew/Cellar/at-spi2-core/2.58.3/lib -latk-1.0 -L/opt/homebrew/Cellar/glib/2.86.4/lib -lgio-2.0 -lgobject-2.0 -lglib-2.0 -L/opt/homebrew/opt/gettext/lib -lintl'
+pkg_cv_GTK_MAC_CFLAGS='-I/opt/homebrew/Cellar/gtk-mac-integration/3.0.2/include/gtkmacintegration -DMAC_INTEGRATION -I/opt/homebrew/Cellar/gtk+3/3.24.51/include/gtk-3.0 -I/opt/homebrew/Cellar/pango/1.57.0_2/include/pango-1.0 -I/opt/homebrew/Cellar/libthai/0.1.30/include -I/opt/homebrew/Cellar/libdatrie/0.2.14/include -I/opt/homebrew/Cellar/harfbuzz/13.0.1/include/harfbuzz -I/opt/homebrew/Cellar/graphite2/1.3.14/include -I/opt/homebrew/Cellar/cairo/1.18.4/include -I/opt/homebrew/Cellar/cairo/1.18.4/include/cairo -I/opt/homebrew/Cellar/fontconfig/2.17.1/include -I/opt/homebrew/opt/freetype/include/freetype2 -I/opt/homebrew/Cellar/libxext/1.3.7/include -I/opt/homebrew/Cellar/xorgproto/2025.1/include -I/opt/homebrew/Cellar/libxrender/0.9.12/include -I/opt/homebrew/Cellar/libx11/1.8.13/include -I/opt/homebrew/Cellar/libxcb/1.17.0/include -I/opt/homebrew/Cellar/libxau/1.0.12/include -I/opt/homebrew/Cellar/libxdmcp/1.1.5/include -I/opt/homebrew/Cellar/pixman/0.46.4/include/pixman-1 -I/opt/homebrew/include/gdk-pixbuf-2.0 -I/opt/homebrew/opt/libpng/include/libpng16 -I/opt/homebrew/opt/libtiff/include -I/opt/homebrew/opt/zstd/include -I/opt/homebrew/Cellar/xz/5.8.2/include -I/opt/homebrew/opt/jpeg-turbo/include -I/opt/homebrew/Cellar/at-spi2-core/2.58.3/include/atk-1.0 -I/opt/homebrew/Cellar/libepoxy/1.5.10/include -I/opt/homebrew/Cellar/fribidi/1.0.16/include/fribidi -I/opt/homebrew/Cellar/glib/2.86.4/include/gio-unix-2.0 -I/opt/homebrew/Cellar/glib/2.86.4/include -I/Library/Developer/CommandLineTools/SDKs/MacOSX15.sdk/usr/include/ffi -I/opt/homebrew/Cellar/glib/2.86.4/include/glib-2.0 -I/opt/homebrew/Cellar/glib/2.86.4/lib/glib-2.0/include -I/opt/homebrew/opt/gettext/include -I/opt/homebrew/Cellar/pcre2/10.47_1/include'
+pkg_cv_GTK_MAC_LIBS='-L/opt/homebrew/Cellar/gtk-mac-integration/3.0.2/lib -lgtkmacintegration-gtk3 -L/opt/homebrew/Cellar/gtk+3/3.24.51/lib -lgtk-3 -lgdk-3 -Wl,-framework,Cocoa -Wl,-framework,Carbon -Wl,-framework,CoreGraphics -L/opt/homebrew/Cellar/pango/1.57.0_2/lib -lpangocairo-1.0 -lpango-1.0 -L/opt/homebrew/Cellar/harfbuzz/13.0.1/lib -lharfbuzz -L/opt/homebrew/Cellar/cairo/1.18.4/lib -lcairo-gobject -lcairo -L/opt/homebrew/lib -lgdk_pixbuf-2.0 -L/opt/homebrew/Cellar/at-spi2-core/2.58.3/lib -latk-1.0 -L/opt/homebrew/Cellar/glib/2.86.4/lib -lgio-2.0 -lgobject-2.0 -lglib-2.0 -L/opt/homebrew/opt/gettext/lib -lintl'
 
 ## ----------------- ##
 ## Output variables. ##
@@ -831,8 +846,10 @@ GENERAL_PLUGIN_DIR='General'
 GLIB_CFLAGS='-I/opt/homebrew/Cellar/glib/2.86.4/include/glib-2.0 -I/opt/homebrew/Cellar/glib/2.86.4/lib/glib-2.0/include -I/opt/homebrew/opt/gettext/include -I/opt/homebrew/Cellar/pcre2/10.47_1/include'
 GLIB_LIBS='-L/opt/homebrew/Cellar/glib/2.86.4/lib -lglib-2.0 -L/opt/homebrew/opt/gettext/lib -lintl'
 GREP='/usr/bin/grep'
-GTK_CFLAGS='-I/opt/homebrew/Cellar/gtk+3/3.24.51/include/gtk-3.0 -I/opt/homebrew/Cellar/pango/1.57.0_2/include/pango-1.0 -I/opt/homebrew/Cellar/libthai/0.1.30/include -I/opt/homebrew/Cellar/libdatrie/0.2.14/include -I/opt/homebrew/Cellar/harfbuzz/13.0.1/include/harfbuzz -I/opt/homebrew/Cellar/graphite2/1.3.14/include -I/opt/homebrew/Cellar/cairo/1.18.4/include -I/opt/homebrew/Cellar/cairo/1.18.4/include/cairo -I/opt/homebrew/Cellar/fontconfig/2.17.1/include -I/opt/homebrew/opt/freetype/include/freetype2 -I/opt/homebrew/Cellar/libxext/1.3.7/include -I/opt/homebrew/Cellar/xorgproto/2025.1/include -I/opt/homebrew/Cellar/libxrender/0.9.12/include -I/opt/homebrew/Cellar/libx11/1.8.13/include -I/opt/homebrew/Cellar/libxcb/1.17.0/include -I/opt/homebrew/Cellar/libxau/1.0.12/include -I/opt/homebrew/Cellar/libxdmcp/1.1.5/include -I/opt/homebrew/Cellar/pixman/0.46.4/include/pixman-1 -I/opt/homebrew/include/gdk-pixbuf-2.0 -I/opt/homebrew/opt/libpng/include/libpng16 -I/opt/homebrew/opt/libtiff/include -I/opt/homebrew/opt/zstd/include -I/opt/homebrew/Cellar/xz/5.8.2/include -I/opt/homebrew/opt/jpeg-turbo/include -I/opt/homebrew/Cellar/at-spi2-core/2.58.3/include/atk-1.0 -I/opt/homebrew/Cellar/libepoxy/1.5.10/include -I/opt/homebrew/Cellar/fribidi/1.0.16/include/fribidi -I/opt/homebrew/Cellar/glib/2.86.4/include/gio-unix-2.0 -I/opt/homebrew/Cellar/glib/2.86.4/include -I/Library/Developer/CommandLineTools/SDKs/MacOSX15.sdk/usr/include/ffi -I/opt/homebrew/Cellar/glib/2.86.4/include/glib-2.0 -I/opt/homebrew/Cellar/glib/2.86.4/lib/glib-2.0/include -I/opt/homebrew/opt/gettext/include -I/opt/homebrew/Cellar/pcre2/10.47_1/include'
-GTK_LIBS='-L/opt/homebrew/Cellar/gtk+3/3.24.51/lib -lgtk-3 -lgdk-3 -Wl,-framework,Cocoa -Wl,-framework,Carbon -Wl,-framework,CoreGraphics -L/opt/homebrew/Cellar/pango/1.57.0_2/lib -lpangocairo-1.0 -lpango-1.0 -L/opt/homebrew/Cellar/harfbuzz/13.0.1/lib -lharfbuzz -L/opt/homebrew/Cellar/cairo/1.18.4/lib -lcairo-gobject -lcairo -L/opt/homebrew/lib -lgdk_pixbuf-2.0 -L/opt/homebrew/Cellar/at-spi2-core/2.58.3/lib -latk-1.0 -L/opt/homebrew/Cellar/glib/2.86.4/lib -lgio-2.0 -lgobject-2.0 -lglib-2.0 -L/opt/homebrew/opt/gettext/lib -lintl'
+GTK_CFLAGS='-I/opt/homebrew/Cellar/gtk+3/3.24.51/include/gtk-3.0 -I/opt/homebrew/Cellar/pango/1.57.0_2/include/pango-1.0 -I/opt/homebrew/Cellar/libthai/0.1.30/include -I/opt/homebrew/Cellar/libdatrie/0.2.14/include -I/opt/homebrew/Cellar/harfbuzz/13.0.1/include/harfbuzz -I/opt/homebrew/Cellar/graphite2/1.3.14/include -I/opt/homebrew/Cellar/cairo/1.18.4/include -I/opt/homebrew/Cellar/cairo/1.18.4/include/cairo -I/opt/homebrew/Cellar/fontconfig/2.17.1/include -I/opt/homebrew/opt/freetype/include/freetype2 -I/opt/homebrew/Cellar/libxext/1.3.7/include -I/opt/homebrew/Cellar/xorgproto/2025.1/include -I/opt/homebrew/Cellar/libxrender/0.9.12/include -I/opt/homebrew/Cellar/libx11/1.8.13/include -I/opt/homebrew/Cellar/libxcb/1.17.0/include -I/opt/homebrew/Cellar/libxau/1.0.12/include -I/opt/homebrew/Cellar/libxdmcp/1.1.5/include -I/opt/homebrew/Cellar/pixman/0.46.4/include/pixman-1 -I/opt/homebrew/include/gdk-pixbuf-2.0 -I/opt/homebrew/opt/libpng/include/libpng16 -I/opt/homebrew/opt/libtiff/include -I/opt/homebrew/opt/zstd/include -I/opt/homebrew/Cellar/xz/5.8.2/include -I/opt/homebrew/opt/jpeg-turbo/include -I/opt/homebrew/Cellar/at-spi2-core/2.58.3/include/atk-1.0 -I/opt/homebrew/Cellar/libepoxy/1.5.10/include -I/opt/homebrew/Cellar/fribidi/1.0.16/include/fribidi -I/opt/homebrew/Cellar/glib/2.86.4/include/gio-unix-2.0 -I/opt/homebrew/Cellar/glib/2.86.4/include -I/Library/Developer/CommandLineTools/SDKs/MacOSX15.sdk/usr/include/ffi -I/opt/homebrew/Cellar/glib/2.86.4/include/glib-2.0 -I/opt/homebrew/Cellar/glib/2.86.4/lib/glib-2.0/include -I/opt/homebrew/opt/gettext/include -I/opt/homebrew/Cellar/pcre2/10.47_1/include -I/opt/homebrew/Cellar/gtk-mac-integration/3.0.2/include/gtkmacintegration -DMAC_INTEGRATION -I/opt/homebrew/Cellar/gtk+3/3.24.51/include/gtk-3.0 -I/opt/homebrew/Cellar/pango/1.57.0_2/include/pango-1.0 -I/opt/homebrew/Cellar/libthai/0.1.30/include -I/opt/homebrew/Cellar/libdatrie/0.2.14/include -I/opt/homebrew/Cellar/harfbuzz/13.0.1/include/harfbuzz -I/opt/homebrew/Cellar/graphite2/1.3.14/include -I/opt/homebrew/Cellar/cairo/1.18.4/include -I/opt/homebrew/Cellar/cairo/1.18.4/include/cairo -I/opt/homebrew/Cellar/fontconfig/2.17.1/include -I/opt/homebrew/opt/freetype/include/freetype2 -I/opt/homebrew/Cellar/libxext/1.3.7/include -I/opt/homebrew/Cellar/xorgproto/2025.1/include -I/opt/homebrew/Cellar/libxrender/0.9.12/include -I/opt/homebrew/Cellar/libx11/1.8.13/include -I/opt/homebrew/Cellar/libxcb/1.17.0/include -I/opt/homebrew/Cellar/libxau/1.0.12/include -I/opt/homebrew/Cellar/libxdmcp/1.1.5/include -I/opt/homebrew/Cellar/pixman/0.46.4/include/pixman-1 -I/opt/homebrew/include/gdk-pixbuf-2.0 -I/opt/homebrew/opt/libpng/include/libpng16 -I/opt/homebrew/opt/libtiff/include -I/opt/homebrew/opt/zstd/include -I/opt/homebrew/Cellar/xz/5.8.2/include -I/opt/homebrew/opt/jpeg-turbo/include -I/opt/homebrew/Cellar/at-spi2-core/2.58.3/include/atk-1.0 -I/opt/homebrew/Cellar/libepoxy/1.5.10/include -I/opt/homebrew/Cellar/fribidi/1.0.16/include/fribidi -I/opt/homebrew/Cellar/glib/2.86.4/include/gio-unix-2.0 -I/opt/homebrew/Cellar/glib/2.86.4/include -I/Library/Developer/CommandLineTools/SDKs/MacOSX15.sdk/usr/include/ffi -I/opt/homebrew/Cellar/glib/2.86.4/include/glib-2.0 -I/opt/homebrew/Cellar/glib/2.86.4/lib/glib-2.0/include -I/opt/homebrew/opt/gettext/include -I/opt/homebrew/Cellar/pcre2/10.47_1/include'
+GTK_LIBS='-L/opt/homebrew/Cellar/gtk+3/3.24.51/lib -lgtk-3 -lgdk-3 -Wl,-framework,Cocoa -Wl,-framework,Carbon -Wl,-framework,CoreGraphics -L/opt/homebrew/Cellar/pango/1.57.0_2/lib -lpangocairo-1.0 -lpango-1.0 -L/opt/homebrew/Cellar/harfbuzz/13.0.1/lib -lharfbuzz -L/opt/homebrew/Cellar/cairo/1.18.4/lib -lcairo-gobject -lcairo -L/opt/homebrew/lib -lgdk_pixbuf-2.0 -L/opt/homebrew/Cellar/at-spi2-core/2.58.3/lib -latk-1.0 -L/opt/homebrew/Cellar/glib/2.86.4/lib -lgio-2.0 -lgobject-2.0 -lglib-2.0 -L/opt/homebrew/opt/gettext/lib -lintl -L/opt/homebrew/Cellar/gtk-mac-integration/3.0.2/lib -lgtkmacintegration-gtk3 -L/opt/homebrew/Cellar/gtk+3/3.24.51/lib -lgtk-3 -lgdk-3 -Wl,-framework,Cocoa -Wl,-framework,Carbon -Wl,-framework,CoreGraphics -L/opt/homebrew/Cellar/pango/1.57.0_2/lib -lpangocairo-1.0 -lpango-1.0 -L/opt/homebrew/Cellar/harfbuzz/13.0.1/lib -lharfbuzz -L/opt/homebrew/Cellar/cairo/1.18.4/lib -lcairo-gobject -lcairo -L/opt/homebrew/lib -lgdk_pixbuf-2.0 -L/opt/homebrew/Cellar/at-spi2-core/2.58.3/lib -latk-1.0 -L/opt/homebrew/Cellar/glib/2.86.4/lib -lgio-2.0 -lgobject-2.0 -lglib-2.0 -L/opt/homebrew/opt/gettext/lib -lintl'
+GTK_MAC_CFLAGS='-I/opt/homebrew/Cellar/gtk-mac-integration/3.0.2/include/gtkmacintegration -DMAC_INTEGRATION -I/opt/homebrew/Cellar/gtk+3/3.24.51/include/gtk-3.0 -I/opt/homebrew/Cellar/pango/1.57.0_2/include/pango-1.0 -I/opt/homebrew/Cellar/libthai/0.1.30/include -I/opt/homebrew/Cellar/libdatrie/0.2.14/include -I/opt/homebrew/Cellar/harfbuzz/13.0.1/include/harfbuzz -I/opt/homebrew/Cellar/graphite2/1.3.14/include -I/opt/homebrew/Cellar/cairo/1.18.4/include -I/opt/homebrew/Cellar/cairo/1.18.4/include/cairo -I/opt/homebrew/Cellar/fontconfig/2.17.1/include -I/opt/homebrew/opt/freetype/include/freetype2 -I/opt/homebrew/Cellar/libxext/1.3.7/include -I/opt/homebrew/Cellar/xorgproto/2025.1/include -I/opt/homebrew/Cellar/libxrender/0.9.12/include -I/opt/homebrew/Cellar/libx11/1.8.13/include -I/opt/homebrew/Cellar/libxcb/1.17.0/include -I/opt/homebrew/Cellar/libxau/1.0.12/include -I/opt/homebrew/Cellar/libxdmcp/1.1.5/include -I/opt/homebrew/Cellar/pixman/0.46.4/include/pixman-1 -I/opt/homebrew/include/gdk-pixbuf-2.0 -I/opt/homebrew/opt/libpng/include/libpng16 -I/opt/homebrew/opt/libtiff/include -I/opt/homebrew/opt/zstd/include -I/opt/homebrew/Cellar/xz/5.8.2/include -I/opt/homebrew/opt/jpeg-turbo/include -I/opt/homebrew/Cellar/at-spi2-core/2.58.3/include/atk-1.0 -I/opt/homebrew/Cellar/libepoxy/1.5.10/include -I/opt/homebrew/Cellar/fribidi/1.0.16/include/fribidi -I/opt/homebrew/Cellar/glib/2.86.4/include/gio-unix-2.0 -I/opt/homebrew/Cellar/glib/2.86.4/include -I/Library/Developer/CommandLineTools/SDKs/MacOSX15.sdk/usr/include/ffi -I/opt/homebrew/Cellar/glib/2.86.4/include/glib-2.0 -I/opt/homebrew/Cellar/glib/2.86.4/lib/glib-2.0/include -I/opt/homebrew/opt/gettext/include -I/opt/homebrew/Cellar/pcre2/10.47_1/include'
+GTK_MAC_LIBS='-L/opt/homebrew/Cellar/gtk-mac-integration/3.0.2/lib -lgtkmacintegration-gtk3 -L/opt/homebrew/Cellar/gtk+3/3.24.51/lib -lgtk-3 -lgdk-3 -Wl,-framework,Cocoa -Wl,-framework,Carbon -Wl,-framework,CoreGraphics -L/opt/homebrew/Cellar/pango/1.57.0_2/lib -lpangocairo-1.0 -lpango-1.0 -L/opt/homebrew/Cellar/harfbuzz/13.0.1/lib -lharfbuzz -L/opt/homebrew/Cellar/cairo/1.18.4/lib -lcairo-gobject -lcairo -L/opt/homebrew/lib -lgdk_pixbuf-2.0 -L/opt/homebrew/Cellar/at-spi2-core/2.58.3/lib -latk-1.0 -L/opt/homebrew/Cellar/glib/2.86.4/lib -lgio-2.0 -lgobject-2.0 -lglib-2.0 -L/opt/homebrew/opt/gettext/lib -lintl'
 HAVE_MACOS_AUDIO_FALSE='#'
 HAVE_MACOS_AUDIO_TRUE=''
 HAVE_MACOS_FALSE='#'
@@ -872,7 +889,7 @@ OPENGL_CFLAGS=''
 OPENGL_LIBS=''
 OTOOL64=':'
 OTOOL='otool'
-OUTPUT_PLUGINS='disk_writer darwin'
+OUTPUT_PLUGINS='darwin'
 OUTPUT_PLUGIN_DIR='Output'
 PACKAGE='xmms'
 PACKAGE_BUGREPORT='xmms-devel@xmms.org'
@@ -884,8 +901,8 @@ PACKAGE_VERSION='1.2.6'
 PATH_SEPARATOR=':'
 PKG_CONFIG='/opt/homebrew/bin/pkg-config'
 PKG_CONFIG_LIBDIR=''
-PKG_CONFIG_PATH=''
-PLUGIN_LDFLAGS='-module -avoid-version -export-symbols-regex "get_.plugin_info"'
+PKG_CONFIG_PATH='/opt/homebrew/lib/pkgconfig:'
+PLUGIN_LDFLAGS='-module -avoid-version -export-symbols-regex "get_.plugin_info" -undefined dynamic_lookup'
 PTHREAD_LIBS='-lpthread'
 RANLIB='ranlib'
 SED='/opt/homebrew/bin/gsed'
@@ -981,6 +998,7 @@ target_alias=''
 #define STDC_HEADERS 1
 #define HAVE_DLFCN_H 1
 #define LT_OBJDIR ".libs/"
+#define HAVE_GTK_MAC 1
 #define HAVE_UNISTD_H 1
 #define HAVE_FCNTL_H 1
 #define HAVE_SYS_IOCTL_H 1

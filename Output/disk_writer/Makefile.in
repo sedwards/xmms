@@ -362,7 +362,7 @@ lib_LTLIBRARIES = libdisk_writer.la
 libdisk_writer_la_LDFLAGS = @PLUGIN_LDFLAGS@
 libdisk_writer_la_LIBADD = @GTK_LIBS@
 libdisk_writer_la_SOURCES = disk_writer.c
-INCLUDES = @GTK_CFLAGS@ -I$(top_builddir)/intl -I$(top_srcdir)/xmms
+AM_CPPFLAGS = @GTK_CFLAGS@ -I$(top_srcdir)/xmms -I$(top_builddir)/intl
 all: all-am
 
 .SUFFIXES:
@@ -688,6 +688,7 @@ uninstall-am: uninstall-libLTLIBRARIES
 
 .PRECIOUS: Makefile
 
+ -I$(top_srcdir)/xmms
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

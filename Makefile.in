@@ -105,7 +105,7 @@ am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
  configure.lineno config.status.lineno
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = config.h $(top_builddir)/xmms/i18n.h
-CONFIG_CLEAN_FILES = intl/Makefile
+CONFIG_CLEAN_FILES = intl/Makefile xmms-config xmms.1
 CONFIG_CLEAN_VPATH_FILES =
 am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
 am__vpath_adj = case $$p in \
@@ -133,8 +133,7 @@ am__uninstall_files_from_dir = { \
   || { echo " ( cd '$$dir' && rm -f" $$files ")"; \
        $(am__cd) "$$dir" && echo $$files | $(am__xargs_n) 40 $(am__rm_f); }; \
   }
-am__installdirs = "$(DESTDIR)$(bindir)" "$(DESTDIR)$(man1dir)" \
-	"$(DESTDIR)$(m4datadir)"
+am__installdirs = "$(DESTDIR)$(bindir)" "$(DESTDIR)$(m4datadir)"
 SCRIPTS = $(bin_SCRIPTS)
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
@@ -163,9 +162,6 @@ am__can_run_installinfo = \
     n|no|NO) false;; \
     *) (install-info --version) >/dev/null 2>&1;; \
   esac
-man1dir = $(mandir)/man1
-NROFF = nroff
-MANS = $(man_MANS)
 DATA = $(m4data_DATA)
 RECURSIVE_CLEAN_TARGETS = mostlyclean-recursive clean-recursive	\
   distclean-recursive maintainer-clean-recursive
@@ -195,6 +191,7 @@ am__define_uniq_tagged_files = \
   done | $(am__uniquify_input)`
 DIST_SUBDIRS = $(SUBDIRS)
 am__DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/config.h.in \
+	$(srcdir)/xmms-config.in $(srcdir)/xmms.1.in \
 	$(top_srcdir)/intl/Makefile.in ABOUT-NLS AUTHORS COPYING \
 	ChangeLog INSTALL NEWS README TODO acconfig.h compile \
 	config.guess config.sub depcomp install-sh ltmain.sh missing \
@@ -285,6 +282,8 @@ GLIB_LIBS = @GLIB_LIBS@
 GREP = @GREP@
 GTK_CFLAGS = @GTK_CFLAGS@
 GTK_LIBS = @GTK_LIBS@
+GTK_MAC_CFLAGS = @GTK_MAC_CFLAGS@
+GTK_MAC_LIBS = @GTK_MAC_LIBS@
 INPUT_PLUGINS = @INPUT_PLUGINS@
 INPUT_PLUGIN_DIR = @INPUT_PLUGIN_DIR@
 INSTALL = @INSTALL@
@@ -403,12 +402,12 @@ ACLOCAL_AMFLAGS = -I m4
 
 #xmms_LDADD = $(GTK_LIBS)
 xmms_LDADD = $(GTK_LIBS) -framework Cocoa
-SUBDIRS = libxmms xmms Output Input Effect General Visualization wmxmms gnomexmms po
+SUBDIRS = libxmms xmms Output Input Effect General Visualization
 bin_SCRIPTS = xmms-config
 EXTRA_DIST = xmms.spec xmms.spec.in FAQ xmms.m4
 m4datadir = $(datadir)/aclocal
 m4data_DATA = xmms.m4
-man_MANS = xmms.1 wmxmms.1 gnomexmms.1
+man_MANS = 
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive
 
@@ -463,6 +462,10 @@ distclean-hdr:
 	-rm -f config.h stamp-h1
 intl/Makefile: $(top_builddir)/config.status $(top_srcdir)/intl/Makefile.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
+xmms-config: $(top_builddir)/config.status $(srcdir)/xmms-config.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+xmms.1: $(top_builddir)/config.status $(srcdir)/xmms.1.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
 install-binSCRIPTS: $(bin_SCRIPTS)
 	@$(NORMAL_INSTALL)
 	@list='$(bin_SCRIPTS)'; test -n "$(bindir)" || list=; \
@@ -507,49 +510,6 @@ clean-libtool:
 
 distclean-libtool:
 	-rm -f libtool config.lt
-install-man1: $(man_MANS)
-	@$(NORMAL_INSTALL)
-	@list1=''; \
-	list2='$(man_MANS)'; \
-	test -n "$(man1dir)" \
-	  && test -n "`echo $$list1$$list2`" \
-	  || exit 0; \
-	echo " $(MKDIR_P) '$(DESTDIR)$(man1dir)'"; \
-	$(MKDIR_P) "$(DESTDIR)$(man1dir)" || exit 1; \
-	{ for i in $$list1; do echo "$$i"; done;  \
-	if test -n "$$list2"; then \
-	  for i in $$list2; do echo "$$i"; done \
-	    | sed -n '/\.1[a-z]*$$/p'; \
-	fi; \
-	} | while read p; do \
-	  if test -f $$p; then d=; else d="$(srcdir)/"; fi; \
-	  echo "$$d$$p"; echo "$$p"; \
-	done | \
-	sed -e 'n;s,.*/,,;p;h;s,.*\.,,;s,^[^1][0-9a-z]*$$,1,;x' \
-	      -e 's,\.[0-9a-z]*$$,,;$(transform);G;s,\n,.,' | \
-	sed 'N;N;s,\n, ,g' | { \
-	list=; while read file base inst; do \
-	  if test "$$base" = "$$inst"; then list="$$list $$file"; else \
-	    echo " $(INSTALL_DATA) '$$file' '$(DESTDIR)$(man1dir)/$$inst'"; \
-	    $(INSTALL_DATA) "$$file" "$(DESTDIR)$(man1dir)/$$inst" || exit $$?; \
-	  fi; \
-	done; \
-	for i in $$list; do echo "$$i"; done | $(am__base_list) | \
-	while read files; do \
-	  test -z "$$files" || { \
-	    echo " $(INSTALL_DATA) $$files '$(DESTDIR)$(man1dir)'"; \
-	    $(INSTALL_DATA) $$files "$(DESTDIR)$(man1dir)" || exit $$?; }; \
-	done; }
-
-uninstall-man1:
-	@$(NORMAL_UNINSTALL)
-	@list=''; test -n "$(man1dir)" || exit 0; \
-	files=`{ for i in $$list; do echo "$$i"; done; \
-	l2='$(man_MANS)'; for i in $$l2; do echo "$$i"; done | \
-	  sed -n '/\.1[a-z]*$$/p'; \
-	} | sed -e 's,.*/,,;h;s,.*\.,,;s,^[^1][0-9a-z]*$$,1,;x' \
-	      -e 's,\.[0-9a-z]*$$,,;$(transform);G;s,\n,.,'`; \
-	dir='$(DESTDIR)$(man1dir)'; $(am__uninstall_files_from_dir)
 install-m4dataDATA: $(m4data_DATA)
 	@$(NORMAL_INSTALL)
 	@list='$(m4data_DATA)'; test -n "$(m4datadir)" || list=; \
@@ -883,10 +843,10 @@ distcleancheck: distclean
 	       exit 1; } >&2
 check-am: all-am
 check: check-recursive
-all-am: Makefile $(SCRIPTS) $(MANS) $(DATA) config.h
+all-am: Makefile $(SCRIPTS) $(DATA) config.h
 installdirs: installdirs-recursive
 installdirs-am:
-	for dir in "$(DESTDIR)$(bindir)" "$(DESTDIR)$(man1dir)" "$(DESTDIR)$(m4datadir)"; do \
+	for dir in "$(DESTDIR)$(bindir)" "$(DESTDIR)$(m4datadir)"; do \
 	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
 	done
 install: install-recursive
@@ -941,7 +901,7 @@ info: info-recursive
 
 info-am:
 
-install-data-am: install-m4dataDATA install-man
+install-data-am: install-m4dataDATA
 
 install-dvi: install-dvi-recursive
 
@@ -957,7 +917,7 @@ install-info: install-info-recursive
 
 install-info-am:
 
-install-man: install-man1
+install-man:
 
 install-pdf: install-pdf-recursive
 
@@ -987,9 +947,7 @@ ps: ps-recursive
 
 ps-am:
 
-uninstall-am: uninstall-binSCRIPTS uninstall-m4dataDATA uninstall-man
-
-uninstall-man: uninstall-man1
+uninstall-am: uninstall-binSCRIPTS uninstall-m4dataDATA
 
 .MAKE: $(am__recursive_targets) all install-am install-strip
 
@@ -1004,13 +962,12 @@ uninstall-man: uninstall-man1
 	install-binSCRIPTS install-data install-data-am install-dvi \
 	install-dvi-am install-exec install-exec-am install-html \
 	install-html-am install-info install-info-am \
-	install-m4dataDATA install-man install-man1 install-pdf \
-	install-pdf-am install-ps install-ps-am install-strip \
-	installcheck installcheck-am installdirs installdirs-am \
-	maintainer-clean maintainer-clean-generic mostlyclean \
-	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
-	tags tags-am uninstall uninstall-am uninstall-binSCRIPTS \
-	uninstall-m4dataDATA uninstall-man uninstall-man1
+	install-m4dataDATA install-man install-pdf install-pdf-am \
+	install-ps install-ps-am install-strip installcheck \
+	installcheck-am installdirs installdirs-am maintainer-clean \
+	maintainer-clean-generic mostlyclean mostlyclean-generic \
+	mostlyclean-libtool pdf pdf-am ps ps-am tags tags-am uninstall \
+	uninstall-am uninstall-binSCRIPTS uninstall-m4dataDATA
 
 .PRECIOUS: Makefile
 

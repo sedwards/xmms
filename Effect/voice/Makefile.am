@@ -10,4 +10,4 @@ about.c \
 voice.c \
 voice.h
 
-INCLUDES = @GTK_CFLAGS@ -I$(top_builddir)/intl
+AM_CPPFLAGS = @GTK_CFLAGS@ -I$(top_srcdir)/xmms -I$(top_builddir)/intl

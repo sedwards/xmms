@@ -1,244 +1,153 @@
-/*  XMMS - Cross-platform multimedia player
- *  Copyright (C) 1998-2000  Peter Alm, Mikael Alm, Olle Hallnas, Thomas Nilsson and 4Front Technologies
- *
- *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 2 of the License, or
- *  (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
- */
-#include "config.h"
-
+#include <config.h>
 #include <gtk/gtk.h>
+#include "gtk3_compat.h"
+#include <stdlib.h>
+#include <string.h>
 #include <math.h>
-
 #include "xmms/plugin.h"
-#include "libxmms/util.h"
-#include "xmms_logo.xpm"
 #include "xmms/i18n.h"
+#include "libxmms/util.h"
 
+#include "xmms_logo.xpm"
 
-#define NUM_BANDS 16
+#define WIDTH 256
+#define HEIGHT 64
 
-static GtkWidget *window = NULL,*area;
-static GdkPixmap *bg_pixmap = NULL, *draw_pixmap = NULL, *bar = NULL;
-static GdkGC *gc = NULL;
-static gint16 bar_heights[NUM_BANDS];
-static gint timeout_tag;
-static gdouble scale;
+static GtkWidget *window = NULL;
+static cairo_surface_t *bg_pixmap = NULL, *draw_pixmap = NULL, *bar = NULL;
+static gboolean playback_started = FALSE;
+static gint16 freq_data[2][256];
 
-static void sanalyzer_init(void);
-static void sanalyzer_cleanup(void);
-static void sanalyzer_playback_start(void);
-static void sanalyzer_playback_stop(void);
-static void sanalyzer_render_freq(gint16 data[2][256]);
+static void spectrum_init(void);
+static void spectrum_cleanup(void);
+static void spectrum_about(void);
+static void spectrum_configure(void);
+static void spectrum_playback_start(void);
+static void spectrum_playback_stop(void);
+static void spectrum_render_freq(gint16 freq_data[2][256]);
 
 VisPlugin sanalyzer_vp =
 {
 	NULL,
 	NULL,
 	0,
-	NULL, /* Description */
+	NULL,
 	0,
-	1,		
-	sanalyzer_init, /* init */
-	sanalyzer_cleanup, /* cleanup */
-	NULL, /* about */
-	NULL, /* configure */
-	NULL, /* disable_plugin */
-	sanalyzer_playback_start, /* playback_start */
-	sanalyzer_playback_stop, /* playback_stop */
-	NULL, /* render_pcm */
-	sanalyzer_render_freq  /* render_freq */
+	2,
+	spectrum_init,
+	spectrum_cleanup,
+	spectrum_about,
+	spectrum_configure,
+	NULL,
+	spectrum_playback_start,
+	spectrum_playback_stop,
+	NULL,
+	spectrum_render_freq
 };
 
 VisPlugin *get_vplugin_info(void)
 {
-	sanalyzer_vp.description =
-		g_strdup_printf(_("Simple spectrum analyzer %s"), VERSION);
+	sanalyzer_vp.description = g_strdup(_("Spectrum Analyzer"));
 	return &sanalyzer_vp;
 }
 
-#define WIDTH 250
-#define HEIGHT 100
-
-
-static void sanalyzer_destroy_cb(GtkWidget *w,gpointer data)
+static gboolean spectrum_draw_cb(GtkWidget *widget, cairo_t *cr, gpointer data)
 {
-	sanalyzer_vp.disable_plugin(&sanalyzer_vp);
+    if (draw_pixmap) {
+        cairo_set_source_surface(cr, draw_pixmap, 0, 0);
+        cairo_paint(cr);
+    }
+    return TRUE;
 }
 
-static void sanalyzer_init(void)
+static void spectrum_init(void)
 {
-	GdkColor color;
-	int i;
-	if(window)
-		return;
-	window = gtk_window_new(GTK_WINDOW_DIALOG);
-	gtk_window_set_title(GTK_WINDOW(window),_("Spectrum analyzer"));
-	gtk_window_set_policy(GTK_WINDOW(window), FALSE, FALSE, FALSE);
-	gtk_widget_realize(window);
-	bg_pixmap = gdk_pixmap_create_from_xpm_d(window->window,NULL,NULL,sanalyzer_xmms_logo_xpm);
-	gdk_window_set_back_pixmap(window->window,bg_pixmap,0);
-	gtk_signal_connect(GTK_OBJECT(window),"destroy",GTK_SIGNAL_FUNC(sanalyzer_destroy_cb),NULL);
-	gtk_signal_connect(GTK_OBJECT(window), "destroy", GTK_SIGNAL_FUNC(gtk_widget_destroyed), &window);
-	gtk_widget_set_usize(window, WIDTH, HEIGHT);
-	gc = gdk_gc_new(window->window);
-	draw_pixmap = gdk_pixmap_new(window->window,WIDTH,HEIGHT,gdk_rgb_get_visual()->depth);
-	
-	bar = gdk_pixmap_new(window->window,25, HEIGHT, gdk_rgb_get_visual()->depth);
-	for(i = 0; i < HEIGHT / 2; i++)
-	{
-		color.red = 0xFFFF;
-		color.green = ((i * 255) / (HEIGHT / 2)) << 8;
-		color.blue = 0;
-		
-		gdk_color_alloc(gdk_colormap_get_system(),&color);
-		gdk_gc_set_foreground(gc,&color);
-		gdk_draw_line(bar,gc,0,i,24,i);
-	}
-	for(i = 0; i < HEIGHT / 2; i++)
-	{
-		color.red = (255 - ((i * 255) / (HEIGHT / 2))) <<8;
-		color.green = 0xFFFF;
-		color.blue = 0;
-		
-		gdk_color_alloc(gdk_colormap_get_system(),&color);
-		gdk_gc_set_foreground(gc,&color);
-		gdk_draw_line(bar,gc,0,i + (HEIGHT / 2),24,i + (HEIGHT / 2));
-	}
-	scale = HEIGHT / log(256);
-	gdk_color_black(gdk_colormap_get_system(),&color);
-	gdk_gc_set_foreground(gc,&color);
-	
-	area = gtk_drawing_area_new();
-	gtk_container_add(GTK_CONTAINER(window),area);
-	gtk_widget_realize(area);
-	gdk_window_set_back_pixmap(area->window,bg_pixmap,0);
-	
-	gtk_widget_show(area);
-	gtk_widget_show(window);
-	gdk_window_clear(window->window);
-	gdk_window_clear(area->window);
+	window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+	gtk_window_set_title(GTK_WINDOW(window), _("Spectrum Analyzer"));
+    gtk_widget_set_size_request(window, WIDTH, HEIGHT);
+    
+    g_signal_connect(window, "draw", G_CALLBACK(spectrum_draw_cb), NULL);
+    g_signal_connect(window, "destroy", G_CALLBACK(gtk_widget_destroyed), &window);
+
+    GdkPixbuf *pb = gdk_pixbuf_new_from_xpm_data((const char **)sanalyzer_xmms_logo_xpm);
+    bg_pixmap = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, WIDTH, HEIGHT);
+    cairo_t *cr = cairo_create(bg_pixmap);
+    gdk_cairo_set_source_pixbuf(cr, pb, 0, 0);
+    cairo_paint(cr);
+    cairo_destroy(cr);
+    g_object_unref(pb);
+
+    draw_pixmap = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, WIDTH, HEIGHT);
+    bar = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, 25, HEIGHT);
+    
+    cr = cairo_create(bar);
+    for (int i = 0; i < (HEIGHT / 2); i++)
+    {
+        double r = (double)i / (HEIGHT / 2.0);
+        cairo_set_source_rgb(cr, r, 1.0 - r, 0.0);
+        cairo_move_to(cr, 0, (HEIGHT/2) - i);
+        cairo_line_to(cr, 24, (HEIGHT/2) - i);
+        cairo_stroke(cr);
+        
+        cairo_set_source_rgb(cr, r, 0.0, 1.0 - r);
+        cairo_move_to(cr, 0, (HEIGHT/2) + i);
+        cairo_line_to(cr, 24, (HEIGHT/2) + i);
+        cairo_stroke(cr);
+    }
+    cairo_destroy(cr);
+
+	gtk_widget_show_all(window);
 }
 
-static void sanalyzer_cleanup(void)
+static void spectrum_cleanup(void)
 {
-	if(window)
-	{
+	if (window)
 		gtk_widget_destroy(window);
-	}
-	if(gc)
-	{
-		gdk_gc_unref(gc);
-		gc = NULL;
-	}
-	if(bg_pixmap)
-	{
-		gdk_pixmap_unref(bg_pixmap);
-		bg_pixmap = NULL;
-	}
-	if(draw_pixmap)
-	{
-		gdk_pixmap_unref(draw_pixmap);
-		draw_pixmap = NULL;
-	}
-	if(bar)
-	{
-		gdk_pixmap_unref(bar);
-		bar = NULL;
-	}
+    if (bg_pixmap) cairo_surface_destroy(bg_pixmap);
+    if (draw_pixmap) cairo_surface_destroy(draw_pixmap);
+    if (bar) cairo_surface_destroy(bar);
 }
 
-static gint draw_func(gpointer data)
+static void spectrum_about(void)
 {
-	gint i;
-	
-	if(!window)
-	{
-		timeout_tag = 0;
-		return FALSE;
-	}
-	
-	GDK_THREADS_ENTER();
-	gdk_draw_rectangle(draw_pixmap,gc,TRUE,0,0,WIDTH,HEIGHT);
-
-	
-	for(i = 0; i < NUM_BANDS; i++)
-	{
-		/*if(bar_heights[i] > 4)
-			bar_heights[i] -= 4;
-		else
-			bar_heights[i] = 0;*/
-		gdk_draw_pixmap(draw_pixmap,gc,bar, 0,HEIGHT - 1 - bar_heights[i], i * (WIDTH / NUM_BANDS), HEIGHT - 1 - bar_heights[i], (WIDTH / NUM_BANDS) - 1, bar_heights[i]);
-		
-	}
-	gdk_window_clear(area->window);
-	GDK_THREADS_LEAVE();
-	
-	return TRUE;
+	xmms_show_message(_("About Spectrum Analyzer"),
+					  _("Spectrum Analyzer plugin\n\n"
+					    "By Peter Alm 1998"), _("Ok"), FALSE, NULL, NULL);
 }
 
-static void sanalyzer_playback_start(void)
+static void spectrum_configure(void)
 {
-	if(window)
-	{
-		gdk_window_set_back_pixmap(area->window,draw_pixmap,0);
-		gdk_window_clear(area->window);
-	}
 }
 
-
-static void sanalyzer_playback_stop(void)
+static void spectrum_playback_start(void)
 {
-	if(GTK_WIDGET_REALIZED(area))
-	{
-		gdk_window_set_back_pixmap(area->window,bg_pixmap,0);
-		gdk_window_clear(area->window);
-	}
+	playback_started = TRUE;
 }
 
-
-static void sanalyzer_render_freq(gint16 data[2][256])
+static void spectrum_playback_stop(void)
 {
-	gint i,c;
-	gint y;
+	playback_started = FALSE;
+}
 
-	gint xscale[] = {0, 1, 2, 3, 5, 7, 10, 14, 20, 28, 40, 54, 74, 101, 137, 187, 255};
-	
-	if(!window)
-		return;
-	for(i = 0; i < NUM_BANDS; i++)
-	{
-		for(c = xscale[i], y = 0; c < xscale[i + 1]; c++)
-		{
-			if(data[0][c] > y)
-				y = data[0][c];
-		}
-		y >>= 7;
-		if(y != 0)
-		{
-			y = (gint)(log(y) * scale);
-			if(y > HEIGHT - 1)
-				y = HEIGHT - 1;
-		}
- 
-		if(y > bar_heights[i])
-			bar_heights[i] = y;
-		else if(bar_heights[i] > 4)
-			bar_heights[i] -= 4;
-		else
-			bar_heights[i] = 0;
-		
-	}
-	draw_func(NULL);
-	return;			
+static void spectrum_render_freq(gint16 freq_data[2][256])
+{
+    if (!window || !draw_pixmap) return;
+
+    cairo_t *cr = cairo_create(draw_pixmap);
+    
+    /* Clear with background */
+    cairo_set_source_surface(cr, bg_pixmap, 0, 0);
+    cairo_paint(cr);
+
+    for (int i = 0; i < 256; i++)
+    {
+        int h = (freq_data[0][i] + freq_data[1][i]) / 2;
+        if (h > HEIGHT) h = HEIGHT;
+        
+        cairo_set_source_surface(cr, bar, i, 0);
+        cairo_rectangle(cr, i, HEIGHT - h, 1, h);
+        cairo_fill(cr);
+    }
+    cairo_destroy(cr);
+    gtk_widget_queue_draw(window);
 }

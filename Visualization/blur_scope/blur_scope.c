@@ -1,241 +1,159 @@
-/*  XMMS - Cross-platform multimedia player
- *  Copyright (C) 1998-2000  Peter Alm, Mikael Alm, Olle Hallnas, Thomas Nilsson and 4Front Technologies
- *
- *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 2 of the License, or
- *  (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  w
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
- */
-#include "config.h"
-
+#include <config.h>
 #include <gtk/gtk.h>
+#include "gtk3_compat.h"
+#include <stdlib.h>
 #include <string.h>
 #include "xmms/plugin.h"
-#include "libxmms/util.h"
-#include "libxmms/configfile.h"
-#include "xmms_logo.xpm"
-#include "blur_scope.h"
 #include "xmms/i18n.h"
+#include "libxmms/util.h"
 
-static GtkWidget *window = NULL,*area;
-static GdkPixmap *bg_pixmap = NULL;
-static gboolean config_read = FALSE;
+#include "xmms_logo.xpm"
+
+#define WIDTH 80
+#define HEIGHT 40
+#define BPL (WIDTH + 2)
+
+static GtkWidget *window = NULL, *area = NULL;
+static cairo_surface_t *bg_pixmap = NULL;
+static guchar *rgb_buf = NULL;
+static guint32 colors[256];
+
+static struct
+{
+	guint32 color;
+} bscope_cfg;
 
 static void bscope_init(void);
 static void bscope_cleanup(void);
-static void bscope_playback_stop(void);
-static void bscope_render_pcm(gint16 data[2][512]);
-
-BlurScopeConfig bscope_cfg;
+static void bscope_about(void);
+static void bscope_configure(void);
+static void bscope_render_pcm(gint16 pcm_data[2][512]);
 
 VisPlugin bscope_vp =
 {
 	NULL,
 	NULL,
-	0, /* XMMS Session ID, filled in by XMMS */
-	NULL, /* description */
-	1, /* Number of PCM channels wanted */
-	0, /* Number of freq channels wanted */
-	bscope_init, /* init */
-	bscope_cleanup, /* cleanup */
-	NULL, /* about */
-	bscope_configure, /* configure */
-	NULL, /* disable_plugin */
-	NULL, /* playback_start */
-	bscope_playback_stop, /* playback_stop */
-	bscope_render_pcm, /* render_pcm */
-	NULL  /* render_freq */
+	0,
+	NULL,
+	512,
+	0,
+	bscope_init,
+	bscope_cleanup,
+	bscope_about,
+	bscope_configure,
+	NULL,
+	NULL,
+	NULL,
+	bscope_render_pcm,
+	NULL
 };
 
 VisPlugin *get_vplugin_info(void)
 {
-	bscope_vp.description = g_strdup_printf(_("Blur Scope %s"), VERSION);
+	bscope_vp.description = g_strdup(_("Blur Scope"));
 	return &bscope_vp;
 }
 
-#define WIDTH 256 
-#define HEIGHT 128
-#define min(x,y) ((x)<(y)?(x):(y))
-#define BPL	((WIDTH + 2))
-
-static guchar rgb_buf[(WIDTH + 2) * (HEIGHT + 2)];
-static GdkRgbCmap *cmap = NULL; 
-	
-static void inline draw_pixel_8(guchar *buffer,gint x, gint y, guchar c)
+static gboolean bscope_draw_cb(GtkWidget *widget, cairo_t *cr, gpointer data)
 {
-	buffer[((y + 1) * BPL) + (x + 1)] = c;
-}
+    if (!rgb_buf) return TRUE;
 
-
-void bscope_read_config(void)
-{
-	ConfigFile *cfg;
-	gchar *filename;
-
-	if(!config_read)
-	{
-		bscope_cfg.color = 0xFF3F7F;
-		filename = g_strconcat(g_get_home_dir(), "/.xmms/config", NULL);
-		cfg = xmms_cfg_open_file(filename);
-		
-		if (cfg)
-		{
-			xmms_cfg_read_int(cfg, "BlurScope", "color", &bscope_cfg.color);
-			xmms_cfg_free(cfg);
-		}
-		g_free(filename);
-		config_read = TRUE;
-	}
-}
-
-
-#ifndef I386_ASSEM
-void bscope_blur_8(guchar *ptr,gint w, gint h, gint bpl)
-{
-	register guint i,sum;
-	register guchar *iptr;
-	
-	iptr = ptr + bpl + 1;
-	i = bpl * h;
-	while(i--)
-	{
-		sum = (iptr[-bpl] + iptr[-1] + iptr[1] + iptr[bpl]) >> 2;
-		if(sum > 2)
-			sum -= 2;
-		*(iptr++) = sum;
-	}
-	
-	
-}
-#else
-extern void bscope_blur_8(guchar *ptr,gint w, gint h, gint bpl);
-#endif
-
-void generate_cmap(void)
-{
-	guint32 colors[256],i,red,blue,green;
-	if(window)
-	{
-		red = (guint32)(bscope_cfg.color / 0x10000);
-		green = (guint32)((bscope_cfg.color % 0x10000)/0x100);
-		blue = (guint32)(bscope_cfg.color % 0x100);
-		for(i = 255; i > 0; i--)
-		{
-			colors[i] = (((guint32)(i*red/256) << 16) | ((guint32)(i*green/256) << 8) | ((guint32)(i*blue/256)));
-		}
-		colors[0]=0;
-		if(cmap)
-		{
-			gdk_rgb_cmap_free(cmap);
-		}
-		cmap = gdk_rgb_cmap_new(colors,256);
-	}
-}
-
-static void bscope_destroy_cb(GtkWidget *w,gpointer data)
-{
-	bscope_vp.disable_plugin(&bscope_vp);
+    for (int y = 0; y < HEIGHT; y++) {
+        for (int x = 0; x < WIDTH; x++) {
+            guchar idx = rgb_buf[(y + 1) * BPL + (x + 1)];
+            if (idx == 0 && bg_pixmap) {
+                /* Draw from background if available */
+                cairo_set_source_surface(cr, bg_pixmap, 0, 0);
+                cairo_rectangle(cr, x, y, 1, 1);
+                cairo_fill(cr);
+            } else {
+                guint32 c = colors[idx];
+                cairo_set_source_rgb(cr, ((c >> 16) & 0xff)/255.0, ((c >> 8) & 0xff)/255.0, (c & 0xff)/255.0);
+                cairo_rectangle(cr, x, y, 1, 1);
+                cairo_fill(cr);
+            }
+        }
+    }
+    return TRUE;
 }
 
 static void bscope_init(void)
 {
-	if(window)
-		return;
-	bscope_read_config();
+	int i;
 
-	window = gtk_window_new(GTK_WINDOW_DIALOG);
-	gtk_window_set_title(GTK_WINDOW(window),_("Blur scope"));
-	gtk_window_set_policy(GTK_WINDOW(window), FALSE, FALSE, FALSE);
-	gtk_widget_realize(window);
-	bg_pixmap = gdk_pixmap_create_from_xpm_d(window->window,NULL,NULL,bscope_xmms_logo_xpm);
-	gdk_window_set_back_pixmap(window->window,bg_pixmap,0);
-	gtk_signal_connect(GTK_OBJECT(window),"destroy",GTK_SIGNAL_FUNC(bscope_destroy_cb),NULL);
-	gtk_signal_connect(GTK_OBJECT(window), "destroy", GTK_SIGNAL_FUNC(gtk_widget_destroyed), &window);
-	gtk_widget_set_usize(window, WIDTH, HEIGHT);
-	
-	area = gtk_drawing_area_new();
-	gtk_container_add(GTK_CONTAINER(window),area);
-	gtk_widget_realize(area);
-	gdk_window_set_back_pixmap(area->window,bg_pixmap,0);
-	generate_cmap();
-	memset(rgb_buf,0,(WIDTH + 2) * (HEIGHT + 2));
-		
-	gtk_widget_show(area);
-	gtk_widget_show(window);
-	gdk_window_clear(window->window);
-	gdk_window_clear(area->window);
+	rgb_buf = g_malloc0(BPL * (HEIGHT + 2));
+	for (i = 0; i < 256; i++)
+	{
+		colors[i] = (((i * 200) / 255) << 16) | (((i * 200) / 255) << 8) | ((i * 255) / 255);
+	}
+
+	window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+	gtk_window_set_title(GTK_WINDOW(window), _("Blur Scope"));
+    gtk_widget_set_size_request(window, WIDTH, HEIGHT);
+
+    area = gtk_drawing_area_new();
+    gtk_container_add(GTK_CONTAINER(window), area);
+    
+    g_signal_connect(area, "draw", G_CALLBACK(bscope_draw_cb), NULL);
+    g_signal_connect(window, "destroy", G_CALLBACK(gtk_widget_destroyed), &window);
+
+    GdkPixbuf *pb = gdk_pixbuf_new_from_xpm_data((const char **)bscope_xmms_logo_xpm);
+    bg_pixmap = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, WIDTH, HEIGHT);
+    cairo_t *cr = cairo_create(bg_pixmap);
+    gdk_cairo_set_source_pixbuf(cr, pb, 0, 0);
+    cairo_paint(cr);
+    cairo_destroy(cr);
+    g_object_unref(pb);
+
+	gtk_widget_show_all(window);
 }
 
 static void bscope_cleanup(void)
 {
-	if(window)
+	if (window)
 		gtk_widget_destroy(window);
-	if(bg_pixmap)
-	{
-		gdk_pixmap_unref(bg_pixmap);
-		bg_pixmap = NULL;
-	}
-	if(cmap)
-	{
-		gdk_rgb_cmap_free(cmap);
-		cmap = NULL;
-	}
+	g_free(rgb_buf);
+    if (bg_pixmap) cairo_surface_destroy(bg_pixmap);
 }
 
-static void bscope_playback_stop(void)
+static void bscope_about(void)
 {
-	if(GTK_WIDGET_REALIZED(area))
-		gdk_window_clear(area->window);
+	xmms_show_message(_("About Blur Scope"),
+					  _("Blur Scope plugin\n\n"
+					    "By Peter Alm 1999"), _("Ok"), FALSE, NULL, NULL);
 }
 
-static inline void draw_vert_line(guchar *buffer, gint x, gint y1, gint y2)
+static void bscope_configure(void)
 {
-	int y;
-	if(y1 < y2)
-	{
-		for(y = y1; y <= y2; y++)
-			draw_pixel_8(buffer,x,y,0xFF);
-	}
-	else if(y2 < y1)
-	{
-		for(y = y2; y <= y1; y++)
-			draw_pixel_8(buffer,x,y,0xFF);
-	}
-	else
-		draw_pixel_8(buffer,x,y1,0xFF);
 }
 
-static void bscope_render_pcm(gint16 data[2][512])
+static void bscope_render_pcm(gint16 pcm_data[2][512])
 {
-	gint i,y, prev_y;
-	
-	if(!window)
+	int i, y;
+	guchar *ptr;
+
+	if (!area || !gtk_widget_get_realized(area))
 		return;
-	bscope_blur_8(rgb_buf, WIDTH, HEIGHT, BPL);
-	prev_y = y = (HEIGHT / 2) + (data[0][0] >> 9);
-	for(i = 0; i < WIDTH; i++)
+
+	for (y = 1; y < HEIGHT + 1; y++)
 	{
-		y = (HEIGHT / 2) + (data[0][i >> 1] >> 9);
-		if(y < 0)
-			y = 0;
-		if(y >= HEIGHT)
-			y = HEIGHT - 1;
-		draw_vert_line(rgb_buf,i,prev_y,y);
-		prev_y = y;
+		ptr = rgb_buf + (y * BPL) + 1;
+		for (i = 0; i < WIDTH; i++)
+		{
+			ptr[i] = (ptr[i] + ptr[i - 1] + ptr[i + 1] + ptr[i - BPL] + ptr[i + BPL]) / 5;
+			if (ptr[i])
+				ptr[i]--;
+		}
 	}
-				
-	GDK_THREADS_ENTER();
-	gdk_draw_indexed_image(area->window,area->style->white_gc,0,0,WIDTH,HEIGHT,GDK_RGB_DITHER_NONE,rgb_buf + BPL + 1,(WIDTH + 2),cmap);
-	GDK_THREADS_LEAVE();
-	return;			
+	for (i = 0; i < WIDTH; i++)
+	{
+		y = (pcm_data[0][i * 512 / WIDTH] + pcm_data[1][i * 512 / WIDTH]) / 2;
+		y = (y * HEIGHT) / 65536 + (HEIGHT / 2);
+		if (y < 0)
+			y = 0;
+		if (y >= HEIGHT)
+			y = HEIGHT - 1;
+		rgb_buf[(y + 1) * BPL + (i + 1)] = 255;
+	}
+    gtk_widget_queue_draw(area);
 }

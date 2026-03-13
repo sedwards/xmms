@@ -16,6 +16,7 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 #include "xmms/i18n.h"
+#include "gtk3_compat.h"
 #include "libxmms/util.h"
 #include "voice.h"
 

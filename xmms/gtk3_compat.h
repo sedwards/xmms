@@ -48,9 +48,14 @@
 #define gtk_hbutton_box_new() gtk_button_box_new(GTK_ORIENTATION_HORIZONTAL)
 #define gtk_button_box_set_spacing(w, s) gtk_box_set_spacing(GTK_BOX(w), s)
 
+#define gtk_timeout_add(i, f, d) g_timeout_add(i, (GSourceFunc)f, d)
+#define gtk_timeout_remove(t) g_source_remove(t)
+
 /* Accessors for opaque structs */
 #define gtk_adjustment_value(adj) gtk_adjustment_get_value(GTK_ADJUSTMENT(adj))
 #define gtk_dialog_vbox(dlg) gtk_dialog_get_content_area(GTK_DIALOG(dlg))
 #define gtk_dialog_action_area(dlg) gtk_dialog_get_action_area(GTK_DIALOG(dlg))
+
+void xmms_log(const char *format, ...);
 
 #endif /* GTK3_COMPAT_H */

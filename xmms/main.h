@@ -68,6 +68,7 @@ Config;
 extern Config cfg;
 
 extern GtkWidget *mainwin;
+extern gint scaling_factor;
 extern cairo_t *mainwin_gc;
 extern gboolean mainwin_moving;
 extern GList *disabled_iplugins;

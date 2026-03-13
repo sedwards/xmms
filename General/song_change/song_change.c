@@ -2,6 +2,7 @@
 
 #include "xmms/i18n.h"
 #include <gtk/gtk.h>
+#include "gtk3_compat.h"
 #include <sys/types.h>
 #include <sys/wait.h>
 

@@ -7,3 +7,6 @@ Makefile.la
 *.libs
 .deps
 xmms/xmms
+.DS_Store
+/build
+

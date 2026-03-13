@@ -45,9 +45,9 @@ void move_widget(void *w, gint x, gint y);
 void draw_widget(void *w);
 void add_widget(GList ** list, void *v);
 
-void handle_press_cb(GList *wlist, GtkWidget *widget, GdkEventButton *event);
-void handle_release_cb(GList *wlist, GtkWidget *widget, GdkEventButton *event);
-void handle_motion_cb(GList *wlist, GtkWidget *widget, GdkEventMotion *event);
+gboolean handle_press_cb(GtkWidget * widget, GdkEventButton * event, gpointer data);
+void handle_release_cb(GtkWidget * widget, GdkEventButton * event, gpointer data);
+void handle_motion_cb(GtkWidget * widget, GdkEventMotion * event, gpointer data);
 
 void draw_widget_list(GList *wlist, cairo_t *cr, gboolean *redraw, gboolean force);
 void widget_list_change_pixmap(GList *wlist, cairo_surface_t *surface);

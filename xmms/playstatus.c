@@ -47,6 +47,7 @@ static void playstatus_draw(PlayStatus * ps, cairo_t *cr)
 
 void playstatus_set_status(PlayStatus * ps, PStatus status)
 {
+    if (!ps) return;
 	ps->ps_status = status;
 	draw_widget(ps);
 }

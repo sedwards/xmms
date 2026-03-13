@@ -1,185 +1,144 @@
-#include "config.h"
-
-#include "xmms/i18n.h"
-#include <xmms/plugin.h>
+#include <config.h>
 #include <gtk/gtk.h>
 #include "gtk3_compat.h"
+#include "xmms/i18n.h"
+#include "xmms/plugin.h"
 #include "libxmms/util.h"
 #include "libxmms/configfile.h"
 
-static void init(void);
-static void about(void);
-static void configure(void);
-static int mod_samples(gpointer *d, gint length, AFormat afmt, gint srate, gint nch);
+static void stereo_init(void);
+static void stereo_about(void);
+static void stereo_configure(void);
+static int stereo_mod_samples(gpointer *data, gint length, AFormat fmt, gint srate, gint nch);
 
 EffectPlugin stereo_ep =
 {
 	NULL,
 	NULL,
-	NULL, /* Description */
-	init,
 	NULL,
-	about,
-	configure,
-	mod_samples
+	stereo_init,
+	NULL,
+	stereo_about,
+	stereo_configure,
+	stereo_mod_samples,
+    NULL
 };
 
-static const char *about_text = N_("Extra Stereo Plugin\n\n"
-				   "By Johan Levin 1999.");
+static gfloat value = 1.0;
+static GtkWidget *conf_dialog;
 
-static GtkWidget *conf_dialog = NULL;
-static gfloat value;
+static const char *about_text =
+N_("Extra Stereo Plugin\n"
+   "By Johan Levin 1999");
 
 EffectPlugin *get_eplugin_info(void)
 {
-	stereo_ep.description =
-		g_strdup_printf(_("Extra Stereo Plugin %s"), VERSION);
+	stereo_ep.description = g_strdup(_("Extra Stereo Plugin"));
 	return &stereo_ep;
 }
 
-static void init(void)
+static void stereo_init(void)
 {
 	ConfigFile *cfg;
-	cfg = xmms_cfg_open_default_file();
-	if (!xmms_cfg_read_float(cfg, "extra_stereo", "intensity", &value))
-		value = 2.5;
-	xmms_cfg_free(cfg);
+
+	if ((cfg = xmms_cfg_open_default_file()) != NULL)
+	{
+		xmms_cfg_read_float(cfg, "stereo_plugin", "value", &value);
+		xmms_cfg_free(cfg);
+	}
 }
 
-static void about(void)
+static void stereo_about(void)
 {
 	static GtkWidget *about_dialog = NULL;
-	
+
 	if (about_dialog != NULL)
 		return;
 
 	about_dialog = xmms_show_message(_("About Extra Stereo Plugin"),
-					 _(about_text), _("Ok"), FALSE,
-					 NULL, NULL);
-	gtk_signal_connect(GTK_OBJECT(about_dialog), "destroy",
-			   GTK_SIGNAL_FUNC(gtk_widget_destroyed),
-			   &about_dialog);
+					  _(about_text), _("Ok"), FALSE,
+					  NULL, NULL);
+	g_signal_connect(about_dialog, "destroy",
+			   G_CALLBACK(gtk_widget_destroyed), &about_dialog);
 }
 
-static void conf_ok_cb(GtkButton * button, gpointer data)
+static void apply_changes(GtkAdjustment *adj)
 {
 	ConfigFile *cfg;
 
-	value = *(gfloat *) data;
-	
+	value = gtk_adjustment_get_value(adj);
 	cfg = xmms_cfg_open_default_file();
-	xmms_cfg_write_float(cfg, "extra_stereo", "intensity", value);
+	xmms_cfg_write_float(cfg, "stereo_plugin", "value", value);
 	xmms_cfg_write_default_file(cfg);
 	xmms_cfg_free(cfg);
-	gtk_widget_destroy(conf_dialog);
 }
 
-static void conf_cancel_cb(GtkButton * button, gpointer data)
+void stereo_configure(void)
 {
-	gtk_widget_destroy(conf_dialog);
-}
+	GtkAdjustment *adjustment;
 
-static void conf_apply_cb(GtkButton *button, gpointer data)
-{
-	value = *(gfloat *) data;
-}
-
-static void configure(void)
-{
-	GtkWidget *hbox, *label, *scale, *button, *bbox;
-	GtkObject *adjustment;
-
-	if (conf_dialog != NULL)
+	if (conf_dialog)
+	{
+		gdk_window_raise(gtk_widget_get_window(conf_dialog));
 		return;
+	}
 
-	conf_dialog = gtk_dialog_new();
-	gtk_signal_connect(GTK_OBJECT(conf_dialog), "destroy",
-			   GTK_SIGNAL_FUNC(gtk_widget_destroyed), &conf_dialog);
-	gtk_window_set_title(GTK_WINDOW(conf_dialog), _("Configure Extra Stereo"));
+	conf_dialog = gtk_dialog_new_with_buttons(_("Extra Stereo Configuration"),
+                                             NULL, GTK_DIALOG_MODAL,
+                                             _("Ok"), GTK_RESPONSE_OK,
+                                             _("Cancel"), GTK_RESPONSE_CANCEL,
+                                             NULL);
 
-	label = gtk_label_new(_("Effect intensity:"));
-	gtk_box_pack_start(GTK_BOX(GTK_DIALOG(conf_dialog)->vbox), label,
+	g_signal_connect(conf_dialog, "destroy",
+			   G_CALLBACK(gtk_widget_destroyed), &conf_dialog);
+
+    GtkWidget *table = gtk_grid_new();
+    gtk_grid_set_row_spacing(GTK_GRID(table), 5);
+    gtk_grid_set_column_spacing(GTK_GRID(table), 5);
+	gtk_container_set_border_width(GTK_CONTAINER(table), 5);
+	gtk_box_pack_start(GTK_BOX(gtk_dialog_vbox(conf_dialog)), table,
 			   TRUE, TRUE, 0);
-	gtk_widget_show(label);
 
-	hbox = gtk_hbox_new(FALSE, 10);
-	gtk_box_pack_start(GTK_BOX(GTK_DIALOG(conf_dialog)->vbox), hbox,
-			   TRUE, TRUE, 10);
-	gtk_widget_show(hbox);
+	GtkWidget *label = gtk_label_new(_("Effect intensity:"));
+	gtk_grid_attach(GTK_GRID(table), label, 0, 0, 1, 1);
 
-	adjustment = gtk_adjustment_new(value, 0.0, 15.0 + 1.0, 0.1, 1.0, 1.0);
-	scale = gtk_hscale_new(GTK_ADJUSTMENT(adjustment));
-	gtk_box_pack_start(GTK_BOX(hbox), scale, TRUE, TRUE, 10);
-	gtk_widget_show(scale);
+	adjustment = gtk_adjustment_new(value, 0.0, 16.0, 0.1, 1.0, 1.0);
+	GtkWidget *scale = gtk_scale_new(GTK_ORIENTATION_HORIZONTAL, adjustment);
+	gtk_scale_set_digits(GTK_SCALE(scale), 1);
+    gtk_widget_set_hexpand(scale, TRUE);
+	gtk_grid_attach(GTK_GRID(table), scale, 1, 0, 1, 1);
 
-	bbox = gtk_hbutton_box_new();
-	gtk_button_box_set_layout(GTK_BUTTON_BOX(bbox), GTK_BUTTONBOX_END);
-	gtk_button_box_set_spacing(GTK_BUTTON_BOX(bbox), 5);
-	gtk_box_pack_start(GTK_BOX((GTK_DIALOG(conf_dialog)->action_area)),
-			   bbox, TRUE, TRUE, 0);
-
-	button = gtk_button_new_with_label(_("Ok"));
-	GTK_WIDGET_SET_FLAGS(button, GTK_CAN_DEFAULT);
-	gtk_box_pack_start(GTK_BOX(bbox), button, TRUE, TRUE, 0);
-	gtk_signal_connect(GTK_OBJECT(button), "clicked",
-			   GTK_SIGNAL_FUNC(conf_ok_cb),
-			   &GTK_ADJUSTMENT(adjustment)->value);
-	gtk_widget_grab_default(button);
-	gtk_widget_show(button);
-
-	button = gtk_button_new_with_label(_("Cancel"));
-	GTK_WIDGET_SET_FLAGS(button, GTK_CAN_DEFAULT);
-	gtk_box_pack_start(GTK_BOX(bbox), button, TRUE, TRUE, 0);
-	gtk_signal_connect(GTK_OBJECT(button), "clicked",
-			   GTK_SIGNAL_FUNC(conf_cancel_cb), NULL);
-	gtk_widget_show(button);
-
-	button = gtk_button_new_with_label(_("Apply"));
-	GTK_WIDGET_SET_FLAGS(button, GTK_CAN_DEFAULT);
-	gtk_box_pack_start(GTK_BOX(bbox), button, TRUE, TRUE, 0);
-	gtk_signal_connect(GTK_OBJECT(button), "clicked",
-			   GTK_SIGNAL_FUNC(conf_apply_cb),
-			   &GTK_ADJUSTMENT(adjustment)->value);
-	gtk_widget_show(button);
-
-	gtk_widget_show(bbox);
-
-	gtk_widget_show(conf_dialog);
+	gtk_widget_show_all(conf_dialog);
+    
+    if (gtk_dialog_run(GTK_DIALOG(conf_dialog)) == GTK_RESPONSE_OK) {
+        apply_changes(adjustment);
+    }
+    gtk_widget_destroy(conf_dialog);
+    conf_dialog = NULL;
 }
 
-static int mod_samples(gpointer *d, gint length, AFormat afmt, gint srate, gint nch)
+static int stereo_mod_samples(gpointer *data, gint length, AFormat fmt, gint srate, gint nch)
 {
-	gint i;
-	gdouble avg, ldiff, rdiff, tmp, mul;
-	gint16  *data = (gint16 *)*d;
+	gint i, num_samples;
+	gint16 *ptr = (gint16 *) *data;
+	gfloat l, r, avg;
 
-	if (!(afmt == FMT_S16_NE ||
-	      (afmt == FMT_S16_LE && G_BYTE_ORDER == G_LITTLE_ENDIAN) ||
-	      (afmt == FMT_S16_BE && G_BYTE_ORDER == G_BIG_ENDIAN)) ||
-	    nch != 2)
+	if (value == 1.0 || nch != 2 || (fmt != FMT_S16_LE && fmt != FMT_S16_BE && fmt != FMT_S16_NE))
 		return length;
 
-	mul = value;
-	
-	for (i = 0; i < length / 2; i += 2)
+    num_samples = length / 4; /* 2 channels * 2 bytes */
+
+	for (i = 0; i < num_samples; i++)
 	{
-		avg = (data[i] + data[i + 1]) / 2;
-		ldiff = data[i] - avg;
-		rdiff = data[i + 1] - avg;
-
-		tmp = avg + ldiff * mul;
-		if (tmp < -32768)
-			tmp = -32768;
-		if (tmp > 32767)
-			tmp = 32767;
-		data[i] = tmp;
-
-		tmp = avg + rdiff * mul;
-		if (tmp < -32768)
-			tmp = -32768;
-		if (tmp > 32767)
-			tmp = 32767;
-		data[i + 1] = tmp;
+		l = ptr[i*2];
+		r = ptr[i*2+1];
+		avg = (l + r) / 2;
+		l -= avg;
+		r -= avg;
+		l *= value;
+		r *= value;
+		ptr[i*2] = (gint16)(l + avg);
+		ptr[i*2+1] = (gint16)(r + avg);
 	}
-	return length;
+    return length;
 }

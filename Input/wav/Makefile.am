@@ -8,5 +8,4 @@ libwav_la_SOURCES = 	\
 wav.c \
 wav.h
 
-INCLUDES = @GTK_CFLAGS@ -I$(top_builddir)/intl -I$(top_srcdir)/xmms
-
+AM_CPPFLAGS = @GTK_CFLAGS@ -I$(top_srcdir)/intl -I$(top_srcdir)/xmms

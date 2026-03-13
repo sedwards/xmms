@@ -6,6 +6,6 @@ libsanalyzer_la_LDFLAGS = @PLUGIN_LDFLAGS@
 libsanalyzer_la_LIBADD = @GTK_LIBS@
 
 libsanalyzer_la_SOURCES =  spectrum.c
-INCLUDES = @GTK_CFLAGS@ -I$(top_builddir)/intl
+AM_CPPFLAGS = @GTK_CFLAGS@ -I$(top_srcdir)/xmms -I$(top_builddir)/intl
 
 EXTRA_DIST = xmms_logo.xpm

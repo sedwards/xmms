@@ -64,6 +64,14 @@ PKG_CHECK_MODULES([GLIB], [glib-2.0 >= 2.40])
 PKG_CHECK_MODULES([GTK], [gtk+-3.0 >= 3.0])
 PKG_CHECK_MODULES([CAIRO], [cairo >= 1.18])
 
+if test "x$HAVE_MACOS" = "xyes"; then
+  PKG_CHECK_MODULES([GTK_MAC], [gtk-mac-integration-gtk3 >= 2.0],
+    [AC_DEFINE([HAVE_GTK_MAC], [1], [Define if gtk-mac-integration is available])
+     GTK_CFLAGS="$GTK_CFLAGS $GTK_MAC_CFLAGS"
+     GTK_LIBS="$GTK_LIBS $GTK_MAC_LIBS"],
+    [AC_MSG_WARN([gtk-mac-integration not found, native menus disabled])])
+fi
+
 AC_SUBST(GLIB_CFLAGS)
 AC_SUBST(GLIB_LIBS)
 AC_SUBST(CAIRO_LIBS)
@@ -148,9 +156,9 @@ AC_CHECK_LIB([z], [inflate],
 AC_SUBST([Z_LIBS])
 
 INPUT_PLUGINS="wav tonegen"
-OUTPUT_PLUGINS="disk_writer"
+OUTPUT_PLUGINS=""
 if test "x$enable_macos_audio" = "xyes"; then
-  OUTPUT_PLUGINS="$OUTPUT_PLUGINS darwin"
+  OUTPUT_PLUGINS="darwin"
 fi
 EFFECT_PLUGINS="echo_plugin stereo_plugin voice"
 GENERAL_PLUGINS="song_change"
@@ -206,7 +214,11 @@ XMMS_DEFINES="-DDATA_DIR=\\\"$datadir/xmms\\\" \
 
 AC_SUBST(XMMS_DEFINES)
 
-PLUGIN_LDFLAGS='-module -avoid-version -export-symbols-regex "get_.plugin_info"'
+if test "x$HAVE_MACOS" = "xyes"; then
+  PLUGIN_LDFLAGS='-module -avoid-version -export-symbols-regex "get_.plugin_info" -undefined dynamic_lookup'
+else
+  PLUGIN_LDFLAGS='-module -avoid-version -export-symbols-regex "get_.plugin_info"'
+fi
 AC_SUBST(PLUGIN_LDFLAGS)
 
 AC_CONFIG_SUBDIRS([libxmms])
@@ -219,7 +231,6 @@ Input/Makefile
 Input/wav/Makefile
 Input/tonegen/Makefile
 Output/Makefile
-Output/disk_writer/Makefile
 Output/darwin/Makefile
 Effect/Makefile
 Effect/echo_plugin/Makefile
@@ -230,8 +241,9 @@ General/song_change/Makefile
 Visualization/Makefile
 Visualization/sanalyzer/Makefile
 Visualization/blur_scope/Makefile
-po/Makefile.in
 intl/Makefile
+xmms-config
+xmms.1
 ])
 
 AC_OUTPUT

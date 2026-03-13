@@ -97,9 +97,6 @@ host_triplet = @host@
 @HAVE_MACOS_TRUE@    audio_coreaudio.m \
 @HAVE_MACOS_TRUE@    metal_visualizer.m
 
-@HAVE_MACOS_FALSE@am__append_3 = \
-@HAVE_MACOS_FALSE@    dirbrowser.c
-
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/acinclude.m4 \
@@ -146,14 +143,12 @@ LTLIBRARIES = $(lib_LTLIBRARIES)
 libxmms_la_DEPENDENCIES =
 am__libxmms_la_SOURCES_DIST = configfile.c configfile.h xmmsctrl.c \
 	xmmsctrl.h dirbrowser.h util.c util.h formatter.c formatter.h \
-	titlestring.c titlestring.h darwin_dirbrowser.m \
-	audio_coreaudio.m metal_visualizer.m dirbrowser.c
+	titlestring.c titlestring.h dirbrowser.c darwin_dirbrowser.m \
+	audio_coreaudio.m metal_visualizer.m
 @HAVE_MACOS_TRUE@am__objects_1 = darwin_dirbrowser.lo \
 @HAVE_MACOS_TRUE@	audio_coreaudio.lo metal_visualizer.lo
-@HAVE_MACOS_FALSE@am__objects_2 = dirbrowser.lo
 am_libxmms_la_OBJECTS = configfile.lo xmmsctrl.lo util.lo formatter.lo \
-	titlestring.lo darwin_dirbrowser.lo $(am__objects_1) \
-	$(am__objects_2)
+	titlestring.lo dirbrowser.lo $(am__objects_1)
 libxmms_la_OBJECTS = $(am_libxmms_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
@@ -419,8 +414,7 @@ AM_CPPFLAGS = @GTK_CFLAGS@ -I../intl \
 
 libxmms_la_SOURCES = configfile.c configfile.h xmmsctrl.c xmmsctrl.h \
 	dirbrowser.h util.c util.h formatter.c formatter.h \
-	titlestring.c titlestring.h darwin_dirbrowser.m \
-	$(am__append_2) $(am__append_3)
+	titlestring.c titlestring.h dirbrowser.c $(am__append_2)
 xmmsinclude_HEADERS = configfile.h xmmsctrl.h dirbrowser.h util.h formatter.h titlestring.h
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-am

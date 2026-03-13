@@ -73,6 +73,9 @@ void g_free_orig (gpointer mem);
 /* Define to 1 if you have the <fcntl.h> header file. */
 #define HAVE_FCNTL_H 1
 
+/* Define if gtk-mac-integration is available */
+#define HAVE_GTK_MAC 1
+
 /* Define to 1 if you have the 'iconv_open' function. */
 /* #undef HAVE_ICONV_OPEN */
 

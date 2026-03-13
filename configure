@@ -684,6 +684,8 @@ HAVE_METAL_TRUE
 HAVE_MACOS_AUDIO_FALSE
 HAVE_MACOS_AUDIO_TRUE
 PTHREAD_LIBS
+GTK_MAC_LIBS
+GTK_MAC_CFLAGS
 CAIRO_LIBS
 CAIRO_CFLAGS
 GTK_LIBS
@@ -860,6 +862,8 @@ GTK_CFLAGS
 GTK_LIBS
 CAIRO_CFLAGS
 CAIRO_LIBS
+GTK_MAC_CFLAGS
+GTK_MAC_LIBS
 OPENGL_CFLAGS
 OPENGL_LIBS'
 ac_subdirs_all='libxmms'
@@ -1540,6 +1544,10 @@ Some influential environment variables:
   CAIRO_CFLAGS
               C compiler flags for CAIRO, overriding pkg-config
   CAIRO_LIBS  linker flags for CAIRO, overriding pkg-config
+  GTK_MAC_CFLAGS
+              C compiler flags for GTK_MAC, overriding pkg-config
+  GTK_MAC_LIBS
+              linker flags for GTK_MAC, overriding pkg-config
   OPENGL_CFLAGS
               C compiler flags for OPENGL, overriding pkg-config
   OPENGL_LIBS linker flags for OPENGL, overriding pkg-config
@@ -14745,6 +14753,86 @@ printf "%s\n" "yes" >&6; }
 
 fi
 
+if test "x$HAVE_MACOS" = "xyes"; then
+
+pkg_failed=no
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for gtk-mac-integration-gtk3 >= 2.0" >&5
+printf %s "checking for gtk-mac-integration-gtk3 >= 2.0... " >&6; }
+
+if test -n "$GTK_MAC_CFLAGS"; then
+    pkg_cv_GTK_MAC_CFLAGS="$GTK_MAC_CFLAGS"
+ elif test -n "$PKG_CONFIG"; then
+    if test -n "$PKG_CONFIG" && \
+    { { printf "%s\n" "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"gtk-mac-integration-gtk3 >= 2.0\""; } >&5
+  ($PKG_CONFIG --exists --print-errors "gtk-mac-integration-gtk3 >= 2.0") 2>&5
+  ac_status=$?
+  printf "%s\n" "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; }; then
+  pkg_cv_GTK_MAC_CFLAGS=`$PKG_CONFIG --cflags "gtk-mac-integration-gtk3 >= 2.0" 2>/dev/null`
+		      test "x$?" != "x0" && pkg_failed=yes
+else
+  pkg_failed=yes
+fi
+ else
+    pkg_failed=untried
+fi
+if test -n "$GTK_MAC_LIBS"; then
+    pkg_cv_GTK_MAC_LIBS="$GTK_MAC_LIBS"
+ elif test -n "$PKG_CONFIG"; then
+    if test -n "$PKG_CONFIG" && \
+    { { printf "%s\n" "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"gtk-mac-integration-gtk3 >= 2.0\""; } >&5
+  ($PKG_CONFIG --exists --print-errors "gtk-mac-integration-gtk3 >= 2.0") 2>&5
+  ac_status=$?
+  printf "%s\n" "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; }; then
+  pkg_cv_GTK_MAC_LIBS=`$PKG_CONFIG --libs "gtk-mac-integration-gtk3 >= 2.0" 2>/dev/null`
+		      test "x$?" != "x0" && pkg_failed=yes
+else
+  pkg_failed=yes
+fi
+ else
+    pkg_failed=untried
+fi
+
+
+
+if test $pkg_failed = yes; then
+        { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
+printf "%s\n" "no" >&6; }
+
+if $PKG_CONFIG --atleast-pkgconfig-version 0.20; then
+        _pkg_short_errors_supported=yes
+else
+        _pkg_short_errors_supported=no
+fi
+        if test $_pkg_short_errors_supported = yes; then
+                GTK_MAC_PKG_ERRORS=`$PKG_CONFIG --short-errors --print-errors --cflags --libs "gtk-mac-integration-gtk3 >= 2.0" 2>&1`
+        else
+                GTK_MAC_PKG_ERRORS=`$PKG_CONFIG --print-errors --cflags --libs "gtk-mac-integration-gtk3 >= 2.0" 2>&1`
+        fi
+        # Put the nasty error message in config.log where it belongs
+        echo "$GTK_MAC_PKG_ERRORS" >&5
+
+        { printf "%s\n" "$as_me:${as_lineno-$LINENO}: WARNING: gtk-mac-integration not found, native menus disabled" >&5
+printf "%s\n" "$as_me: WARNING: gtk-mac-integration not found, native menus disabled" >&2;}
+elif test $pkg_failed = untried; then
+        { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
+printf "%s\n" "no" >&6; }
+        { printf "%s\n" "$as_me:${as_lineno-$LINENO}: WARNING: gtk-mac-integration not found, native menus disabled" >&5
+printf "%s\n" "$as_me: WARNING: gtk-mac-integration not found, native menus disabled" >&2;}
+else
+        GTK_MAC_CFLAGS=$pkg_cv_GTK_MAC_CFLAGS
+        GTK_MAC_LIBS=$pkg_cv_GTK_MAC_LIBS
+        { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+printf "%s\n" "yes" >&6; }
+
+printf "%s\n" "#define HAVE_GTK_MAC 1" >>confdefs.h
+
+     GTK_CFLAGS="$GTK_CFLAGS $GTK_MAC_CFLAGS"
+     GTK_LIBS="$GTK_LIBS $GTK_MAC_LIBS"
+fi
+fi
+
 
 
 
@@ -15076,9 +15164,9 @@ fi
 
 
 INPUT_PLUGINS="wav tonegen"
-OUTPUT_PLUGINS="disk_writer"
+OUTPUT_PLUGINS=""
 if test "x$enable_macos_audio" = "xyes"; then
-  OUTPUT_PLUGINS="$OUTPUT_PLUGINS darwin"
+  OUTPUT_PLUGINS="darwin"
 fi
 EFFECT_PLUGINS="echo_plugin stereo_plugin voice"
 GENERAL_PLUGINS="song_change"
@@ -15153,7 +15241,11 @@ XMMS_DEFINES="-DDATA_DIR=\\\"$datadir/xmms\\\" \
 
 
 
-PLUGIN_LDFLAGS='-module -avoid-version -export-symbols-regex "get_.plugin_info"'
+if test "x$HAVE_MACOS" = "xyes"; then
+  PLUGIN_LDFLAGS='-module -avoid-version -export-symbols-regex "get_.plugin_info" -undefined dynamic_lookup'
+else
+  PLUGIN_LDFLAGS='-module -avoid-version -export-symbols-regex "get_.plugin_info"'
+fi
 
 
 
@@ -15161,7 +15253,7 @@ PLUGIN_LDFLAGS='-module -avoid-version -export-symbols-regex "get_.plugin_info"'
 subdirs="$subdirs libxmms"
 
 
-ac_config_files="$ac_config_files Makefile xmms/Makefile xmms/defskin/Makefile Input/Makefile Input/wav/Makefile Input/tonegen/Makefile Output/Makefile Output/disk_writer/Makefile Output/darwin/Makefile Effect/Makefile Effect/echo_plugin/Makefile Effect/stereo_plugin/Makefile Effect/voice/Makefile General/Makefile General/song_change/Makefile Visualization/Makefile Visualization/sanalyzer/Makefile Visualization/blur_scope/Makefile po/Makefile.in intl/Makefile"
+ac_config_files="$ac_config_files Makefile xmms/Makefile xmms/defskin/Makefile Input/Makefile Input/wav/Makefile Input/tonegen/Makefile Output/Makefile Output/darwin/Makefile Effect/Makefile Effect/echo_plugin/Makefile Effect/stereo_plugin/Makefile Effect/voice/Makefile General/Makefile General/song_change/Makefile Visualization/Makefile Visualization/sanalyzer/Makefile Visualization/blur_scope/Makefile intl/Makefile xmms-config xmms.1"
 
 
 cat >confcache <<\_ACEOF
@@ -16219,7 +16311,6 @@ do
     "Input/wav/Makefile") CONFIG_FILES="$CONFIG_FILES Input/wav/Makefile" ;;
     "Input/tonegen/Makefile") CONFIG_FILES="$CONFIG_FILES Input/tonegen/Makefile" ;;
     "Output/Makefile") CONFIG_FILES="$CONFIG_FILES Output/Makefile" ;;
-    "Output/disk_writer/Makefile") CONFIG_FILES="$CONFIG_FILES Output/disk_writer/Makefile" ;;
     "Output/darwin/Makefile") CONFIG_FILES="$CONFIG_FILES Output/darwin/Makefile" ;;
     "Effect/Makefile") CONFIG_FILES="$CONFIG_FILES Effect/Makefile" ;;
     "Effect/echo_plugin/Makefile") CONFIG_FILES="$CONFIG_FILES Effect/echo_plugin/Makefile" ;;
@@ -16230,8 +16321,9 @@ do
     "Visualization/Makefile") CONFIG_FILES="$CONFIG_FILES Visualization/Makefile" ;;
     "Visualization/sanalyzer/Makefile") CONFIG_FILES="$CONFIG_FILES Visualization/sanalyzer/Makefile" ;;
     "Visualization/blur_scope/Makefile") CONFIG_FILES="$CONFIG_FILES Visualization/blur_scope/Makefile" ;;
-    "po/Makefile.in") CONFIG_FILES="$CONFIG_FILES po/Makefile.in" ;;
     "intl/Makefile") CONFIG_FILES="$CONFIG_FILES intl/Makefile" ;;
+    "xmms-config") CONFIG_FILES="$CONFIG_FILES xmms-config" ;;
+    "xmms.1") CONFIG_FILES="$CONFIG_FILES xmms.1" ;;
 
   *) as_fn_error $? "invalid argument: '$ac_config_target'" "$LINENO" 5;;
   esac

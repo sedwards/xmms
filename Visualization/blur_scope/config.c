@@ -1,128 +1,93 @@
-#include "config.h"
-
+#include <config.h>
 #include <gtk/gtk.h>
-
-#include "libxmms/configfile.h"
-#include "blur_scope.h"
+#include "gtk3_compat.h"
+#include <stdlib.h>
+#include <string.h>
+#include "xmms/plugin.h"
 #include "xmms/i18n.h"
+#include "libxmms/configfile.h"
 
-static GtkWidget *configure_win = NULL;
-static GtkWidget *vbox, *options_frame, *options_vbox;
-static GtkWidget *options_colorpicker;
-static GtkWidget *bbox, *ok, *cancel;
+static GtkWidget *configure_win, *options_colorpicker;
 
-static void configure_ok(GtkWidget *w, gpointer data)
+static struct
 {
-	ConfigFile *cfg;	
-	gchar *filename;
-	gdouble color[3]; 
-	
-	
-	
-	filename = g_strconcat(g_get_home_dir(), "/.xmms/config", NULL);
-	cfg = xmms_cfg_open_file(filename);
-	if (!cfg)
-		cfg = xmms_cfg_new();
-	gtk_color_selection_get_color(GTK_COLOR_SELECTION(options_colorpicker), color);
-	bscope_cfg.color = ((guint32)(255.0*color[0])<<16) |
-		              ((guint32)(255.0*color[1])<<8) |
-		              ((guint32)(255.0*color[2])); 
-	xmms_cfg_write_int(cfg, "BlurScope", "color", bscope_cfg.color);
-	xmms_cfg_write_file(cfg, filename);
+	guint32 color;
+} bscope_cfg;
+
+void bscope_load_config(void)
+{
+	ConfigFile *cfg;
+
+	bscope_cfg.color = 0x000000;
+	if ((cfg = xmms_cfg_open_default_file()) != NULL)
+	{
+		xmms_cfg_read_int(cfg, "BlurScope", "color", (gint *)&bscope_cfg.color);
+		xmms_cfg_free(cfg);
+	}
+}
+
+static void bscope_save_config(void)
+{
+	ConfigFile *cfg;
+
+	cfg = xmms_cfg_open_default_file();
+	xmms_cfg_write_int(cfg, "BlurScope", "color", (gint)bscope_cfg.color);
+	xmms_cfg_write_default_file(cfg);
 	xmms_cfg_free(cfg);
-	g_free(filename);
-	generate_cmap();
+}
+
+static void config_ok_cb(GtkWidget * widget, gpointer data)
+{
+    GdkRGBA color;
+    gtk_color_chooser_get_rgba(GTK_COLOR_CHOOSER(options_colorpicker), &color);
+    
+    bscope_cfg.color = ((guint32)(color.red * 255) << 16) | 
+                       ((guint32)(color.green * 255) << 8) | 
+                       ((guint32)(color.blue * 255));
+                       
+	bscope_save_config();
 	gtk_widget_destroy(configure_win);
+    configure_win = NULL;
 }
 
-static void configure_cancel(GtkWidget *w, gpointer data)
+void bscope_configure(void)
 {
-	bscope_cfg.color = (guint32)data;
-	generate_cmap();
-	gtk_widget_destroy(configure_win);
-}
+	GtkWidget *vbox, *bbox, *ok, *cancel;
+    GdkRGBA rgba;
 
-static void color_changed(GtkWidget *w, gpointer data)
-{
-	gdouble color[3]; 
-	gtk_color_selection_get_color(GTK_COLOR_SELECTION(options_colorpicker), color);
-	bscope_cfg.color = ((guint32)(255.0*color[0])<<16) |
-		              ((guint32)(255.0*color[1])<<8) |
-		              ((guint32)(255.0*color[2]));
-	generate_cmap();
-}
-
-void bscope_configure (void)
-{
-	gdouble color[3];
-	if(configure_win)
+	if (configure_win)
+	{
+		gdk_window_raise(gtk_widget_get_window(configure_win));
 		return;
+	}
 
-	bscope_read_config();
-	color[0]=((gdouble)(bscope_cfg.color /0x10000))/256;
-	color[1]=((gdouble)((bscope_cfg.color %0x10000)/0x100))/256;
-	color[2]=((gdouble)(bscope_cfg.color %0x100))/256;
-	
-	configure_win = gtk_window_new(GTK_WINDOW_DIALOG);
-	gtk_container_set_border_width(GTK_CONTAINER(configure_win), 10);
-	gtk_window_set_title(GTK_WINDOW(configure_win), _("Color Entry"));
-	gtk_window_set_policy(GTK_WINDOW(configure_win), FALSE, FALSE, FALSE);
-	gtk_window_set_position(GTK_WINDOW(configure_win), GTK_WIN_POS_MOUSE);
-	gtk_signal_connect(GTK_OBJECT(configure_win), "destroy", GTK_SIGNAL_FUNC(gtk_widget_destroyed),
-			   &configure_win);
+	configure_win = gtk_dialog_new_with_buttons(_("Blur Scope Configuration"),
+                                               NULL, GTK_DIALOG_MODAL,
+                                               _("Ok"), GTK_RESPONSE_OK,
+                                               _("Cancel"), GTK_RESPONSE_CANCEL,
+                                               NULL);
 
-	vbox = gtk_vbox_new(FALSE, 5);
+	g_signal_connect(configure_win, "destroy", G_CALLBACK(gtk_widget_destroyed), &configure_win);
 
-	options_frame = gtk_frame_new(_("Options:"));
-	gtk_container_set_border_width(GTK_CONTAINER(options_frame), 5);
+	vbox = gtk_dialog_get_content_area(GTK_DIALOG(configure_win));
+    gtk_container_set_border_width(GTK_CONTAINER(vbox), 10);
 
-	options_vbox = gtk_vbox_new(FALSE, 5);
-	gtk_container_set_border_width(GTK_CONTAINER(options_vbox), 5);
+	options_colorpicker = gtk_color_chooser_widget_new();
+    
+    rgba.red = ((bscope_cfg.color >> 16) & 0xff) / 255.0;
+    rgba.green = ((bscope_cfg.color >> 8) & 0xff) / 255.0;
+    rgba.blue = (bscope_cfg.color & 0xff) / 255.0;
+    rgba.alpha = 1.0;
+    gtk_color_chooser_set_rgba(GTK_COLOR_CHOOSER(options_colorpicker), &rgba);
+    
+	gtk_box_pack_start(GTK_BOX(vbox), options_colorpicker, TRUE, TRUE, 0);
 
-	options_colorpicker = gtk_color_selection_new();
-	gtk_color_selection_set_color(GTK_COLOR_SELECTION(options_colorpicker), color);
-	gtk_signal_connect(GTK_OBJECT(options_colorpicker), "color_changed", GTK_SIGNAL_FUNC(color_changed), NULL);
-
-	gtk_box_pack_start(GTK_BOX(options_vbox), options_colorpicker, FALSE, FALSE, 0);
-        gtk_widget_show(options_colorpicker);
-	
-	
-	gtk_container_add(GTK_CONTAINER(options_frame), options_vbox);
-	gtk_widget_show(options_vbox);
-
-	gtk_box_pack_start(GTK_BOX(vbox), options_frame, TRUE, TRUE, 0);
-	gtk_widget_show(options_frame);
-
-	bbox = gtk_hbutton_box_new();
-	gtk_button_box_set_layout(GTK_BUTTON_BOX(bbox), GTK_BUTTONBOX_END);
-	gtk_button_box_set_spacing(GTK_BUTTON_BOX(bbox), 5);
-	gtk_box_pack_start(GTK_BOX(vbox), bbox, FALSE, FALSE, 0);
-
-	ok = gtk_button_new_with_label(_("Ok"));
-	gtk_signal_connect(GTK_OBJECT(ok), "clicked",
-			   GTK_SIGNAL_FUNC(configure_ok), NULL);
-	GTK_WIDGET_SET_FLAGS(ok, GTK_CAN_DEFAULT);
-	gtk_box_pack_start(GTK_BOX(bbox), ok, TRUE, TRUE, 0);
-	gtk_widget_show(ok);
-	
-
-	cancel = gtk_button_new_with_label(_("Cancel"));
-	gtk_signal_connect(GTK_OBJECT(cancel), "clicked",
-			   GTK_SIGNAL_FUNC(configure_cancel),
-			   (gpointer)bscope_cfg.color);
-	GTK_WIDGET_SET_FLAGS(cancel, GTK_CAN_DEFAULT);
-	gtk_box_pack_start(GTK_BOX(bbox), cancel, TRUE, TRUE, 0);
-	gtk_widget_show(cancel);
-	gtk_widget_show(bbox);
-	
-	gtk_container_add(GTK_CONTAINER(configure_win), vbox);
-	gtk_widget_show(vbox);
-	gtk_widget_show(configure_win);
-	gtk_widget_grab_default(ok);
+	gtk_widget_show_all(configure_win);
+    
+    if (gtk_dialog_run(GTK_DIALOG(configure_win)) == GTK_RESPONSE_OK) {
+        config_ok_cb(NULL, NULL);
+    } else {
+        gtk_widget_destroy(configure_win);
+        configure_win = NULL;
+    }
 }
-
-
-
-
-
-

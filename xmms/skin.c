@@ -181,8 +181,6 @@ void init_skins(void)
 	skin->def_mask_shade = create_default_mask(275, 14);
 	skin->def_mask_shade_ds = create_default_mask(550, 28);
 
-	setup_skin_masks();
-
 	create_skin_window();
 }
 
@@ -719,6 +717,8 @@ void skin_draw_pixmap(cairo_t *cr, SkinIndex si,
     cairo_rectangle(cr, xdest, ydest, width, height);
     cairo_clip(cr);
     cairo_set_source_surface(cr, tmp, xdest - xsrc, ydest - ysrc);
+    /* Use NEAREST filter to keep skins sharp when scaled by OS or doublesize */
+    cairo_pattern_set_filter(cairo_get_source(cr), CAIRO_FILTER_NEAREST);
     cairo_paint(cr);
     cairo_restore(cr);
 }

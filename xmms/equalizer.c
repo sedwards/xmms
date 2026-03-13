@@ -211,6 +211,11 @@ void equalizerwin_auto_pushed(gboolean toggled)
 void draw_equalizer_window(gboolean force)
 {
 	cairo_t *cr = cairo_create(EQUALIZER_DOUBLESIZE ? equalizerwin_bg_dblsize : equalizerwin_bg);
+    
+    /* Ensure background is opaque black */
+    cairo_set_source_rgb(cr, 0, 0, 0);
+    cairo_paint(cr);
+
 	GtkImage *img, *img2;
 	GList *wl;
 	Widget *w;
@@ -630,51 +635,62 @@ static void equalizerwin_create_widgets(void)
 }
 
 
+static gboolean equalizerwin_draw_cb(GtkWidget *widget, cairo_t *cr, gpointer data)
+{
+	cairo_surface_t *bg = EQUALIZER_DOUBLESIZE ? equalizerwin_bg_dblsize : equalizerwin_bg;
+    if (bg)
+	{
+		cairo_set_source_surface(cr, bg, 0, 0);
+		cairo_paint(cr);
+	}
+
+    lock_widget_list(equalizerwin_wlist);
+    GList *wl = equalizerwin_wlist;
+    while (wl)
+    {
+        Widget *w = (Widget *)wl->data;
+        if (w && w->visible && w->draw)
+            w->draw(w, cr);
+        wl = wl->next;
+    }
+    unlock_widget_list(equalizerwin_wlist);
+
+	return TRUE;
+}
+
+static gboolean equalizerwin_button_press(GtkWidget *widget, GdkEventButton *event, gpointer data)
+{
+    gboolean hit = handle_press_cb(widget, event, &equalizerwin_wlist);
+    if (!hit && event->button == 1) {
+        gtk_window_begin_move_drag(GTK_WINDOW(equalizerwin), event->button, event->x_root, event->y_root, event->time);
+    }
+    return TRUE;
+}
+
 static void equalizerwin_create_gtk(void)
 {
 	equalizerwin = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-	dock_add_window(dock_window_list, equalizerwin);
 	gtk_widget_set_app_paintable(equalizerwin, TRUE);
-	/* window policy stubbed */
 	gtk_window_set_title(GTK_WINDOW(equalizerwin), _("XMMS Equalizer"));
-	gtk_window_set_wmclass(GTK_WINDOW(equalizerwin), "XMMS_Equalizer", "xmms");
+    gtk_window_set_decorated(GTK_WINDOW(equalizerwin), FALSE);
 	gtk_window_set_transient_for(GTK_WINDOW(equalizerwin), GTK_WINDOW(mainwin));
-	if (cfg.equalizer_x != -1 && cfg.save_window_position)
-		dock_set_uposition(equalizerwin, cfg.equalizer_x, cfg.equalizer_y);
+
 	if (cfg.doublesize && cfg.eq_doublesize_linked)
-		gtk_widget_set_usize(equalizerwin, 550, (cfg.equalizer_shaded ? 28 : 232));
+		gtk_widget_set_size_request(equalizerwin, 550, (cfg.equalizer_shaded ? 28 : 232));
 	else
-		gtk_widget_set_usize(equalizerwin, 275, (cfg.equalizer_shaded ? 14 : 116));
+		gtk_widget_set_size_request(equalizerwin, 275, (cfg.equalizer_shaded ? 14 : 116));
 
-	gtk_widget_set_events(equalizerwin, GDK_FOCUS_CHANGE_MASK | GDK_BUTTON_MOTION_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK);
+    GtkWidget *da = gtk_drawing_area_new();
+    gtk_container_add(GTK_CONTAINER(equalizerwin), da);
+
+	g_signal_connect(da, "draw", G_CALLBACK(equalizerwin_draw_cb), NULL);
+    g_signal_connect(da, "button-press-event", G_CALLBACK(equalizerwin_button_press), NULL);
+    g_signal_connect(da, "button-release-event", G_CALLBACK(handle_release_cb), &equalizerwin_wlist);
+    g_signal_connect(da, "motion-notify-event", G_CALLBACK(handle_motion_cb), &equalizerwin_wlist);
+
+    gtk_widget_add_events(da, GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK | GDK_POINTER_MOTION_MASK);
+
 	gtk_widget_realize(equalizerwin);
-	hint_set_skip_winlist(equalizerwin);
-	util_set_cursor(equalizerwin);
-	if (!cfg.show_wm_decorations)
-		gdk_window_set_decorations(gtk_widget_get_window(equalizerwin), 0);
-
-	equalizerwin_accel = gtk_accel_group_new();
-	gtk_window_add_accel_group(GTK_WINDOW(equalizerwin), equalizerwin_accel);
-
-	equalizerwin_set_back_pixmap();
-	gtk_signal_connect(GTK_OBJECT(equalizerwin), "delete_event",
-			   GTK_SIGNAL_FUNC(equalizerwin_delete), NULL);
-	gtk_signal_connect(GTK_OBJECT(equalizerwin), "button_press_event",
-			   GTK_SIGNAL_FUNC(equalizerwin_press), NULL);
-	gtk_signal_connect(GTK_OBJECT(equalizerwin), "button_release_event",
-			   GTK_SIGNAL_FUNC(equalizerwin_release), NULL);
-	gtk_signal_connect(GTK_OBJECT(equalizerwin), "motion_notify_event",
-			   GTK_SIGNAL_FUNC(equalizerwin_motion), NULL);
-	gtk_signal_connect(GTK_OBJECT(equalizerwin), "focus_in_event",
-			   GTK_SIGNAL_FUNC(equalizerwin_focus_in), NULL);
-	gtk_signal_connect(GTK_OBJECT(equalizerwin), "focus_out_event",
-			   GTK_SIGNAL_FUNC(equalizerwin_focus_out), NULL);
-	gtk_signal_connect(GTK_OBJECT(equalizerwin), "configure_event",
-			   GTK_SIGNAL_FUNC(equalizerwin_configure), NULL);
-	gtk_signal_connect(GTK_OBJECT(equalizerwin), "client_event",
-			   GTK_SIGNAL_FUNC(equalizerwin_client_event), NULL);
-	gtk_signal_connect(GTK_OBJECT(equalizerwin), "key-press-event",
-			   GTK_SIGNAL_FUNC(equalizerwin_keypress), NULL);
 }
 
 void equalizerwin_create(void)
@@ -716,7 +732,8 @@ void equalizerwin_real_show(void)
 	if (!pposition_broken && cfg.equalizer_x != -1 &&
 	    cfg.save_window_position && cfg.show_wm_decorations)
 		dock_set_uposition(equalizerwin, cfg.equalizer_x, cfg.equalizer_y);
-	gtk_widget_show(equalizerwin);
+	gtk_widget_show_all(equalizerwin);
+    gtk_window_present(GTK_WINDOW(equalizerwin));
 	if (pposition_broken && cfg.equalizer_x != -1 && cfg.save_window_position)
 		dock_set_uposition(equalizerwin, cfg.equalizer_x, cfg.equalizer_y);
 	if (cfg.doublesize && cfg.eq_doublesize_linked)

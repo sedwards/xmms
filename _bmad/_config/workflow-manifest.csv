@@ -39,6 +39,7 @@ name,description,module,path,canonicalId
 "handover","Package complete testable flows and hand off to development","wds","_bmad/wds/workflows/4-ux-design/workflow-handover.md",""
 "workflow-sketch","Analyze user-provided sketches (photos, screenshots, wireframes) and translate them into structured page specifications.","wds","_bmad/wds/workflows/4-ux-design/workflow-sketch.md",""
 "workflow-specify","Create a complete, implementation-ready page specification with layout, components, content, interactions, and states.","wds","_bmad/wds/workflows/4-ux-design/workflow-specify.md",""
+"workflow-suggest","Build a scenario's page flow step by step, with the agent proposing and the user confirming at each stage.","wds","_bmad/wds/workflows/4-ux-design/workflow-suggest.md",""
 "workflow-visual","Create visual representations of page designs using external tools and integrate results back into specifications.","wds","_bmad/wds/workflows/4-ux-design/workflow-visual.md",""
 "ux-design","Transform ideas into detailed visual specifications through scenario-driven design","wds","_bmad/wds/workflows/4-ux-design/workflow.md",""
 "acceptance-testing","Design and run acceptance tests from specification criteria","wds","_bmad/wds/workflows/5-agentic-development/workflow-acceptance-testing.md",""
