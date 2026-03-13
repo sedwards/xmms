@@ -1,4 +1,3 @@
-
 /*  XMMS - Cross-platform multimedia player
  *  Copyright (C) 1998-2000  Peter Alm, Mikael Alm, Olle Hallnas, Thomas Nilsson and 4Front Technologies
  *
@@ -18,37 +17,26 @@
  */
 #include "xmms.h"
 
-void monostereo_draw(Widget * w)
+static void monostereo_draw(MonoStereo * ms, cairo_t *cr)
 {
-	MonoStereo *ms = (MonoStereo *) w;
-	cairo_surface_t *obj;
-
-	obj = ms->ms_widget.parent;
-
 	switch (ms->ms_num_channels)
 	{
 		case 0:
-			skin_draw_pixmap(obj, ms->ms_widget.gc,
-					 ms->ms_skin_index, 29, 12,
+			skin_draw_pixmap(cr, ms->ms_skin_index, 29, 12,
 					 ms->ms_widget.x, ms->ms_widget.y, 27, 12);
-			skin_draw_pixmap(obj, ms->ms_widget.gc,
-					 ms->ms_skin_index, 0, 12,
+			skin_draw_pixmap(cr, ms->ms_skin_index, 0, 12,
 					 ms->ms_widget.x + 27, ms->ms_widget.y, 29, 12);
 			break;
 		case 1:
-			skin_draw_pixmap(obj, ms->ms_widget.gc,
-					 ms->ms_skin_index, 29, 0,
+			skin_draw_pixmap(cr, ms->ms_skin_index, 29, 0,
 					 ms->ms_widget.x, ms->ms_widget.y, 27, 12);
-			skin_draw_pixmap(obj, ms->ms_widget.gc,
-					 ms->ms_skin_index, 0, 12,
+			skin_draw_pixmap(cr, ms->ms_skin_index, 0, 12,
 					 ms->ms_widget.x + 27, ms->ms_widget.y, 29, 12);
 			break;
 		case 2:
-			skin_draw_pixmap(obj, ms->ms_widget.gc,
-					 ms->ms_skin_index, 29, 12,
+			skin_draw_pixmap(cr, ms->ms_skin_index, 29, 12,
 					 ms->ms_widget.x, ms->ms_widget.y, 27, 12);
-			skin_draw_pixmap(obj, ms->ms_widget.gc,
-					 ms->ms_skin_index, 0, 0,
+			skin_draw_pixmap(cr, ms->ms_skin_index, 0, 0,
 					 ms->ms_widget.x + 27, ms->ms_widget.y, 29, 12);
 			break;
 	}
@@ -60,19 +48,18 @@ void monostereo_set_num_channels(MonoStereo * ms, gint nch)
 	draw_widget(ms);
 }
 
-MonoStereo *create_monostereo(GList ** wlist, cairo_surface_t * parent, cairo_t * gc, gint x, gint y, SkinIndex si)
+MonoStereo *create_monostereo(GList ** wlist, cairo_surface_t * parent, gint x, gint y, SkinIndex si)
 {
 	MonoStereo *ms;
 
 	ms = (MonoStereo *) g_malloc0(sizeof (MonoStereo));
 	ms->ms_widget.parent = parent;
-	ms->ms_widget.gc = gc;
 	ms->ms_widget.x = x;
 	ms->ms_widget.y = y;
 	ms->ms_widget.width = 56;
 	ms->ms_widget.height = 12;
 	ms->ms_widget.visible = 1;
-	ms->ms_widget.draw = monostereo_draw;
+	ms->ms_widget.draw = (void (*) (void *, cairo_t *)) monostereo_draw;
 	ms->ms_skin_index = si;
 
 	add_widget(wlist, ms);

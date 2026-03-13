@@ -75,7 +75,7 @@ extern GtkWidget *equalizerwin;
 extern GtkWidget *playlistwin;
 
 //PORT
-//extern GtkItemFactory *mainwin_vis_menu, *mainwin_general_menu, *mainwin_options_menu;
+extern GtkItemFactory *mainwin_vis_menu, *mainwin_general_menu, *mainwin_options_menu, *mainwin_songname_menu;
 
 extern GList *dock_window_list;
 extern gboolean pposition_broken;
@@ -100,7 +100,7 @@ void mainwin_adjust_balance_release(void);
 void mainwin_set_volume_slider(gint percent);
 void mainwin_set_balance_slider(gint percent);
 
-void mainwin_vis_set_type(VisType mode);
+void mainwin_vis_set_type(InputVisType mode);
 
 void mainwin_set_info_text(void);
 void mainwin_set_song_info(gint rate, gint freq, gint nch);

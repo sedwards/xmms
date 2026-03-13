@@ -1,41 +1,22 @@
-/*  XMMS - Cross-platform multimedia player
- *  Copyright (C) 1998-2001  Peter Alm, Mikael Alm, Olle Hallnas,
- *                           Thomas Nilsson and 4Front Technologies
- *  Copyright (C) 1999-2001  Haavard Kvaalen
- *
- *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 2 of the License, or
- *  (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
- */
 #include "xmms.h"
+#include "bmp.h"
 
-/*
-#include "defskin/main.png"
-#include "defskin/cbuttons.png"
-#include "defskin/titlebar.png"
-#include "defskin/shufrep.png"
-#include "defskin/text.png"
-#include "defskin/volume.png"
-#include "defskin/monoster.png"
-#include "defskin/playpaus.png"
-#include "defskin/nums_ex.png"
-#include "defskin/posbar.png"
-#include "defskin/pledit.png"
-#include "defskin/eqmain.png"
-#include "defskin/eq_ex.png"
-*/
+#include "defskin/main.xpm"
+#include "defskin/cbuttons.xpm"
+#include "defskin/titlebar.xpm"
+#include "defskin/shufrep.xpm"
+#include "defskin/text.xpm"
+#include "defskin/volume.xpm"
+#include "defskin/monoster.xpm"
+#include "defskin/playpaus.xpm"
+#include "defskin/nums_ex.xpm"
+#include "defskin/posbar.xpm"
+#include "defskin/pledit.xpm"
+#include "defskin/eqmain.xpm"
+#include "defskin/eq_ex.xpm"
 
 #include <ctype.h>
+#include <math.h>
 
 #ifndef HAVE_MKDTEMP
 char* mkdtemp(char* path);
@@ -78,46 +59,37 @@ static void setup_skin_masks(void)
 		return;
 	if (cfg.player_visible)
 	{
-		gtk_widget_shape_combine_mask(mainwin, skin_get_mask(SKIN_MASK_MAIN, cfg.doublesize, cfg.player_shaded), 0, 0);
+		gtk_widget_shape_combine_region(mainwin, skin_get_mask(SKIN_MASK_MAIN, cfg.doublesize, cfg.player_shaded));
 	}
 
-	gtk_widget_shape_combine_mask(equalizerwin, skin_get_mask(SKIN_MASK_EQ, EQUALIZER_DOUBLESIZE, cfg.equalizer_shaded), 0, 0);
+	gtk_widget_shape_combine_region(equalizerwin, skin_get_mask(SKIN_MASK_EQ, EQUALIZER_DOUBLESIZE, cfg.equalizer_shaded));
 }
 
-static GdkBitmap *create_default_mask(GdkWindow * parent, gint w, gint h)
+static cairo_region_t *create_default_mask(gint w, gint h)
 {
-	GdkBitmap *ret;
-	cairo_t *gc;
-	GdkColor pattern;
+	cairo_rectangle_int_t rect = { 0, 0, w, h };
+	return cairo_region_create_rectangle(&rect);
+}
 
-	ret = gdk_pixmap_new(parent, w, h, 1);
-	gc = gdk_gc_new(ret);
-	pattern.pixel = 1;
-	gdk_gc_set_foreground(gc, &pattern);
-	gdk_draw_rectangle(ret, gc, TRUE, 0, 0, w, h);
-	gdk_gc_destroy(gc);
-
-	return ret;
+static cairo_surface_t *create_surface_from_pixbuf(GdkPixbuf *pb)
+{
+    cairo_surface_t *surface;
+    cairo_t *cr;
+    surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, gdk_pixbuf_get_width(pb), gdk_pixbuf_get_height(pb));
+    cr = cairo_create(surface);
+    gdk_cairo_set_source_pixbuf(cr, pb, 0, 0);
+    cairo_paint(cr);
+    cairo_destroy(cr);
+    return surface;
 }
 
 static void load_def_pixmap(SkinPixmap *skinpixmap, gchar **skindata)
 {
-	skinpixmap->def_pixmap = gdk_pixmap_create_from_xpm_d(mainwin->window, NULL, NULL, skindata);
-	gdk_window_get_size(skinpixmap->def_pixmap, &skinpixmap->width, &skinpixmap->height);
-}
-
-static void skin_query_color(GdkColormap *cm, GdkColor *c)
-{
-// POrting using Coca
-/*
-	XColor xc = {0};
-	
-	xc.pixel = c->pixel;
-	XQueryColor(GDK_COLORMAP_XDISPLAY(cm), GDK_COLORMAP_XCOLORMAP(cm), &xc);
-	c->red = xc.red;
-	c->green = xc.green;
-	c->blue = xc.blue;
-*/
+    GdkPixbuf *pb = gdk_pixbuf_new_from_xpm_data((const char **)skindata);
+    skinpixmap->def_pixmap = create_surface_from_pixbuf(pb);
+    skinpixmap->width = gdk_pixbuf_get_width(pb);
+    skinpixmap->height = gdk_pixbuf_get_height(pb);
+    g_object_unref(pb);
 }
 
 static glong skin_calc_luminance(GdkColor *c)
@@ -127,41 +99,37 @@ static glong skin_calc_luminance(GdkColor *c)
 
 static void skin_get_textcolors(cairo_surface_t *text, GdkColor *bgc, GdkColor *fgc)
 {
-	/*
-	 * Try to extract reasonable background and foreground colors
-	 * from the font pixmap
-	 */
-	
-	GtkImage *gi;
-	GdkColormap *cm;
 	int i;
+	unsigned char *data;
+	int stride;
 
-	if (text == NULL)
-		return;
+	if (text == NULL || cairo_surface_get_type(text) != CAIRO_SURFACE_TYPE_IMAGE) return;
 	
-	/* Get the first line of text */
-	gi = gdk_image_get(text, 0, 0, 155, 6);
-	cm = gdk_window_get_colormap(playlistwin->window);
-	for (i = 0; i < 6; i ++)
-	{
+	cairo_surface_flush(text);
+	data = cairo_image_surface_get_data(text);
+	stride = cairo_image_surface_get_stride(text);
+
+	for (i = 0; i < 6; i++) {
 		GdkColor c;
 		gint x;
 		glong d, max_d;
-
-		/* Get a pixel from the middle of the space character */
-		bgc[i].pixel = gdk_image_get_pixel(gi, 151, i);
-		skin_query_color(cm, &bgc[i]);
+		uint32_t *pixels = (uint32_t *) (data + i * stride);
+		uint32_t p = pixels[151];
+		bgc[i].pixel = 0;
+		bgc[i].red = ((p >> 16) & 0xff) * 257;
+		bgc[i].green = ((p >> 8) & 0xff) * 257;
+		bgc[i].blue = (p & 0xff) * 257;
 
 		max_d = 0;
-		for (x = 1; x < 150; x ++)
-		{
-			c.pixel = gdk_image_get_pixel(gi, x, i);
-			skin_query_color(cm, &c);
+		for (x = 1; x < 150; x++) {
+			p = pixels[x];
+			c.pixel = 0;
+			c.red = ((p >> 16) & 0xff) * 257;
+			c.green = ((p >> 8) & 0xff) * 257;
+			c.blue = (p & 0xff) * 257;
 
-			d = labs(skin_calc_luminance(&c) -
-				 skin_calc_luminance(&bgc[i]));
-			if (d > max_d)
-			{
+			d = labs(skin_calc_luminance(&c) - skin_calc_luminance(&bgc[i]));
+			if (d > max_d) {
 				memcpy(&fgc[i], &c, sizeof(GdkColor));
 				max_d = d;
 			}
@@ -193,29 +161,25 @@ void init_skins(void)
 	skin->def_pledit_normal.red = 0x2400;
 	skin->def_pledit_normal.green = 0x9900;
 	skin->def_pledit_normal.blue = 0xffff;
-	gdk_color_alloc(gdk_window_get_colormap(playlistwin->window), &skin->def_pledit_normal);
 	skin->def_pledit_current.red = 0xffff;
 	skin->def_pledit_current.green = 0xee00;
 	skin->def_pledit_current.blue = 0xffff;
-	gdk_color_alloc(gdk_window_get_colormap(playlistwin->window), &skin->def_pledit_current);
 	skin->def_pledit_normalbg.red = 0x0A00;
 	skin->def_pledit_normalbg.green = 0x1200;
 	skin->def_pledit_normalbg.blue = 0x0A00;
-	gdk_color_alloc(gdk_window_get_colormap(playlistwin->window), &skin->def_pledit_normalbg);
 	skin->def_pledit_selectedbg.red = 0x0A00;
 	skin->def_pledit_selectedbg.green = 0x1200;
 	skin->def_pledit_selectedbg.blue = 0x4A00;
-	gdk_color_alloc(gdk_window_get_colormap(playlistwin->window), &skin->def_pledit_selectedbg);
 	for (i = 0; i < 24; i++)
 	{
 		skin->vis_color[i][0] = skin_default_viscolor[i][0];
 		skin->vis_color[i][1] = skin_default_viscolor[i][1];
 		skin->vis_color[i][2] = skin_default_viscolor[i][2];
 	}
-	skin->def_mask = create_default_mask(mainwin->window, 275, 116);
-	skin->def_mask_ds = create_default_mask(mainwin->window, 550, 232);
-	skin->def_mask_shade = create_default_mask(mainwin->window, 275, 14);
-	skin->def_mask_shade_ds = create_default_mask(mainwin->window, 550, 28);
+	skin->def_mask = create_default_mask(275, 116);
+	skin->def_mask_ds = create_default_mask(550, 232);
+	skin->def_mask_shade = create_default_mask(275, 14);
+	skin->def_mask_shade_ds = create_default_mask(550, 28);
 
 	setup_skin_masks();
 
@@ -224,16 +188,10 @@ void init_skins(void)
 
 static guint hex_chars_to_int(gchar c, gchar d)
 {
-	/*
-	 * Converts a value in the range 0x00-0xFF
-	 * to a integer in the range 0-65535
-	 */
 	gchar str[3];
-
 	str[0] = c;
 	str[1] = d;
 	str[2] = '\0';
-
 	return (CLAMP(strtol(str, NULL, 16), 0, 255) * 256);
 }
 
@@ -255,29 +213,19 @@ GdkColor *load_skin_color(const gchar * path, const gchar * file, const gchar * 
 			if (value[0] == '#')
 				ptr++;
 			len = strlen(ptr);
-
-			/*
-			 * The handling of incomplete values is done this way
-			 * to maximize winamp compatibility
-			 */
 			if (len >= 6)
 			{
-				color->red = hex_chars_to_int(*ptr,
-							      *(ptr + 1));
+				color->red = hex_chars_to_int(*ptr, *(ptr + 1));
 				ptr += 2;
 			}
 			if (len >= 4)
 			{
-				color->green = hex_chars_to_int(*ptr,
-								*(ptr + 1));
+				color->green = hex_chars_to_int(*ptr, *(ptr + 1));
 				ptr += 2;
 			}
 			if (len >= 2)
-				color->blue = hex_chars_to_int(*ptr,
-							       *(ptr + 1));
+				color->blue = hex_chars_to_int(*ptr, *(ptr + 1));
 				
-
-			gdk_color_alloc(gdk_window_get_colormap(playlistwin->window), color);
 			g_free(value);
 		}
 		g_free(filename);
@@ -285,97 +233,81 @@ GdkColor *load_skin_color(const gchar * path, const gchar * file, const gchar * 
 	return color;
 }
 
-static void load_skin_pixmap(SkinPixmap *skinpixmap,
-			     const gchar * path, const gchar * file)
+static void load_skin_pixmap(SkinPixmap *skinpixmap, const gchar * path, const gchar * file)
 {
 	char *filename;
 	gint w, h;
-
 	filename = find_file_recursively(path, file);
-
-	if (!filename)
-		return;
-
+	if (!filename) return;
 	skinpixmap->pixmap = read_bmp(filename);
-
 	g_free(filename);
-
-	if (!skinpixmap->pixmap)
-		return;
-	gdk_window_get_size(skinpixmap->pixmap, &w, &h);
-
+	if (!skinpixmap->pixmap) return;
+	w = cairo_image_surface_get_width(skinpixmap->pixmap);
+	h = cairo_image_surface_get_height(skinpixmap->pixmap);
 	skinpixmap->current_width = MIN(w, skinpixmap->width);
 	skinpixmap->current_height = MIN(h, skinpixmap->height);
 }
 
-GdkBitmap *skin_create_transparent_mask(const gchar * path, const gchar * file, const gchar * section, GdkWindow * window, gint width, gint height, gboolean doublesize)
+cairo_region_t *skin_create_transparent_mask(const gchar * path, const gchar * file, const gchar * section, gint width, gint height, gboolean doublesize)
 {
 	gchar *filename;
-
-	GdkBitmap *mask = NULL;
-	cairo_t *gc = NULL;
-	GdkColor pattern;
-	GdkPoint *gpoints;
-
+	cairo_surface_t *surf;
+	cairo_t *cr;
+	cairo_region_t *region;
 	gboolean created_mask = FALSE;
 	GArray *num, *point;
 	gint i, j, k;
 
-	if (!path)
-		return NULL;
+	if (!path) return NULL;
 	filename = find_file_recursively(path, file);
-	if (!filename)
-		return NULL;
+	if (!filename) return NULL;
 
-	if ((num = read_ini_array(filename, section, "NumPoints")) == NULL)
-	{
+	if ((num = read_ini_array(filename, section, "NumPoints")) == NULL) {
 		g_free(filename);
 		return NULL;
 	}
-		
-	if ((point = read_ini_array(filename, section, "PointList")) == NULL)
-	{
+	if ((point = read_ini_array(filename, section, "PointList")) == NULL) {
 		g_array_free(num, TRUE);
 		g_free(filename);
 		return NULL;
 	}
 
-	mask = gdk_pixmap_new(window, width, height, 1);
-	gc = gdk_gc_new(mask);
-	
-	pattern.pixel = 0;
-	gdk_gc_set_foreground(gc, &pattern);
-	gdk_draw_rectangle(mask, gc, TRUE, 0, 0, width, height);
-	pattern.pixel = 1;
-	gdk_gc_set_foreground(gc, &pattern);
+	surf = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, width, height);
+	cr = cairo_create(surf);
+	cairo_set_source_rgba(cr, 0, 0, 0, 0);
+	cairo_set_operator(cr, CAIRO_OPERATOR_SOURCE);
+	cairo_paint(cr);
+	cairo_set_source_rgba(cr, 1, 1, 1, 1);
 		
 	j = 0;
-	for (i = 0; i < num->len; i++)
-	{
-		if ((point->len - j) >= (g_array_index(num, gint, i) * 2))
-		{
+	for (i = 0; i < num->len; i++) {
+		if ((point->len - j) >= (g_array_index(num, gint, i) * 2)) {
 			created_mask = TRUE;
-			gpoints = g_malloc(g_array_index(num, gint, i) * sizeof (GdkPoint));
-			for (k = 0; k < g_array_index(num, gint, i); k++)
-			{
-				gpoints[k].x = g_array_index(point, gint, j + k * 2) * (1 + doublesize);
-				gpoints[k].y = g_array_index(point, gint, j + k * 2 + 1) * (1 + doublesize);
+			cairo_new_path(cr);
+			for (k = 0; k < g_array_index(num, gint, i); k++) {
+			    double x = g_array_index(point, gint, j + k * 2) * (1 + doublesize);
+			    double y = g_array_index(point, gint, j + k * 2 + 1) * (1 + doublesize);
+				if (k == 0) cairo_move_to(cr, x, y);
+				else cairo_line_to(cr, x, y);
 			}
 			j += k * 2;
-			gdk_draw_polygon(mask, gc, TRUE, gpoints, g_array_index(num, gint, i));
-			g_free(gpoints);
+			cairo_close_path(cr);
+			cairo_fill(cr);
 		}
 	}
 	g_array_free(num, TRUE);
 	g_array_free(point, TRUE);
 	g_free(filename);
 
-	if (!created_mask)
-		gdk_draw_rectangle(mask, gc, TRUE, 0, 0, width, height);
+	if (!created_mask) {
+	    cairo_rectangle(cr, 0, 0, width, height);
+	    cairo_fill(cr);
+	}
 
-	gdk_gc_destroy(gc);
-
-	return mask;
+    cairo_destroy(cr);
+    region = gdk_cairo_region_create_from_surface(surf);
+    cairo_surface_destroy(surf);
+	return region;
 }
 
 void load_skin_viscolor(const gchar * path, const gchar * file)
@@ -424,34 +356,28 @@ void load_skin_viscolor(const gchar * path, const gchar * file)
 
 static void skin_numbers_generate_dash(SkinPixmap *numbers)
 {
-	cairo_t *gc;
+	cairo_t *cr;
 	cairo_surface_t *pixmap;
 
-	if (numbers->pixmap == NULL ||
-	    numbers->current_width < 99)
-		return;
+	if (numbers->pixmap == NULL || numbers->current_width < 99) return;
 
-	gc = gdk_gc_new(numbers->pixmap);
-	pixmap = gdk_pixmap_new(mainwin->window, 108,
-				numbers->current_height,
-				gdk_rgb_get_visual()->depth);
-	skin_draw_pixmap(pixmap, gc, SKIN_NUMBERS,
-			 0, 0, 0, 0, 99, 13);
-	skin_draw_pixmap(pixmap, gc, SKIN_NUMBERS,
-			 90, 0, 99, 0, 9, 13);
-	skin_draw_pixmap(pixmap, gc, SKIN_NUMBERS,
-			 20, 6, 101, 6, 5, 1);
-	gdk_gc_unref(gc);
-	gdk_pixmap_unref(numbers->pixmap);
+	pixmap = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, 108, numbers->current_height);
+	cr = cairo_create(pixmap);
+	
+	skin_draw_pixmap(cr, SKIN_NUMBERS, 0, 0, 0, 0, 99, 13);
+	skin_draw_pixmap(cr, SKIN_NUMBERS, 90, 0, 99, 0, 9, 13);
+	skin_draw_pixmap(cr, SKIN_NUMBERS, 20, 6, 101, 6, 5, 1);
+	cairo_destroy(cr);
+	
+	cairo_surface_destroy(numbers->pixmap);
 	numbers->pixmap = pixmap;
 	numbers->current_width = 108;
 }
 
-
 static void skin_free_pixmap(SkinPixmap *p)
 {
 	if (p->pixmap)
-		gdk_pixmap_unref(p->pixmap);
+		cairo_surface_destroy(p->pixmap);
 	p->pixmap = NULL;
 }
 
@@ -475,21 +401,21 @@ void free_skin(void)
 	skin_free_pixmap(&skin->eq_ex);
 
 	if (skin->mask_main)
-		gdk_bitmap_unref(skin->mask_main);
+		cairo_region_destroy(skin->mask_main);
 	if (skin->mask_main_ds)
-		gdk_bitmap_unref(skin->mask_main_ds);
+		cairo_region_destroy(skin->mask_main_ds);
 	if (skin->mask_shade)
-		gdk_bitmap_unref(skin->mask_shade);
+		cairo_region_destroy(skin->mask_shade);
 	if (skin->mask_shade_ds)
-		gdk_bitmap_unref(skin->mask_shade_ds);
+		cairo_region_destroy(skin->mask_shade_ds);
 	if (skin->mask_eq)
-		gdk_bitmap_unref(skin->mask_eq);
+		cairo_region_destroy(skin->mask_eq);
 	if (skin->mask_eq_ds)
-		gdk_bitmap_unref(skin->mask_eq_ds);
+		cairo_region_destroy(skin->mask_eq_ds);
 	if (skin->mask_eq_shade)
-		gdk_bitmap_unref(skin->mask_eq_shade);
+		cairo_region_destroy(skin->mask_eq_shade);
 	if (skin->mask_eq_shade_ds)
-		gdk_bitmap_unref(skin->mask_eq_shade_ds);
+		cairo_region_destroy(skin->mask_eq_shade_ds);
 
 	skin->mask_main = NULL;
 	skin->mask_main_ds = NULL;
@@ -549,14 +475,14 @@ static void skin_load_pixmaps(const char *path)
 	skin->pledit_current = load_skin_color(path, "pledit.txt", "text", "current");
 	skin->pledit_normalbg = load_skin_color(path, "pledit.txt", "text", "normalbg");
 	skin->pledit_selectedbg = load_skin_color(path, "pledit.txt", "text", "selectedbg");
-	skin->mask_main = skin_create_transparent_mask(path, "region.txt", "Normal", mainwin->window, 275, 116, FALSE);
-	skin->mask_main_ds = skin_create_transparent_mask(path, "region.txt", "Normal", mainwin->window, 550, 232, TRUE);
-	skin->mask_shade = skin_create_transparent_mask(path, "region.txt", "WindowShade", mainwin->window, 275, 14, FALSE);
-	skin->mask_shade_ds = skin_create_transparent_mask(path, "region.txt", "WindowShade", mainwin->window, 550, 28, TRUE);
-	skin->mask_eq = skin_create_transparent_mask(path, "region.txt", "Equalizer", equalizerwin->window, 275, 116, FALSE);
-	skin->mask_eq_ds = skin_create_transparent_mask(path, "region.txt", "Equalizer", equalizerwin->window, 550, 232, TRUE);
-	skin->mask_eq_shade = skin_create_transparent_mask(path, "region.txt", "EqualizerWS", equalizerwin->window, 275, 14, FALSE);
-	skin->mask_eq_shade_ds = skin_create_transparent_mask(path, "region.txt", "EqualizerWS", equalizerwin->window, 550, 28, TRUE);
+	skin->mask_main = skin_create_transparent_mask(path, "region.txt", "Normal", 275, 116, FALSE);
+	skin->mask_main_ds = skin_create_transparent_mask(path, "region.txt", "Normal", 550, 232, TRUE);
+	skin->mask_shade = skin_create_transparent_mask(path, "region.txt", "WindowShade", 275, 14, FALSE);
+	skin->mask_shade_ds = skin_create_transparent_mask(path, "region.txt", "WindowShade", 550, 28, TRUE);
+	skin->mask_eq = skin_create_transparent_mask(path, "region.txt", "Equalizer", 275, 116, FALSE);
+	skin->mask_eq_ds = skin_create_transparent_mask(path, "region.txt", "Equalizer", 550, 232, TRUE);
+	skin->mask_eq_shade = skin_create_transparent_mask(path, "region.txt", "EqualizerWS", 275, 14, FALSE);
+	skin->mask_eq_shade_ds = skin_create_transparent_mask(path, "region.txt", "EqualizerWS", 550, 28, TRUE);
 	
 	load_skin_viscolor(path, "viscolor.txt");
 }
@@ -564,17 +490,11 @@ static void skin_load_pixmaps(const char *path)
 static char * skin_decompress_skin(const char* path)
 {
 	char *tmp = NULL, *tempdir, *unzip, *tar, *ending;
-
 	unzip = getenv("UNZIPCMD");
-	if (!unzip)
-		unzip = "unzip";
+	if (!unzip) unzip = "unzip";
 	tar = getenv("TARCMD");
-	if (!tar)
-		tar = "tar";
-
-	if ((ending = strrchr(path, '.')) == NULL)
-		return NULL;
-
+	if (!tar) tar = "tar";
+	if ((ending = strrchr(path, '.')) == NULL) return NULL;
 	tempdir = g_strconcat(g_get_tmp_dir(), "/xmmsskin.XXXXXXXX", NULL);
 	if (!mkdtemp(tempdir))
 	{
@@ -582,7 +502,6 @@ static char * skin_decompress_skin(const char* path)
 		g_message("Failed to create temporary directory: %s.  Unable to load skin.", strerror(errno));
 		return NULL;
 	}
-
 	if (!strcasecmp(ending, ".zip") || !strcasecmp(ending, ".wsz"))
 		tmp = g_strdup_printf("%s >/dev/null -o -j \"%s\" -d %s", unzip, path, tempdir);
 	if (!strcasecmp(ending, ".tgz") || !strcasecmp(ending, ".gz"))
@@ -591,17 +510,14 @@ static char * skin_decompress_skin(const char* path)
 		tmp = g_strdup_printf("bzip2 -dc \"%s\" | %s >/dev/null xf - -C %s", path, tar, tempdir);
 	if (!strcasecmp(ending, ".tar"))
 		tmp = g_strdup_printf("%s >/dev/null xf \"%s\" -C %s", tar, path, tempdir);
-
 	system(tmp);
 	g_free(tmp);
 	return tempdir;
 }
-	
 
 static void _load_skin(const gchar * path, gboolean force)
 {
 	char *ending;
-
 	if (!force)
 	{
 		if (skin->path && path)
@@ -616,7 +532,6 @@ static void _load_skin(const gchar * path, gboolean force)
 	{
 		skin->path = g_realloc(skin->path, strlen(path) + 1);
 		strcpy(skin->path, path);
-
 		ending = strrchr(path, '.');
 		if (ending &&
 		    (!strcasecmp(ending, ".zip") || !strcasecmp(ending, ".wsz") ||
@@ -636,76 +551,46 @@ static void _load_skin(const gchar * path, gboolean force)
 	}
 	else
 	{
-		if (skin->path)
-			g_free(skin->path);
+		if (skin->path) g_free(skin->path);
 		skin->path = NULL;
 	}
-
 	setup_skin_masks();
-
 	draw_main_window(TRUE);
 	draw_playlist_window(TRUE);
 	draw_equalizer_window(TRUE);
 	playlistwin_update_list();
 }
 
-void load_skin(const gchar * path)
-{
-	_load_skin(path, FALSE);
-}
-
-void reload_skin(void)
-{
-	_load_skin(skin->path, TRUE);
-}
-
-void cleanup_skins(void)
-{
-	free_skin();
-}
+void load_skin(const gchar * path) { _load_skin(path, FALSE); }
+void reload_skin(void) { _load_skin(skin->path, TRUE); }
+void cleanup_skins(void) { free_skin(); }
 
 static SkinPixmap *get_skin_pixmap(SkinIndex si)
 {
 	switch (si)
 	{
-		case SKIN_MAIN:
-			return &skin->main;
-		case SKIN_CBUTTONS:
-			return &skin->cbuttons;
-		case SKIN_TITLEBAR:
-			return &skin->titlebar;
-		case SKIN_SHUFREP:
-			return &skin->shufrep;
-		case SKIN_TEXT:
-			return &skin->text;
-		case SKIN_VOLUME:
-			return &skin->volume;
-		case SKIN_BALANCE:
-			return &skin->balance;
-		case SKIN_MONOSTEREO:
-			return &skin->monostereo;
-		case SKIN_PLAYPAUSE:
-			return &skin->playpause;
-		case SKIN_NUMBERS:
-			return &skin->numbers;
-		case SKIN_POSBAR:
-			return &skin->posbar;
-		case SKIN_PLEDIT:
-			return &skin->pledit;
-		case SKIN_EQMAIN:
-			return &skin->eqmain;
-		case SKIN_EQ_EX:
-			return &skin->eq_ex;
+		case SKIN_MAIN: return &skin->main;
+		case SKIN_CBUTTONS: return &skin->cbuttons;
+		case SKIN_TITLEBAR: return &skin->titlebar;
+		case SKIN_SHUFREP: return &skin->shufrep;
+		case SKIN_TEXT: return &skin->text;
+		case SKIN_VOLUME: return &skin->volume;
+		case SKIN_BALANCE: return &skin->balance;
+		case SKIN_MONOSTEREO: return &skin->monostereo;
+		case SKIN_PLAYPAUSE: return &skin->playpause;
+		case SKIN_NUMBERS: return &skin->numbers;
+		case SKIN_POSBAR: return &skin->posbar;
+		case SKIN_PLEDIT: return &skin->pledit;
+		case SKIN_EQMAIN: return &skin->eqmain;
+		case SKIN_EQ_EX: return &skin->eq_ex;
 	}
 	g_error("Unable to find skin pixmap");
-
 	return NULL;
 }
 
-GdkBitmap* skin_get_mask(MaskIndex mi, gboolean doublesize, gboolean shaded)
+cairo_region_t* skin_get_mask(MaskIndex mi, gboolean doublesize, gboolean shaded)
 {
-	GdkBitmap *ret = NULL;
-	
+	cairo_region_t *ret = NULL;
 	switch (mi)
 	{
 		case SKIN_MASK_MAIN:
@@ -714,15 +599,12 @@ GdkBitmap* skin_get_mask(MaskIndex mi, gboolean doublesize, gboolean shaded)
 				if (!doublesize)
 				{
 					ret = skin->mask_main;
-					if (!ret)
-						ret = skin->def_mask;
+					if (!ret) ret = skin->def_mask;
 				}
 				else
 				{
 					ret = skin->mask_main_ds;
-					if (!ret)
-						ret = skin->def_mask_ds;
-					break;
+					if (!ret) ret = skin->def_mask_ds;
 				}
 			}
 			else
@@ -730,15 +612,12 @@ GdkBitmap* skin_get_mask(MaskIndex mi, gboolean doublesize, gboolean shaded)
 				if (!doublesize)
 				{
 					ret = skin->mask_shade;
-					if (!ret)
-						ret = skin->def_mask_shade;
+					if (!ret) ret = skin->def_mask_shade;
 				}
 				else
 				{
 					ret = skin->mask_shade_ds;
-					if (!ret)
-						ret = skin->def_mask_shade_ds;
-					break;
+					if (!ret) ret = skin->def_mask_shade_ds;
 				}
 			}
 			break;
@@ -748,14 +627,12 @@ GdkBitmap* skin_get_mask(MaskIndex mi, gboolean doublesize, gboolean shaded)
 				if (!doublesize)
 				{
 					ret = skin->mask_eq;
-					if (!ret)
-						ret = skin->def_mask;
+					if (!ret) ret = skin->def_mask;
 				}
 				else
 				{
 					ret = skin->mask_eq_ds;
-					if (!ret)
-						ret = skin->def_mask_ds;
+					if (!ret) ret = skin->def_mask_ds;
 				}
 			}
 			else
@@ -763,14 +640,12 @@ GdkBitmap* skin_get_mask(MaskIndex mi, gboolean doublesize, gboolean shaded)
 				if (!doublesize)
 				{
 					ret = skin->mask_eq_shade;
-					if (!ret)
-						ret = skin->def_mask_shade;
+					if (!ret) ret = skin->def_mask_shade;
 				}
 				else
 				{
 					ret = skin->mask_eq_shade_ds;
-					if (!ret)
-						ret = skin->def_mask_shade_ds;
+					if (!ret) ret = skin->def_mask_shade_ds;
 				}
 			}
 			break;
@@ -781,40 +656,31 @@ GdkBitmap* skin_get_mask(MaskIndex mi, gboolean doublesize, gboolean shaded)
 GdkColor *get_skin_color(SkinColorIndex si)
 {
 	GdkColor *ret = NULL;
-
 	switch (si)
 	{
 		case SKIN_PLEDIT_NORMAL:
 			ret = skin->pledit_normal;
-			if (!ret)
-				ret = &skin->def_pledit_normal;
+			if (!ret) ret = &skin->def_pledit_normal;
 			break;
 		case SKIN_PLEDIT_CURRENT:
 			ret = skin->pledit_current;
-			if (!ret)
-				ret = &skin->def_pledit_current;
+			if (!ret) ret = &skin->def_pledit_current;
 			break;
 		case SKIN_PLEDIT_NORMALBG:
 			ret = skin->pledit_normalbg;
-			if (!ret)
-				ret = &skin->def_pledit_normalbg;
+			if (!ret) ret = &skin->def_pledit_normalbg;
 			break;
 		case SKIN_PLEDIT_SELECTEDBG:
 			ret = skin->pledit_selectedbg;
-			if (!ret)
-				ret = &skin->def_pledit_selectedbg;
+			if (!ret) ret = &skin->def_pledit_selectedbg;
 			break;
 	        case SKIN_TEXTBG:
-			if (skin->text.pixmap)
-				ret = skin->textbg;
-			else
-				ret = skin->def_textbg;
+			if (skin->text.pixmap) ret = skin->textbg;
+			else ret = skin->def_textbg;
 			break;
 	        case SKIN_TEXTFG:
-			if (skin->text.pixmap)
-				ret = skin->textfg;
-			else
-				ret = skin->def_textfg;
+			if (skin->text.pixmap) ret = skin->textfg;
+			else ret = skin->def_textfg;
 			break;
 	}
 	return ret;
@@ -823,7 +689,6 @@ GdkColor *get_skin_color(SkinColorIndex si)
 void get_skin_viscolor(guchar vis_color[24][3])
 {
 	gint i;
-
 	for (i = 0; i < 24; i++)
 	{
 		vis_color[i][0] = skin->vis_color[i][0];
@@ -832,39 +697,36 @@ void get_skin_viscolor(guchar vis_color[24][3])
 	}
 }
 
-int skin_get_id(void)
-{
-	return skin_current_num;
-}
+int skin_get_id(void) { return skin_current_num; }
 
-void skin_draw_pixmap(GdkDrawable *drawable, cairo_t *gc, SkinIndex si,
+void skin_draw_pixmap(cairo_t *cr, SkinIndex si,
 		      gint xsrc, gint ysrc, gint xdest, gint ydest,
 		      gint width, gint height)
 {
 	SkinPixmap *pixmap = get_skin_pixmap(si);
 	cairo_surface_t *tmp;
 
-	if (pixmap->pixmap != NULL)
-	{
-		if (xsrc > pixmap->current_width || ysrc > pixmap->current_height)
-			return;
-
+	if (pixmap->pixmap != NULL) {
+		if (xsrc > pixmap->current_width || ysrc > pixmap->current_height) return;
 		tmp = pixmap->pixmap;
 		width = MIN(width, pixmap->current_width - xsrc);
 		height = MIN(height, pixmap->current_height - ysrc);
-	}
-	else
+	} else {
 		tmp = pixmap->def_pixmap;
+	}
 
-	gdk_draw_pixmap(drawable, gc, tmp, xsrc, ysrc, xdest, ydest, width, height);
+    cairo_save(cr);
+    cairo_rectangle(cr, xdest, ydest, width, height);
+    cairo_clip(cr);
+    cairo_set_source_surface(cr, tmp, xdest - xsrc, ydest - ysrc);
+    cairo_paint(cr);
+    cairo_restore(cr);
 }
 
-/*
 void skin_get_eq_spline_colors(guint32 (*colors)[19])
 {
 	gint i;
 	cairo_surface_t *pixmap;
-	GtkImage *img;
 
 	if (skin->eqmain.pixmap != NULL &&
 	    skin->eqmain.current_width >= 116 &&
@@ -873,11 +735,14 @@ void skin_get_eq_spline_colors(guint32 (*colors)[19])
 	else
 		pixmap = skin->eqmain.def_pixmap;
 
-	img = gdk_image_get(pixmap, 115, 294, 1, 19);
-	
-	for (i = 0; i < 19; i++)
-		(*colors)[i] = gdk_image_get_pixel(img, 0, i);
-
-	gdk_image_destroy(img);
+    if (cairo_surface_get_type(pixmap) != CAIRO_SURFACE_TYPE_IMAGE) return;
+    
+    cairo_surface_flush(pixmap);
+    unsigned char *data = cairo_image_surface_get_data(pixmap);
+    int stride = cairo_image_surface_get_stride(pixmap);
+    
+	for (i = 0; i < 19; i++) {
+        uint32_t *pixels = (uint32_t *)(data + (294 + i) * stride);
+		(*colors)[i] = pixels[115];
+    }
 }
-*/

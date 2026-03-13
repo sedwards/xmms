@@ -34,25 +34,19 @@ gfloat eqslider_get_position(EqSlider * es)
 	return 20.0 - (((gfloat) es->es_position * 20.0) / 25.0);
 }
 
-void eqslider_draw(Widget * w)
+static void eqslider_draw(EqSlider * es, cairo_t *cr)
 {
-	EqSlider *es = (EqSlider *) w;
-	cairo_surface_t *obj;
-	SkinIndex src;
 	gint frame;
-
-	src = SKIN_EQMAIN;
-	obj = es->es_widget.parent;
 
 	frame = 27 - ((es->es_position * 27) / 50);
 	if (frame < 14)
-		skin_draw_pixmap(obj, es->es_widget.gc, src, (frame * 15) + 13, 164, es->es_widget.x, es->es_widget.y, es->es_widget.width, es->es_widget.height);
+		skin_draw_pixmap(cr, SKIN_EQMAIN, (frame * 15) + 13, 164, es->es_widget.x, es->es_widget.y, es->es_widget.width, es->es_widget.height);
 	else
-		skin_draw_pixmap(obj, es->es_widget.gc, src, ((frame - 14) * 15) + 13, 229, es->es_widget.x, es->es_widget.y, es->es_widget.width, es->es_widget.height);
+		skin_draw_pixmap(cr, SKIN_EQMAIN, ((frame - 14) * 15) + 13, 229, es->es_widget.x, es->es_widget.y, es->es_widget.width, es->es_widget.height);
 	if (es->es_isdragging)
-		skin_draw_pixmap(obj, es->es_widget.gc, src, 0, 176, es->es_widget.x + 1, es->es_widget.y + es->es_position, 11, 11);
+		skin_draw_pixmap(cr, SKIN_EQMAIN, 0, 176, es->es_widget.x + 1, es->es_widget.y + es->es_position, 11, 11);
 	else
-		skin_draw_pixmap(obj, es->es_widget.gc, src, 0, 164, es->es_widget.x + 1, es->es_widget.y + es->es_position, 11, 11);
+		skin_draw_pixmap(cr, SKIN_EQMAIN, 0, 164, es->es_widget.x + 1, es->es_widget.y + es->es_position, 11, 11);
 }
 
 void eqslider_set_mainwin_text(EqSlider * es)
@@ -72,9 +66,8 @@ void eqslider_set_mainwin_text(EqSlider * es)
 	g_free(tmp);
 }
 
-void eqslider_button_press_cb(GtkWidget * w, GdkEventButton * event, gpointer data)
+static void eqslider_button_press_cb(GtkWidget * w, GdkEventButton * event, EqSlider * es)
 {
-	EqSlider *es = (EqSlider *) data;
 	gint y;
 
 	if (inside_widget(event->x, event->y, &es->es_widget))
@@ -119,9 +112,8 @@ void eqslider_button_press_cb(GtkWidget * w, GdkEventButton * event, gpointer da
 	}
 }
 
-void eqslider_motion_cb(GtkWidget * w, GdkEventMotion * event, gpointer data)
+static void eqslider_motion_cb(GtkWidget * w, GdkEventMotion * event, EqSlider * es)
 {
-	EqSlider *es = (EqSlider *) data;
 	gint y;
 
 	y = event->y - es->es_widget.y;
@@ -140,10 +132,8 @@ void eqslider_motion_cb(GtkWidget * w, GdkEventMotion * event, gpointer data)
 	}
 }
 
-void eqslider_button_release_cb(GtkWidget * w, GdkEventButton * event, gpointer data)
+static void eqslider_button_release_cb(GtkWidget * w, GdkEventButton * event, EqSlider * es)
 {
-	EqSlider *es = (EqSlider *) data;
-
 	if (es->es_isdragging)
 	{
 		es->es_isdragging = FALSE;
@@ -152,22 +142,21 @@ void eqslider_button_release_cb(GtkWidget * w, GdkEventButton * event, gpointer 
 	}
 }
 
-EqSlider *create_eqslider(GList ** wlist, cairo_surface_t * parent, cairo_t * gc, gint x, gint y)
+EqSlider *create_eqslider(GList ** wlist, cairo_surface_t * parent, gint x, gint y)
 {
 	EqSlider *es;
 
 	es = (EqSlider *) g_malloc0(sizeof (EqSlider));
 	es->es_widget.parent = parent;
-	es->es_widget.gc = gc;
 	es->es_widget.x = x;
 	es->es_widget.y = y;
 	es->es_widget.width = 14;
 	es->es_widget.height = 63;
 	es->es_widget.visible = TRUE;
-	es->es_widget.button_press_cb = GTK_SIGNAL_FUNC(eqslider_button_press_cb);
-	es->es_widget.button_release_cb = GTK_SIGNAL_FUNC(eqslider_button_release_cb);
-	es->es_widget.motion_cb = GTK_SIGNAL_FUNC(eqslider_motion_cb);
-	es->es_widget.draw = eqslider_draw;
+	es->es_widget.button_press_cb = (void (*) (GtkWidget *, GdkEventButton *, gpointer)) eqslider_button_press_cb;
+	es->es_widget.button_release_cb = (void (*) (GtkWidget *, GdkEventButton *, gpointer)) eqslider_button_release_cb;
+	es->es_widget.motion_cb = (void (*) (GtkWidget *, GdkEventMotion *, gpointer)) eqslider_motion_cb;
+	es->es_widget.draw = (void (*) (void *, cairo_t *)) eqslider_draw;
 	add_widget(wlist, es);
 	return es;
 }

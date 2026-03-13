@@ -49,7 +49,7 @@ void vis_about(int i)
 		((VisPlugin *) node->data)->about();
 }
 
-void vis_configure.act i)
+void vis_configure(int i)
 {
 	GList *node = g_list_nth(vp_data->vis_list, i);
 

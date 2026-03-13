@@ -16,14 +16,13 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 #ifndef EQ_GRAPH_H
-#define EQ_GRAPH_H
+#define	EQ_GRAPH_H
 
 typedef struct
 {
 	Widget eg_widget;
-}
-EqGraph;
+} EqGraph;
 
-EqGraph *create_eqgraph(GList ** wlist, cairo_surface_t * parent, cairo_t * gc, gint x, gint y);
+EqGraph *create_eqgraph(GList ** wlist, cairo_surface_t * parent, gint x, gint y);
 
 #endif

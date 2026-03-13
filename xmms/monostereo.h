@@ -16,17 +16,16 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 #ifndef MONOSTEREO_H
-#define MONOSTEREO_H
+#define	MONOSTEREO_H
 
 typedef struct
 {
 	Widget ms_widget;
-	int ms_num_channels;
+	gint ms_num_channels;
 	SkinIndex ms_skin_index;
-}
-MonoStereo;
+} MonoStereo;
 
-MonoStereo *create_monostereo(GList ** wlist, cairo_surface_t * parent, cairo_t * gc, gint x, gint y, SkinIndex si);
 void monostereo_set_num_channels(MonoStereo * ms, gint nch);
+MonoStereo *create_monostereo(GList ** wlist, cairo_surface_t * parent, gint x, gint y, SkinIndex si);
 
 #endif

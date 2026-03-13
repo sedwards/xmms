@@ -36,7 +36,7 @@ void effect_about(int i)
 	}
 }
 
-void effect_configure.act i)
+void effect_configure(int i)
 {
 	GList *node = g_list_nth(ep_data->effect_list, i);
 	EffectPlugin *effect;

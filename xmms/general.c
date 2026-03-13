@@ -24,7 +24,7 @@ void general_about(int i)
 		((GeneralPlugin *) node->data)->about();
 }
 
-void general_configure.act i)
+void general_configure(int i)
 {
 	GList *node = g_list_nth(gp_data->general_list, i);
 

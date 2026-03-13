@@ -16,17 +16,17 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 #ifndef SBUTTON_H
-#define SBUTTON_H
+#define	SBUTTON_H
 
 typedef struct
 {
 	Widget sb_widget;
-	gint sb_pressed, sb_inside;
-	void (*sb_push_cb) (void);
-}
-SButton;
+	gint xsrc, ysrc, width, height;
+	SkinIndex si;
+	void (*callback) (void);
+	gboolean pressed, inside;
+} SButton;
 
-SButton *create_sbutton(GList ** wlist, cairo_surface_t * parent, cairo_t * gc, gint x, gint y, gint w, gint h, void (*cb) (void));
-void free_sbutton(SButton * b);
+SButton *create_sbutton(GList ** list, cairo_surface_t * parent, gint x, gint y, gint width, gint height, gint xsrc, gint ysrc, SkinIndex si, void (*callback) (void));
 
 #endif

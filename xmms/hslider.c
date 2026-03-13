@@ -32,36 +32,30 @@ gint hslider_get_position(HSlider * hs)
 	return hs->hs_position;
 }
 
-void hslider_draw(Widget * w)
+static void hslider_draw(HSlider * hs, cairo_t *cr)
 {
-	HSlider *hs = (HSlider *) w;
-	cairo_surface_t *obj;
-
-	obj = hs->hs_widget.parent;
-
-	skin_draw_pixmap(obj, hs->hs_widget.gc, hs->hs_skin_index,
+	skin_draw_pixmap(cr, hs->hs_skin_index,
 			 hs->hs_frame_offset, hs->hs_frame * hs->hs_frame_height,
 			 hs->hs_widget.x, hs->hs_widget.y, hs->hs_widget.width,
 			 hs->hs_widget.height);
 	if (hs->hs_pressed)
-		skin_draw_pixmap(obj, hs->hs_widget.gc,
+		skin_draw_pixmap(cr,
 				 hs->hs_skin_index, hs->hs_knob_px,
 				 hs->hs_knob_py, hs->hs_widget.x + hs->hs_position,
 				 hs->hs_widget.y +
 				 ((hs->hs_widget.height - hs->hs_knob_height) / 2),
 				 hs->hs_knob_width, hs->hs_knob_height);
 	else
-		skin_draw_pixmap(obj, hs->hs_widget.gc, hs->hs_skin_index,
-				 hs->hs_knob_nx, hs->hs_knob_ny,
+		skin_draw_pixmap(cr, hs->hs_skin_index, hs->hs_knob_nx,
+				 hs->hs_knob_ny,
 				 hs->hs_widget.x + hs->hs_position,
 				 hs->hs_widget.y +
 				 ((hs->hs_widget.height - hs->hs_knob_height) / 2),
 				 hs->hs_knob_width, hs->hs_knob_height);
 }
 
-void hslider_button_press_cb(GtkWidget * w, GdkEventButton * event, gpointer data)
+static void hslider_button_press_cb(GtkWidget * w, GdkEventButton * event, HSlider * hs)
 {
-	HSlider *hs = (HSlider *) data;
 	gint x;
 
 	if (event->button != 1)
@@ -91,9 +85,8 @@ void hslider_button_press_cb(GtkWidget * w, GdkEventButton * event, gpointer dat
 	}
 }
 
-void hslider_motion_cb(GtkWidget * w, GdkEventMotion * event, gpointer data)
+static void hslider_motion_cb(GtkWidget * w, GdkEventMotion * event, HSlider * hs)
 {
-	HSlider *hs = (HSlider *) data;
 	gint x;
 
 	if (hs->hs_pressed)
@@ -117,10 +110,8 @@ void hslider_motion_cb(GtkWidget * w, GdkEventMotion * event, gpointer data)
 	}
 }
 
-void hslider_button_release_cb(GtkWidget * w, GdkEventButton * event, gpointer data)
+static void hslider_button_release_cb(GtkWidget * w, GdkEventButton * event, HSlider * hs)
 {
-	HSlider *hs = (HSlider *) data;
-
 	if (hs->hs_pressed)
 	{
 		hs->hs_pressed = FALSE;
@@ -130,7 +121,7 @@ void hslider_button_release_cb(GtkWidget * w, GdkEventButton * event, gpointer d
 	}
 }
 
-HSlider *create_hslider(GList ** wlist, cairo_surface_t * parent, cairo_t * gc, gint x,
+HSlider *create_hslider(GList ** wlist, cairo_surface_t * parent, gint x,
 			gint y, gint w, gint h,	gint knx, gint kny, gint kpx,
 			gint kpy, gint kw, gint kh, gint fh, gint fo, gint min,
 			gint max, gint(*fcb) (gint), void (*mcb) (gint),
@@ -140,16 +131,15 @@ HSlider *create_hslider(GList ** wlist, cairo_surface_t * parent, cairo_t * gc, 
 
 	hs = (HSlider *) g_malloc0(sizeof (HSlider));
 	hs->hs_widget.parent = parent;
-	hs->hs_widget.gc = gc;
 	hs->hs_widget.x = x;
 	hs->hs_widget.y = y;
 	hs->hs_widget.width = w;
 	hs->hs_widget.height = h;
 	hs->hs_widget.visible = 1;
-	hs->hs_widget.button_press_cb = GTK_SIGNAL_FUNC(hslider_button_press_cb);
-	hs->hs_widget.button_release_cb = GTK_SIGNAL_FUNC(hslider_button_release_cb);
-	hs->hs_widget.motion_cb = GTK_SIGNAL_FUNC(hslider_motion_cb);
-	hs->hs_widget.draw = hslider_draw;
+	hs->hs_widget.button_press_cb = (void (*) (GtkWidget *, GdkEventButton *, gpointer)) hslider_button_press_cb;
+	hs->hs_widget.button_release_cb = (void (*) (GtkWidget *, GdkEventButton *, gpointer)) hslider_button_release_cb;
+	hs->hs_widget.motion_cb = (void (*) (GtkWidget *, GdkEventMotion *, gpointer)) hslider_motion_cb;
+	hs->hs_widget.draw = (void (*) (void *, cairo_t *)) hslider_draw;
 	hs->hs_knob_nx = knx;
 	hs->hs_knob_ny = kny;
 	hs->hs_knob_px = kpx;

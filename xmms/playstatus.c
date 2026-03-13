@@ -17,33 +17,28 @@
  */
 #include "xmms.h"
 
-void playstatus_draw(Widget * w)
+static void playstatus_draw(PlayStatus * ps, cairo_t *cr)
 {
-	PlayStatus *ps = (PlayStatus *) w;
-	cairo_surface_t *obj;
-
-	obj = ps->ps_widget.parent;
-
 	if (ps->ps_status == STATUS_PLAY)
-		skin_draw_pixmap(obj, ps->ps_widget.gc, SKIN_PLAYPAUSE,
+		skin_draw_pixmap(cr, SKIN_PLAYPAUSE,
 				 36, 0, ps->ps_widget.x, ps->ps_widget.y, 3, 9);
 	else
-		skin_draw_pixmap(obj, ps->ps_widget.gc, SKIN_PLAYPAUSE,
+		skin_draw_pixmap(cr, SKIN_PLAYPAUSE,
 				 27, 0, ps->ps_widget.x, ps->ps_widget.y, 2, 9);
 	switch (ps->ps_status)
 	{
 		case STATUS_STOP:
-			skin_draw_pixmap(obj, ps->ps_widget.gc,
+			skin_draw_pixmap(cr,
 					 SKIN_PLAYPAUSE, 18, 0,
 					 ps->ps_widget.x + 2, ps->ps_widget.y, 9, 9);
 			break;
 		case STATUS_PAUSE:
-			skin_draw_pixmap(obj, ps->ps_widget.gc,
+			skin_draw_pixmap(cr,
 					 SKIN_PLAYPAUSE, 9, 0,
 					 ps->ps_widget.x + 2, ps->ps_widget.y, 9, 9);
 			break;
 		case STATUS_PLAY:
-			skin_draw_pixmap(obj, ps->ps_widget.gc,
+			skin_draw_pixmap(cr,
 					 SKIN_PLAYPAUSE, 1, 0,
 					 ps->ps_widget.x + 3, ps->ps_widget.y, 8, 9);
 			break;
@@ -56,19 +51,18 @@ void playstatus_set_status(PlayStatus * ps, PStatus status)
 	draw_widget(ps);
 }
 
-PlayStatus *create_playstatus(GList ** wlist, cairo_surface_t * parent, cairo_t * gc, gint x, gint y)
+PlayStatus *create_playstatus(GList ** wlist, cairo_surface_t * parent, gint x, gint y)
 {
 	PlayStatus *ps;
 
 	ps = g_malloc0(sizeof (PlayStatus));
 	ps->ps_widget.parent = parent;
-	ps->ps_widget.gc = gc;
 	ps->ps_widget.x = x;
 	ps->ps_widget.y = y;
 	ps->ps_widget.width = 11;
 	ps->ps_widget.height = 9;
 	ps->ps_widget.visible = TRUE;
-	ps->ps_widget.draw = playstatus_draw;
+	ps->ps_widget.draw = (void (*) (void *, cairo_t *)) playstatus_draw;
 	add_widget(wlist, ps);
 	return ps;
 }

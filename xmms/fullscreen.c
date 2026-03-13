@@ -17,9 +17,8 @@
  */
 #include <config.h>
 #include "xmms.h"
-#include "libxmms/util.h"
 
-gboolean xmms_fullscreen_available(Display * dpy)
+gboolean xmms_fullscreen_available(void * dpy)
 {
 	return FALSE;
 }
@@ -63,7 +62,3 @@ void xmms_fullscreen_modelist_free(GSList * modes)
 {
 	return;
 }
-
-#endif
-
-

@@ -63,28 +63,18 @@ float eval_spline(gfloat xa[], gfloat ya[], gfloat y2a[], gint n, gfloat x)
 	return (a * ya[klo] + b * ya[khi] + ((a * a * a - a) * y2a[klo] + (b * b * b - b) * y2a[khi]) * (h * h) / 6.0);
 }
 
-void eqgraph_draw(Widget * w)
+static void eqgraph_draw(EqGraph * eg, cairo_t *cr)
 {
-	EqGraph *eg = (EqGraph *) w;
-	cairo_surface_t *obj;
-	GdkColor col;
 	guint32 cols[19];
 	gint i, y, ymin, ymax, py = 0;
 	gfloat x[] = {0, 11, 23, 35, 47, 59, 71, 83, 97, 109}, yf[10];
 
-	/*
-	 * This avoids the init_spline() function to be inlined.
-	 * Inlining the function caused troubles when compiling with
-	 * `-O' (at least on FreeBSD).
-	 */
-	void (*__init_spline)(gfloat *, gfloat *, gint, gfloat *) =
-	    init_spline;
+	void (*__init_spline)(gfloat *, gfloat *, gint, gfloat *) = init_spline;
 
-	obj = eg->eg_widget.parent;
-	skin_draw_pixmap(obj, eg->eg_widget.gc, SKIN_EQMAIN,
+	skin_draw_pixmap(cr, SKIN_EQMAIN,
 			 0, 294, eg->eg_widget.x, eg->eg_widget.y,
 			 eg->eg_widget.width, eg->eg_widget.height);
-	skin_draw_pixmap(obj, eg->eg_widget.gc, SKIN_EQMAIN,
+	skin_draw_pixmap(cr, SKIN_EQMAIN,
 			 0, 314, eg->eg_widget.x,
 			 eg->eg_widget.y + 9 + ((cfg.equalizer_preamp * 9) / 20),
 			 eg->eg_widget.width, 1);
@@ -92,48 +82,43 @@ void eqgraph_draw(Widget * w)
 	skin_get_eq_spline_colors(&cols);
 
 	__init_spline(x, cfg.equalizer_bands, 10, yf);
+    
+    cairo_save(cr);
+    cairo_set_line_width(cr, 1.0);
+    
 	for (i = 0; i < 109; i++)
 	{
 		y = 9 - (gint) ((eval_spline(x, cfg.equalizer_bands, yf, 10, i) * 9.0) / 20.0);
-		if (y < 0)
-			y = 0;
-		if (y > 18)
-			y = 18;
-		if (!i)
-			py = y;
-		if (y < py)
-		{
-			ymin = y;
-			ymax = py;
-		}
-		else
-		{
-			ymin = py;
-			ymax = y;
-		}
+		if (y < 0) y = 0;
+		if (y > 18) y = 18;
+		if (!i) py = y;
+		if (y < py) { ymin = y; ymax = py; }
+		else { ymin = py; ymax = y; }
 		py = y;
+        
 		for (y = ymin; y <= ymax; y++)
 		{
-			col.pixel = cols[y];
-			gdk_gc_set_foreground(eg->eg_widget.gc, &col);
-			gdk_draw_point(obj, eg->eg_widget.gc, eg->eg_widget.x + i + 2, eg->eg_widget.y + y);
+            uint32_t p = cols[y];
+            cairo_set_source_rgb(cr, ((p >> 16) & 0xff)/255.0, ((p >> 8) & 0xff)/255.0, (p & 0xff)/255.0);
+            cairo_rectangle(cr, eg->eg_widget.x + i + 2, eg->eg_widget.y + y, 1, 1);
+            cairo_fill(cr);
 		}
 	}
+    cairo_restore(cr);
 }
 
-EqGraph *create_eqgraph(GList ** wlist, cairo_surface_t * parent, cairo_t * gc, gint x, gint y)
+EqGraph *create_eqgraph(GList ** wlist, cairo_surface_t * parent, gint x, gint y)
 {
 	EqGraph *eg;
 
 	eg = (EqGraph *) g_malloc0(sizeof (EqGraph));
 	eg->eg_widget.parent = parent;
-	eg->eg_widget.gc = gc;
 	eg->eg_widget.x = x;
 	eg->eg_widget.y = y;
 	eg->eg_widget.width = 113;
 	eg->eg_widget.height = 19;
 	eg->eg_widget.visible = TRUE;
-	eg->eg_widget.draw = eqgraph_draw;
+	eg->eg_widget.draw = (void (*) (void *, cairo_t *)) eqgraph_draw;
 	add_widget(wlist, eg);
 	return eg;
 }

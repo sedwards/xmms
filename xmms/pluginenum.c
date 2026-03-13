@@ -38,7 +38,7 @@
 
 gchar *plugin_dir_list[] =
 {
-	PLUGINSUBS,
+	PLUGIN_DIR,
 	NULL
 };
 

@@ -21,19 +21,36 @@
 GtkWidget *skinwin, *skinwin_list, *skinwin_close;
 GList *skinlist = NULL;
 
+enum {
+    COLUMN_NAME = 0,
+    NUM_COLUMNS
+};
+
 gint skinwin_delete_event(GtkWidget * widget, GdkEvent * event, gpointer data)
 {
 	gtk_widget_hide(skinwin);
 	return (TRUE);
 }
 
-void change_skin_event(GtkWidget * widget, gint row, gint column, GdkEventButton * event)
+static void change_skin_event(GtkTreeSelection *selection, gpointer data)
 {
-	if (row == 0)
-		load_skin(NULL);
-	else
-		load_skin(((struct SkinNode *) g_list_nth(skinlist, row - 1)->data)->path);
+    GtkTreeIter iter;
+    GtkTreeModel *model;
+    gint row = 0;
 
+    if (gtk_tree_selection_get_selected(selection, &model, &iter))
+    {
+        GtkTreePath *path = gtk_tree_model_get_path(model, &iter);
+        gint *indices = gtk_tree_path_get_indices(path);
+        if (indices)
+            row = indices[0];
+        gtk_tree_path_free(path);
+
+        if (row == 0)
+            load_skin(NULL);
+        else
+            load_skin(((struct SkinNode *) g_list_nth(skinlist, row - 1)->data)->path);
+    }
 }
 
 static void enable_random_skin_event(GtkWidget * widget, gpointer data)
@@ -43,49 +60,58 @@ static void enable_random_skin_event(GtkWidget * widget, gpointer data)
 
 void create_skin_window(void)
 {
-	char *titles[1];
 	GtkWidget *vbox, *hbox, *main_hbox, *separator, *scrolled_win, *checkbox;
+    GtkListStore *store;
+    GtkCellRenderer *renderer;
+    GtkTreeViewColumn *column;
+    GtkTreeSelection *selection;
 
-	skinwin = gtk_window_new(GTK_WINDOW_DIALOG);
+	skinwin = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 	gtk_window_set_title(GTK_WINDOW(skinwin), _("Skin selector"));
 	gtk_window_set_transient_for(GTK_WINDOW(skinwin), GTK_WINDOW(mainwin));
-	gtk_signal_connect(GTK_OBJECT(skinwin), "delete_event", GTK_SIGNAL_FUNC(skinwin_delete_event), NULL);
-	gtk_container_border_width(GTK_CONTAINER(skinwin), 10);
+	g_signal_connect(skinwin, "delete_event", G_CALLBACK(skinwin_delete_event), NULL);
+	gtk_container_set_border_width(GTK_CONTAINER(skinwin), 10);
 
-	vbox = gtk_vbox_new(FALSE, 5);
+	vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 5);
 	gtk_container_add(GTK_CONTAINER(skinwin), vbox);
 
-	titles[0] = _("Skins");
-	skinwin_list = gtk_clist_new_with_titles(1, titles);
-	gtk_clist_column_titles_passive(GTK_CLIST(skinwin_list));
-	gtk_clist_set_selection_mode(GTK_CLIST(skinwin_list), GTK_SELECTION_SINGLE);
-	gtk_signal_connect(GTK_OBJECT(skinwin_list), "select_row", GTK_SIGNAL_FUNC(change_skin_event), NULL);
-	gtk_widget_set_usize(skinwin_list, 250, 200);
+    store = gtk_list_store_new(NUM_COLUMNS, G_TYPE_STRING);
+    skinwin_list = gtk_tree_view_new_with_model(GTK_TREE_MODEL(store));
+    g_object_unref(store);
+    
+    renderer = gtk_cell_renderer_text_new();
+    column = gtk_tree_view_column_new_with_attributes(_("Skins"), renderer, "text", COLUMN_NAME, NULL);
+    gtk_tree_view_append_column(GTK_TREE_VIEW(skinwin_list), column);
+
+    selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(skinwin_list));
+    gtk_tree_selection_set_mode(selection, GTK_SELECTION_SINGLE);
+    g_signal_connect(selection, "changed", G_CALLBACK(change_skin_event), NULL);
+
+	gtk_widget_set_size_request(skinwin_list, 250, 200);
 	scrolled_win = gtk_scrolled_window_new(NULL, NULL);
 	gtk_container_add(GTK_CONTAINER(scrolled_win), skinwin_list);
-	gtk_container_border_width(GTK_CONTAINER(scrolled_win), 5);
+	gtk_container_set_border_width(GTK_CONTAINER(scrolled_win), 5);
 	gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrolled_win), GTK_POLICY_AUTOMATIC, GTK_POLICY_ALWAYS);
 	gtk_box_pack_start(GTK_BOX(vbox), scrolled_win, TRUE, TRUE, 0);
 
-	separator = gtk_hseparator_new();
+	separator = gtk_separator_new(GTK_ORIENTATION_HORIZONTAL);
 	gtk_box_pack_start(GTK_BOX(vbox), separator, FALSE, TRUE, 0);
 
-	main_hbox = gtk_hbox_new(FALSE,5);
-	gtk_box_set_spacing(GTK_BOX(main_hbox),5);
+	main_hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 5);
 	gtk_box_pack_start(GTK_BOX(vbox), main_hbox, FALSE, FALSE, 0);
 
 	checkbox = gtk_check_button_new_with_label(_("Select random skin on play"));
 	gtk_box_pack_start(GTK_BOX(main_hbox), checkbox, FALSE, FALSE, 0);
 	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(checkbox), cfg.random_skin_on_play);
-	gtk_signal_connect(GTK_OBJECT(checkbox), "toggled", GTK_SIGNAL_FUNC(enable_random_skin_event), NULL);
+	g_signal_connect(checkbox, "toggled", G_CALLBACK(enable_random_skin_event), NULL);
 
-	hbox = gtk_hbutton_box_new();
+	hbox = gtk_button_box_new(GTK_ORIENTATION_HORIZONTAL);
 	gtk_button_box_set_layout(GTK_BUTTON_BOX(hbox), GTK_BUTTONBOX_END);
-	gtk_button_box_set_spacing(GTK_BUTTON_BOX(hbox), 5);
+	gtk_box_set_spacing(GTK_BOX(hbox), 5);
 	gtk_box_pack_start(GTK_BOX(main_hbox), hbox, TRUE, TRUE, 0);
 	skinwin_close = gtk_button_new_with_label(_("Close"));
-	GTK_WIDGET_SET_FLAGS(skinwin_close, GTK_CAN_DEFAULT);
-	gtk_signal_connect(GTK_OBJECT(skinwin_close), "clicked", GTK_SIGNAL_FUNC(skinwin_delete_event), NULL);
+	gtk_widget_set_can_default(skinwin_close, TRUE);
+	g_signal_connect(skinwin_close, "clicked", G_CALLBACK(skinwin_delete_event), NULL);
 	gtk_box_pack_start(GTK_BOX(hbox), skinwin_close, FALSE, FALSE, 0);
 	gtk_widget_grab_default(skinwin_close);
 }
@@ -191,6 +217,8 @@ void scan_skins(void)
 	GList *entry;
 	char *none, *str, *skinsdir;
 	gchar **list;
+    GtkListStore *store;
+    GtkTreeIter iter;
 
 	none = _("(none)");
 	if (skinlist)
@@ -215,21 +243,31 @@ void scan_skins(void)
 			scan_skindir(list[i++]);
 	}
 
-	gtk_clist_freeze(GTK_CLIST(skinwin_list));
-	gtk_clist_clear(GTK_CLIST(skinwin_list));
-	gtk_clist_append(GTK_CLIST(skinwin_list), &none);
-	if (!skin->path)
-		gtk_clist_select_row(GTK_CLIST(skinwin_list), 0, 0);
+    store = GTK_LIST_STORE(gtk_tree_view_get_model(GTK_TREE_VIEW(skinwin_list)));
+    gtk_list_store_clear(store);
+
+    gtk_list_store_append(store, &iter);
+    gtk_list_store_set(store, &iter, COLUMN_NAME, none, -1);
+    
+    if (!skin->path)
+    {
+        GtkTreeSelection *selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(skinwin_list));
+        gtk_tree_selection_select_iter(selection, &iter);
+    }
 
 	for (i = 0; i < g_list_length(skinlist); i++)
 	{
 		entry = g_list_nth(skinlist, i);
-		gtk_clist_append(GTK_CLIST(skinwin_list), (gchar **) & ((struct SkinNode *) entry->data)->name);
+        gtk_list_store_append(store, &iter);
+        gtk_list_store_set(store, &iter, COLUMN_NAME, ((struct SkinNode *) entry->data)->name, -1);
+		
 		if (skin->path)
 			if (!strcmp(((struct SkinNode *) entry->data)->path, skin->path))
-				gtk_clist_select_row(GTK_CLIST(skinwin_list), i + 1, 0);
+            {
+                GtkTreeSelection *selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(skinwin_list));
+                gtk_tree_selection_select_iter(selection, &iter);
+            }
 	}
-	gtk_clist_thaw(GTK_CLIST(skinwin_list));
 }
 
 void show_skin_window(void)
@@ -238,9 +276,4 @@ void show_skin_window(void)
 	gtk_window_set_position(GTK_WINDOW(skinwin), GTK_WIN_POS_MOUSE);
 	gtk_widget_show_all(skinwin);
 	gtk_widget_grab_focus(skinwin_list);
-	if (GTK_CLIST(skinwin_list)->selection)
-	{
-		gtk_clist_moveto(GTK_CLIST(skinwin_list), GPOINTER_TO_INT(GTK_CLIST(skinwin_list)->selection->data), 0, 0.5, 0.0);
-		GTK_CLIST(skinwin_list)->focus_row = GPOINTER_TO_INT(GTK_CLIST(skinwin_list)->selection->data);
-	}
 }

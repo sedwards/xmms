@@ -42,7 +42,7 @@ TextBox;
 
 void textbox_set_text(TextBox * tb, gchar * text);
 void textbox_set_scroll(TextBox * tb, gboolean s);
-TextBox *create_textbox(GList ** wlist, cairo_surface_t * parent, cairo_t * gc, gint x, gint y, gint w, gboolean allow_scroll, SkinIndex si);
+TextBox *create_textbox(GList ** wlist, cairo_surface_t * parent, gint x, gint y, gint w, gboolean allow_scroll, SkinIndex si);
 void textbox_set_xfont(TextBox * tb, gboolean use_xfont, gchar *fontname);
 void free_textbox(TextBox * tb);
 

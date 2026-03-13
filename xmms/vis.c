@@ -40,7 +40,6 @@ void vis_timeout_func(Vis * vis, guchar * data)
 		g_timer_elapsed(timer, &micros);
 		if (micros > 14000)
 			g_timer_reset(timer);
-
 	}
 
 	if (cfg.vis_type == VIS_ANALYZER)
@@ -101,7 +100,7 @@ void vis_timeout_func(Vis * vis, guchar * data)
 	{
 		if (!vis->vs_refresh_delay)
 		{
-			vis_draw((Widget *) vis);
+			draw_widget(vis);
 			vis->vs_refresh_delay = vis_redraw_delays[cfg.vis_refresh];
 
 		}
@@ -109,290 +108,126 @@ void vis_timeout_func(Vis * vis, guchar * data)
 	}
 }
 
-void vis_draw(Widget * w)
+static void vis_draw(Vis * vis, cairo_t *cr)
 {
-	Vis *vis = (Vis *) w;
-	gint x, y, h = 0, h2;
+	gint x, y, h = 0, h2, scale;
 	guchar vis_color[24][3];
-	guchar rgb_data[152 * 32], *ptr, c;
-	guint32 colors[24];
-	GdkRgbCmap *cmap;
 
 	if (!vis->vs_widget.visible)
 		return;
 
-	GDK_THREADS_ENTER();
-
 	get_skin_viscolor(vis_color);
-	for (y = 0; y < 24; y++)
-	{
-		colors[y] = vis_color[y][0] << 16 | vis_color[y][1] << 8 | vis_color[y][2];
-	}
-	cmap = gdk_rgb_cmap_new(colors, 24);
+    scale = vis->vs_doublesize ? 2 : 1;
 
-	if (!vis->vs_doublesize)
-	{
-		memset(rgb_data, 0, 76 * 16);
-		for (y = 1; y < 16; y += 2)
-		{
-			ptr = rgb_data + (y * 76);
-			for (x = 0; x < 76; x += 2, ptr += 2)
-				*ptr = 1;
-		}
-		if (cfg.vis_type == VIS_ANALYZER)
-		{
-			for (x = 0; x < 75; x++)
-			{
-				if (cfg.analyzer_type == ANALYZER_BARS && (x % 4) == 0)
-					h = vis->vs_data[x >> 2];
-				else if (cfg.analyzer_type == ANALYZER_LINES)
-					h = vis->vs_data[x];
-				if (h && (cfg.analyzer_type == ANALYZER_LINES ||
-					  (x % 4) != 3))
-				{
-					ptr = rgb_data + ((16 - h) * 76) + x;
-					switch (cfg.analyzer_mode)
-					{
-						case ANALYZER_NORMAL:
-							for (y = 0; y < h; y++, ptr += 76)
-								*ptr = 18 - h + y;
-							break;
-						case ANALYZER_FIRE:
-							for (y = 0; y < h; y++, ptr += 76)
-								*ptr = y + 2;
-							break;
-						case ANALYZER_VLINES:
-							for (y = 0; y < h; y++, ptr += 76)
-								*ptr = 18 - h;
-							break;
-					}
-				}
-			}
-			if (cfg.analyzer_peaks)
-			{
-				for (x = 0; x < 75; x++)
-				{
-					if (cfg.analyzer_type == ANALYZER_BARS && (x % 4) == 0)
-						h = vis->vs_peak[x >> 2];
-					else if(cfg.analyzer_type == ANALYZER_LINES)
-						h = vis->vs_peak[x];
-					if (h && (cfg.analyzer_type == ANALYZER_LINES || (x % 4) != 3))
-						rgb_data[(16 - h) * 76 + x] = 23;
-				}
-			}
-		}
-		else if (cfg.vis_type == VIS_SCOPE)
-		{
-			for (x = 0; x < 75; x++)
-			{
-				switch (cfg.scope_mode)
-				{
-					case SCOPE_DOT:
-						h = vis->vs_data[x];
-						ptr = rgb_data + ((15 - h) * 76) + x;
-						*ptr = vis_scope_colors[h];
-						break;
-					case SCOPE_LINE:
-						if (x != 74)
-						{
-							h = 15 - vis->vs_data[x];
-							h2 = 15 - vis->vs_data[x + 1];
-							if (h > h2)
-							{
-								y = h;
-								h = h2;
-								h2 = y;
-							}
-							ptr = rgb_data + (h * 76) + x;
-							for (y = h; y <= h2; y++, ptr += 76)
-								*ptr = vis_scope_colors[y - 3];
+    cairo_save(cr);
+    cairo_set_line_width(cr, 1.0);
 
-						}
-						else
-						{
-							h = 15 - vis->vs_data[x];
-							ptr = rgb_data + (h * 76) + x;
-							*ptr = vis_scope_colors[h];
-						}
-						break;
-					case SCOPE_SOLID:
-						h = 15 - vis->vs_data[x];
-						h2 = 9;
-						c = vis_scope_colors[(gint) vis->vs_data[x]];
-						if (h > h2)
-						{
-							y = h;
-							h = h2;
-							h2 = y;
-						}
-						ptr = rgb_data + (h * 76) + x;
-						for (y = h; y <= h2; y++, ptr += 76)
-							*ptr = c;
-						break;
-				}
-			}
-		}
+    /* Background pattern */
+    cairo_set_source_rgb(cr, 0, 0, 0);
+    cairo_rectangle(cr, vis->vs_widget.x, vis->vs_widget.y, vis->vs_widget.width * scale, vis->vs_widget.height * scale);
+    cairo_fill(cr);
 
-		gdk_draw_indexed_image(vis->vs_window, vis->vs_widget.gc, vis->vs_widget.x, vis->vs_widget.y, vis->vs_widget.width, vis->vs_widget.height, GDK_RGB_DITHER_NORMAL, (guchar *) rgb_data, 76, cmap);
-	}
-	else
-	{
-		memset(rgb_data, 0, 152 * 32);
-		for (y = 1; y < 16; y += 2)
-		{
-			ptr = rgb_data + (y * 304);
-			for (x = 0; x < 76; x += 2, ptr += 4)
-			{
-				*ptr = 1;
-				*(ptr + 1) = 1;
-				*(ptr + 152) = 1;
-				*(ptr + 153) = 1;
-			}
-		}
-		if (cfg.vis_type == VIS_ANALYZER)
-		{
-			for (x = 0; x < 75; x++)
-			{
-				if (cfg.analyzer_type == ANALYZER_BARS && (x % 4) == 0)
-					h = vis->vs_data[x >> 2];	
-				else if (cfg.analyzer_type == ANALYZER_LINES)
-					h = vis->vs_data[x];
-				if (h && (cfg.analyzer_type == ANALYZER_LINES || (x % 4) != 3))
-				{
-					ptr = rgb_data + ((16 - h) * 304) + (x << 1);
-					switch (cfg.analyzer_mode)
-					{
-						case ANALYZER_NORMAL:
-							for (y = 0; y < h; y++, ptr += 304)
-							{
-								*ptr = 18 - h + y;
-								*(ptr + 1) = 18 - h + y;
-								*(ptr + 152) = 18 - h + y;
-								*(ptr + 153) = 18 - h + y;
-							}
-							break;
-						case ANALYZER_FIRE:
-							for (y = 0; y < h; y++, ptr += 304)
-							{
-								*ptr = y + 2;
-								*(ptr + 1) = y + 2;
-								*(ptr + 152) = y + 2;
-								*(ptr + 153) = y + 2;
-							}
-							break;
-						case ANALYZER_VLINES:
-							for (y = 0; y < h; y++, ptr += 304)
-							{
-								*ptr = 18 - h;
-								*(ptr + 1) = 18 - h;
-								*(ptr + 152) = 18 - h;
-								*(ptr + 153) = 18 - h;
-							}
+    for (y = scale; y < 16 * scale; y += 2 * scale) {
+        cairo_set_source_rgb(cr, vis_color[1][0]/255.0, vis_color[1][1]/255.0, vis_color[1][2]/255.0);
+        for (x = 0; x < 76 * scale; x += 2 * scale) {
+            cairo_rectangle(cr, vis->vs_widget.x + x, vis->vs_widget.y + y, scale, scale);
+            cairo_fill(cr);
+        }
+    }
 
-							break;
-					}
-
-				}
-			}
-			if (cfg.analyzer_peaks)
-			{
-
-				for (x = 0; x < 75; x++)
-				{
-					if (cfg.analyzer_type == ANALYZER_BARS && (x % 4) == 0)
-						h = vis->vs_peak[x >> 2];
-					else if (cfg.analyzer_type == ANALYZER_LINES)
-						h = vis->vs_peak[x];
-
-					if (h && (cfg.analyzer_type == ANALYZER_LINES || (x % 4) != 3))
-					{
-						ptr = rgb_data + (16 - h) * 304 + (x << 1);
-						*ptr = 23;
-						*(ptr + 1) = 23;
-						*(ptr + 152) = 23;
-						*(ptr + 153) = 23;
-					}
-				}
-			}
-		}
-		else if (cfg.vis_type == VIS_SCOPE)
-		{
-			for (x = 0; x < 75; x++)
-			{
-				switch (cfg.scope_mode)
-				{
-					case SCOPE_DOT:
-						h = vis->vs_data[x];
-						ptr = rgb_data + ((15 - h) * 304) + (x << 1);
-						*ptr = vis_scope_colors[h];
-						*(ptr + 1) = vis_scope_colors[h];
-						*(ptr + 152) = vis_scope_colors[h];
-						*(ptr + 153) = vis_scope_colors[h];
-						break;
-					case SCOPE_LINE:
-						if (x != 74)
-						{
-							h = 15 - vis->vs_data[x];
-							h2 = 15 - vis->vs_data[x + 1];
-							if (h > h2)
-							{
-								y = h;
-								h = h2;
-								h2 = y;
-							}
-							ptr = rgb_data + (h * 304) + (x << 1);
-							for (y = h; y <= h2; y++, ptr += 304)
-							{
-								*ptr = vis_scope_colors[y - 3];
-								*(ptr + 1) = vis_scope_colors[y - 3];
-								*(ptr + 152) = vis_scope_colors[y - 3];
-								*(ptr + 153) = vis_scope_colors[y - 3];
-							}
-						}
-						else
-						{
-							h = 15 - vis->vs_data[x];
-							ptr = rgb_data + (h * 304) + (x << 1);
-							*ptr = vis_scope_colors[h];
-							*(ptr + 1) = vis_scope_colors[h];
-							*(ptr + 152) = vis_scope_colors[h];
-							*(ptr + 153) = vis_scope_colors[h];
-						}
-						break;
-					case SCOPE_SOLID:
-						h = 15 - vis->vs_data[x];
-						h2 = 9;
-						c = vis_scope_colors[(gint) vis->vs_data[x]];
-						if (h > h2)
-						{
-							y = h;
-							h = h2;
-							h2 = y;
-						}
-						ptr = rgb_data + (h * 304) + (x << 1);
-						for (y = h; y <= h2; y++, ptr += 304)
-						{
-							*ptr = c;
-							*(ptr + 1) = c;
-							*(ptr + 152) = c;
-							*(ptr + 153) = c;
-						}
-						break;
-				}
-			}
-		}
-
-		gdk_draw_indexed_image(vis->vs_window, vis->vs_widget.gc, vis->vs_widget.x << 1, vis->vs_widget.y << 1, vis->vs_widget.width << 1, vis->vs_widget.height << 1, GDK_RGB_DITHER_NONE, (guchar *) rgb_data, 152, cmap);
-	}
-	gdk_rgb_cmap_free(cmap);
-	GDK_THREADS_LEAVE();
-
+    if (cfg.vis_type == VIS_ANALYZER)
+    {
+        for (x = 0; x < 75; x++)
+        {
+            if (cfg.analyzer_type == ANALYZER_BARS && (x % 4) == 0)
+                h = vis->vs_data[x >> 2];
+            else if (cfg.analyzer_type == ANALYZER_LINES)
+                h = vis->vs_data[x];
+            
+            if (h && (cfg.analyzer_type == ANALYZER_LINES || (x % 4) != 3))
+            {
+                for (y = 0; y < h; y++) {
+                    int color_idx = 0;
+                    switch (cfg.analyzer_mode)
+                    {
+                        case ANALYZER_NORMAL: color_idx = 18 - h + y; break;
+                        case ANALYZER_FIRE: color_idx = y + 2; break;
+                        case ANALYZER_VLINES: color_idx = 18 - h; break;
+                    }
+                    cairo_set_source_rgb(cr, vis_color[color_idx][0]/255.0, vis_color[color_idx][1]/255.0, vis_color[color_idx][2]/255.0);
+                    cairo_rectangle(cr, vis->vs_widget.x + x * scale, vis->vs_widget.y + (16 - h + y) * scale, scale, scale);
+                    cairo_fill(cr);
+                }
+            }
+        }
+        if (cfg.analyzer_peaks)
+        {
+            cairo_set_source_rgb(cr, vis_color[23][0]/255.0, vis_color[23][1]/255.0, vis_color[23][2]/255.0);
+            for (x = 0; x < 75; x++)
+            {
+                if (cfg.analyzer_type == ANALYZER_BARS && (x % 4) == 0)
+                    h = vis->vs_peak[x >> 2];
+                else if(cfg.analyzer_type == ANALYZER_LINES)
+                    h = vis->vs_peak[x];
+                if (h && (cfg.analyzer_type == ANALYZER_LINES || (x % 4) != 3)) {
+                    cairo_rectangle(cr, vis->vs_widget.x + x * scale, vis->vs_widget.y + (16 - h) * scale, scale, scale);
+                    cairo_fill(cr);
+                }
+            }
+        }
+    }
+    else if (cfg.vis_type == VIS_SCOPE)
+    {
+        for (x = 0; x < 75; x++)
+        {
+            int color_idx;
+            switch (cfg.scope_mode)
+            {
+                case SCOPE_DOT:
+                    h = vis->vs_data[x];
+                    color_idx = vis_scope_colors[h];
+                    cairo_set_source_rgb(cr, vis_color[color_idx][0]/255.0, vis_color[color_idx][1]/255.0, vis_color[color_idx][2]/255.0);
+                    cairo_rectangle(cr, vis->vs_widget.x + x * scale, vis->vs_widget.y + (15 - h) * scale, scale, scale);
+                    cairo_fill(cr);
+                    break;
+                case SCOPE_LINE:
+                    h = 15 - vis->vs_data[x];
+                    if (x != 74) {
+                        h2 = 15 - vis->vs_data[x + 1];
+                        if (h > h2) { int tmp = h; h = h2; h2 = tmp; }
+                        for (y = h; y <= h2; y++) {
+                            color_idx = vis_scope_colors[y - 3];
+                            cairo_set_source_rgb(cr, vis_color[color_idx][0]/255.0, vis_color[color_idx][1]/255.0, vis_color[color_idx][2]/255.0);
+                            cairo_rectangle(cr, vis->vs_widget.x + x * scale, vis->vs_widget.y + y * scale, scale, scale);
+                            cairo_fill(cr);
+                        }
+                    } else {
+                        color_idx = vis_scope_colors[h];
+                        cairo_set_source_rgb(cr, vis_color[color_idx][0]/255.0, vis_color[color_idx][1]/255.0, vis_color[color_idx][2]/255.0);
+                        cairo_rectangle(cr, vis->vs_widget.x + x * scale, vis->vs_widget.y + h * scale, scale, scale);
+                        cairo_fill(cr);
+                    }
+                    break;
+                case SCOPE_SOLID:
+                    h = 15 - vis->vs_data[x];
+                    h2 = 9;
+                    color_idx = vis_scope_colors[(gint) vis->vs_data[x]];
+                    if (h > h2) { int tmp = h; h = h2; h2 = tmp; }
+                    cairo_set_source_rgb(cr, vis_color[color_idx][0]/255.0, vis_color[color_idx][1]/255.0, vis_color[color_idx][2]/255.0);
+                    for (y = h; y <= h2; y++) {
+                        cairo_rectangle(cr, vis->vs_widget.x + x * scale, vis->vs_widget.y + y * scale, scale, scale);
+                        cairo_fill(cr);
+                    }
+                    break;
+            }
+        }
+    }
+    cairo_restore(cr);
 }
 
 void vis_clear_data(Vis * vis)
 {
 	gint i;
-
 	for (i = 0; i < 75; i++)
 	{
 		vis->vs_data[i] = (cfg.vis_type == VIS_SCOPE) ? 6 : 0;
@@ -407,10 +242,8 @@ void vis_set_doublesize(Vis * vis, gboolean doublesize)
 
 void vis_clear(Vis * vis)
 {
-	if (!vis->vs_doublesize)
-		gdk_window_clear_area(vis->vs_window, vis->vs_widget.x, vis->vs_widget.y, vis->vs_widget.width, vis->vs_widget.height);
-	else
-		gdk_window_clear_area(vis->vs_window, vis->vs_widget.x << 1, vis->vs_widget.y << 1, vis->vs_widget.width << 1, vis->vs_widget.height << 1);
+    /* Handled by draw_widget marking it for redraw */
+    draw_widget(vis);
 }
 
 void vis_set_window(Vis * vis, GdkWindow * window)
@@ -425,13 +258,13 @@ Vis *create_vis(GList ** wlist, cairo_surface_t * parent, GdkWindow * window, ca
 	vis = (Vis *) g_malloc0(sizeof (Vis));
 	vis->vs_widget.parent = parent;
 	vis->vs_window = window;
-	vis->vs_widget.gc = gc;
 	vis->vs_widget.x = x;
 	vis->vs_widget.y = y;
 	vis->vs_widget.width = width;
 	vis->vs_widget.height = 16;
 	vis->vs_widget.visible = 1;
 	vis->vs_doublesize = doublesize;
+    vis->vs_widget.draw = (void (*) (void *, cairo_t *)) vis_draw;
 	add_widget(wlist, vis);
 	return vis;
 }

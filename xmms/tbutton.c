@@ -17,59 +17,42 @@
  */
 #include "xmms.h"
 
-void tbutton_draw(Widget * w)
+static void tbutton_draw(TButton * button, cairo_t *cr)
 {
-	TButton *button = (TButton *) w;
-	cairo_surface_t *obj;
-
-	obj = button->tb_widget.parent;
+    gint xsrc, ysrc;
 
 	if (button->tb_pressed && button->tb_inside)
 	{
 		if (button->tb_selected)
 		{
-			skin_draw_pixmap(obj, button->tb_widget.gc,
-					 button->tb_skin_index,
-					 button->tb_psx, button->tb_psy,
-					 button->tb_widget.x, button->tb_widget.y,
-					 button->tb_widget.width,
-					 button->tb_widget.height);
+            xsrc = button->tb_psx;
+            ysrc = button->tb_psy;
 		}
 		else
 		{
-			skin_draw_pixmap(obj, button->tb_widget.gc,
-					 button->tb_skin_index,
-					 button->tb_pux, button->tb_puy,
-					 button->tb_widget.x, button->tb_widget.y,
-					 button->tb_widget.width,
-					 button->tb_widget.height);
+            xsrc = button->tb_pux;
+            ysrc = button->tb_puy;
 		}
 	}
 	else
 	{
 		if (button->tb_selected)
 		{
-			skin_draw_pixmap(obj, button->tb_widget.gc,
-					 button->tb_skin_index,
-					 button->tb_nsx, button->tb_nsy,
-					 button->tb_widget.x, button->tb_widget.y,
-					 button->tb_widget.width,
-					 button->tb_widget.height);
+            xsrc = button->tb_nsx;
+            ysrc = button->tb_nsy;
 		}
 		else
 		{
-			skin_draw_pixmap(obj, button->tb_widget.gc,
-					 button->tb_skin_index,
-					 button->tb_nux, button->tb_nuy,
-					 button->tb_widget.x, button->tb_widget.y,
-					 button->tb_widget.width,
-					 button->tb_widget.height);
-
+            xsrc = button->tb_nux;
+            ysrc = button->tb_nuy;
 		}
 	}
+    skin_draw_pixmap(cr, button->tb_skin_index, xsrc, ysrc, 
+                     button->tb_widget.x, button->tb_widget.y, 
+                     button->tb_widget.width, button->tb_widget.height);
 }
 
-void tbutton_button_press_cb(GtkWidget * widget, GdkEventButton * event, TButton * button)
+static void tbutton_button_press_cb(GtkWidget * widget, GdkEventButton * event, TButton * button)
 {
 	if (event->button != 1)
 		return;
@@ -81,7 +64,7 @@ void tbutton_button_press_cb(GtkWidget * widget, GdkEventButton * event, TButton
 	}
 }
 
-void tbutton_button_release_cb(GtkWidget * widget, GdkEventButton * event, TButton * button)
+static void tbutton_button_release_cb(GtkWidget * widget, GdkEventButton * event, TButton * button)
 {
 	if (event->button != 1)
 		return;
@@ -97,7 +80,7 @@ void tbutton_button_release_cb(GtkWidget * widget, GdkEventButton * event, TButt
 		button->tb_pressed = 0;
 }
 
-void tbutton_motion_cb(GtkWidget * widget, GdkEventMotion * event, TButton * button)
+static void tbutton_motion_cb(GtkWidget * widget, GdkEventMotion * event, TButton * button)
 {
 	int inside;
 
@@ -111,7 +94,7 @@ void tbutton_motion_cb(GtkWidget * widget, GdkEventMotion * event, TButton * but
 	}
 }
 
-TButton *create_tbutton(GList ** wlist, cairo_surface_t * parent, cairo_t * gc, gint x, gint y, gint w, gint h,
+TButton *create_tbutton(GList ** wlist, cairo_surface_t * parent, gint x, gint y, gint w, gint h,
 			gint nux, gint nuy, gint pux, gint puy, gint nsx, gint nsy, gint psx, gint psy,
 			void (*cb) (gboolean), SkinIndex si)
 {
@@ -119,16 +102,15 @@ TButton *create_tbutton(GList ** wlist, cairo_surface_t * parent, cairo_t * gc, 
 
 	b = (TButton *) g_malloc0(sizeof (TButton));
 	b->tb_widget.parent = parent;
-	b->tb_widget.gc = gc;
 	b->tb_widget.x = x;
 	b->tb_widget.y = y;
 	b->tb_widget.width = w;
 	b->tb_widget.height = h;
 	b->tb_widget.visible = 1;
-	b->tb_widget.button_press_cb = GTK_SIGNAL_FUNC(tbutton_button_press_cb);
-	b->tb_widget.button_release_cb = GTK_SIGNAL_FUNC(tbutton_button_release_cb);
-	b->tb_widget.motion_cb = GTK_SIGNAL_FUNC(tbutton_motion_cb);
-	b->tb_widget.draw = tbutton_draw;
+	b->tb_widget.button_press_cb = (void (*) (GtkWidget *, GdkEventButton *, gpointer)) tbutton_button_press_cb;
+	b->tb_widget.button_release_cb = (void (*) (GtkWidget *, GdkEventButton *, gpointer)) tbutton_button_release_cb;
+	b->tb_widget.motion_cb = (void (*) (GtkWidget *, GdkEventMotion *, gpointer)) tbutton_motion_cb;
+	b->tb_widget.draw = (void (*) (void *, cairo_t *)) tbutton_draw;
 	b->tb_nux = nux;
 	b->tb_nuy = nuy;
 	b->tb_pux = pux;

@@ -16,26 +16,17 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 #ifndef PBUTTON_H
-#define PBUTTON_H
+#define	PBUTTON_H
 
 typedef struct
 {
 	Widget pb_widget;
 	gint pb_nx, pb_ny, pb_px, pb_py;
-	gboolean pb_pressed, pb_inside, pb_allow_draw;
-	void (*pb_push_cb) (void);
-	SkinIndex pb_skin_index1, pb_skin_index2;
-}
-PButton;
+	SkinIndex si;
+	void (*callback) (void);
+	gboolean pressed, inside;
+} PButton;
 
-/* PORTING
-PButton *create_pbutton(GList ** wlist, cairo_surface_t * parent, cairo_t * gc, gint x, gint y, gint w, gint h, gint nx, gint ny, gint px, gint py, void (*cb) (void), SkinIndex si);
-PButton *create_pbutton_ex(GList ** wlist, cairo_surface_t * parent, cairo_t * gc, gint x, gint y, gint w, gint h, gint nx, gint ny, gint px, gint py, void (*cb) (void), SkinIndex si1, SkinIndex si2);
-*/
-void free_pbutton(PButton * b);
-void pbutton_set_skin_index(PButton *b, SkinIndex si);
-void pbutton_set_skin_index1(PButton *b, SkinIndex si);
-void pbutton_set_skin_index2(PButton *b, SkinIndex si);
-void pbutton_set_button_data(PButton *b, gint nx, gint ny, gint px, gint py);
+PButton *create_pbutton(GList ** list, cairo_surface_t * parent, gint x, gint y, gint width, gint height, gint xsrc, gint ysrc, SkinIndex si, void (*callback) (void));
 
 #endif

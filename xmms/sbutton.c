@@ -17,65 +17,74 @@
  */
 #include "xmms.h"
 
-void sbutton_button_press_cb(GtkWidget * widget, GdkEventButton * event, SButton * button)
+static void sbutton_button_press_cb(GtkWidget * widget, GdkEventButton * event, SButton * b)
 {
-	if (event->button != 1)
-		return;
-	if (inside_widget(event->x, event->y, &button->sb_widget))
+	if (inside_widget(event->x, event->y, b) && event->button == 1)
 	{
-		button->sb_pressed = 1;
-		button->sb_inside = 1;
+		b->pressed = TRUE;
+		draw_widget(b);
 	}
 }
 
-void sbutton_button_release_cb(GtkWidget * widget, GdkEventButton * event, SButton * button)
+static void sbutton_button_release_cb(GtkWidget * widget, GdkEventButton * event, SButton * b)
 {
-	if (event->button != 1)
-		return;
-	if (button->sb_inside && button->sb_pressed)
+	if (b->pressed)
 	{
-		button->sb_inside = 0;
-		if (button->sb_push_cb)
-			button->sb_push_cb();
-	}
-	if (button->sb_pressed)
-		button->sb_pressed = 0;
-}
-
-void sbutton_motion_cb(GtkWidget * widget, GdkEventMotion * event, SButton * button)
-{
-	int inside;
-
-	if (!button->sb_pressed)
-		return;
-	inside = inside_widget(event->x, event->y, &button->sb_widget);
-	if (inside != button->sb_inside)
-	{
-		button->sb_inside = inside;
+		b->pressed = FALSE;
+		if (inside_widget(event->x, event->y, b))
+		{
+			if (b->callback)
+				b->callback();
+		}
+		draw_widget(b);
 	}
 }
 
-SButton *create_sbutton(GList ** wlist, cairo_surface_t * parent, cairo_t * gc, gint x, gint y, gint w, gint h, void (*cb) (void))
+static void sbutton_motion_cb(GtkWidget * widget, GdkEventMotion * event, SButton * b)
+{
+	gboolean p;
+
+	if (b->pressed)
+	{
+		p = inside_widget(event->x, event->y, b);
+		if (p != b->inside)
+		{
+			b->inside = p;
+			draw_widget(b);
+		}
+	}
+}
+
+static void sbutton_draw(SButton * b, cairo_t *cr)
+{
+	gint xsrc;
+
+	xsrc = b->pressed && b->inside ? b->width : 0;
+	skin_draw_pixmap(cr, b->si, xsrc + b->xsrc, b->ysrc, b->sb_widget.x, b->sb_widget.y, b->width, b->height);
+}
+
+SButton *create_sbutton(GList ** list, cairo_surface_t * parent, gint x, gint y, gint width, gint height, gint xsrc, gint ysrc, SkinIndex si, void (*callback) (void))
 {
 	SButton *b;
 
-	b = (SButton *) g_malloc0(sizeof (SButton));
+	b = g_malloc0(sizeof (SButton));
 	b->sb_widget.parent = parent;
-	b->sb_widget.gc = gc;
 	b->sb_widget.x = x;
 	b->sb_widget.y = y;
-	b->sb_widget.width = w;
-	b->sb_widget.height = h;
-	b->sb_widget.visible = 1;
-	b->sb_widget.button_press_cb = GTK_SIGNAL_FUNC(sbutton_button_press_cb);
-	b->sb_widget.button_release_cb = GTK_SIGNAL_FUNC(sbutton_button_release_cb);
-	b->sb_widget.motion_cb = GTK_SIGNAL_FUNC(sbutton_motion_cb);
-	b->sb_push_cb = cb;
-	add_widget(wlist, b);
-	return b;
-}
+	b->sb_widget.width = width;
+	b->sb_widget.height = height;
+	b->sb_widget.visible = TRUE;
+	b->sb_widget.button_press_cb = (void (*) (GtkWidget *, GdkEventButton *, gpointer)) sbutton_button_press_cb;
+	b->sb_widget.button_release_cb = (void (*) (GtkWidget *, GdkEventButton *, gpointer)) sbutton_button_release_cb;
+	b->sb_widget.motion_cb = (void (*) (GtkWidget *, GdkEventMotion *, gpointer)) sbutton_motion_cb;
+	b->sb_widget.draw = (void (*) (void *, cairo_t *)) sbutton_draw;
+	b->xsrc = xsrc;
+	b->ysrc = ysrc;
+	b->si = si;
+	b->callback = callback;
+	b->inside = TRUE;
 
-void free_sbutton(SButton * b)
-{
-	g_free(b);
+	add_widget(list, b);
+
+	return b;
 }

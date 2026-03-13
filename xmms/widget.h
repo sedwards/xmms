@@ -18,23 +18,20 @@
 #ifndef WIDGET_H
 #define	WIDGET_H
 
+#include <gtk/gtk.h>
+#include <cairo.h>
+#include <pthread.h>
+
 typedef struct _Widget
 {
-    /* 1. REPLACE: cairo_surface_t *parent with a Cairo surface */
-    cairo_surface_t *surface; 
-
-    /* 2. REMOVE: cairo_t *gc (Not needed, passed during drawing) */
-
+    cairo_surface_t *parent; 
     gint x, y, width, height, visible;
 
-    /* 3. EVENT CALLBACKS: These remain mostly the same, but 
-          ensure they match GDK 3 event signatures */
     void (*button_press_cb) (GtkWidget *, GdkEventButton *, gpointer);
     void (*button_release_cb) (GtkWidget *, GdkEventButton *, gpointer);
     void (*motion_cb) (GtkWidget *, GdkEventMotion *, gpointer);
 
-    /* 4. DRAW CALLBACK: Must now accept the cairo_t context */
-    void (*draw) (struct _Widget *, cairo_t *cr);
+    void (*draw) (void *, cairo_t *cr);
 
     gboolean redraw;
     pthread_mutex_t mutex;
@@ -47,23 +44,12 @@ void resize_widget(void *w, gint width, gint height);
 void move_widget(void *w, gint x, gint y);
 void draw_widget(void *w);
 void add_widget(GList ** list, void *v);
-/*
-void handle_press_cb(GList * wlist, GtkWidget * widget, GdkEventButton * event);
-void handle_release_cb(GList * wlist, GtkWidget * widget, GdkEventButton * event);
-void handle_motion_cb(GList * wlist, GtkWidget * widget, GdkEventMotion * event);
-void draw_widget_list(GList * wlist, gboolean * redraw, gboolean force);
-void widget_list_change_pixmap(GList * wlist, cairo_surface_t * pixmap);
-*/
 
-/* 1. Events: Keep GdkEvent signatures, but check for GTK 3 coordinate changes */
 void handle_press_cb(GList *wlist, GtkWidget *widget, GdkEventButton *event);
 void handle_release_cb(GList *wlist, GtkWidget *widget, GdkEventButton *event);
 void handle_motion_cb(GList *wlist, GtkWidget *widget, GdkEventMotion *event);
 
-/* 2. Drawing: Pass the cairo_t context provided by the "draw" signal */
 void draw_widget_list(GList *wlist, cairo_t *cr, gboolean *redraw, gboolean force);
-
-/* 3. Pixmaps: Replace cairo_surface_t with cairo_surface_t */
 void widget_list_change_pixmap(GList *wlist, cairo_surface_t *surface);
 
 void clear_widget_list_redraw(GList * wlist);

@@ -16,19 +16,18 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 #ifndef TBUTTON_H
-#define TBUTTON_H
+#define	TBUTTON_H
 
 typedef struct
 {
 	Widget tb_widget;
 	gint tb_nux, tb_nuy, tb_pux, tb_puy, tb_nsx, tb_nsy, tb_psx, tb_psy;
-	gint tb_pressed, tb_inside, tb_selected;
+	gboolean tb_selected, tb_pressed, tb_inside;
 	void (*tb_push_cb) (gboolean);
 	SkinIndex tb_skin_index;
-}
-TButton;
+} TButton;
 
-TButton *create_tbutton(GList ** wlist, cairo_surface_t * parent, cairo_t * gc, gint x, gint y, gint w, gint h,
+TButton *create_tbutton(GList ** wlist, cairo_surface_t * parent, gint x, gint y, gint w, gint h,
 			gint nux, gint nuy, gint pux, gint puy, gint nsx, gint nsy, gint psx, gint psy,
 			void (*cb) (gboolean), SkinIndex si);
 void tbutton_set_toggled(TButton * tb, gboolean toggled);

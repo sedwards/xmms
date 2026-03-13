@@ -36,7 +36,7 @@ extern "C" {
 #endif
 
 //gboolean xmms_fullscreen_available(GtkDisplay *dpy);
-gboolean xmms_fullscreen_available(GdkDisplay *dpy);
+gboolean xmms_fullscreen_available(void *dpy);
 gboolean xmms_fullscreen_init(GtkWidget *win);
 
 gboolean xmms_fullscreen_enter(GtkWidget *win, gint *w, gint *h);

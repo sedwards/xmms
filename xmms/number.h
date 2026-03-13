@@ -1,4 +1,3 @@
-
 /*  XMMS - Cross-platform multimedia player
  *  Copyright (C) 1998-2000  Peter Alm, Mikael Alm, Olle Hallnas, Thomas Nilsson and 4Front Technologies
  *
@@ -17,17 +16,16 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 #ifndef NUMBER_H
-#define NUMBER_H
+#define	NUMBER_H
 
 typedef struct
 {
 	Widget nu_widget;
 	gint nu_number;
 	SkinIndex nu_skin_index;
-}
-Number;
+} Number;
 
 void number_set_number(Number * nu, int number);
-Number *create_number(GList ** wlist, cairo_surface_t * parent, cairo_t * gc, gint x, gint y, SkinIndex si);
+Number *create_number(GList ** wlist, cairo_surface_t * parent, gint x, gint y, SkinIndex si);
 
 #endif

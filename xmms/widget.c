@@ -57,7 +57,6 @@ void draw_widget(void *p)
 	lock_widget(w);
 	w->redraw = TRUE;
 	unlock_widget(w);
-
 }
 
 void add_widget(GList ** list, void *w)
@@ -68,107 +67,73 @@ void add_widget(GList ** list, void *w)
 
 void handle_press_cb(GList * wlist, GtkWidget * widget, GdkEventButton * event)
 {
-	GList *wl;
-
-	wl = wlist;
+	GList *wl = wlist;
 	while (wl)
 	{
-		if (((Widget *) wl->data)->button_press_cb)
-			((Widget *) wl->data)->button_press_cb(widget, event, (Widget *) wl->data);
+		Widget *w = (Widget *) wl->data;
+		if (w->button_press_cb)
+			w->button_press_cb(widget, event, w);
 		wl = wl->next;
 	}
 }
 
 void handle_release_cb(GList * wlist, GtkWidget * widget, GdkEventButton * event)
 {
-	GList *wl;
-
-	wl = wlist;
+	GList *wl = wlist;
 	while (wl)
 	{
-		if (((Widget *) wl->data)->button_release_cb)
-			((Widget *) wl->data)->button_release_cb(widget, event, (Widget *) wl->data);
+		Widget *w = (Widget *) wl->data;
+		if (w->button_release_cb)
+			w->button_release_cb(widget, event, w);
 		wl = wl->next;
 	}
 }
 
 void handle_motion_cb(GList * wlist, GtkWidget * widget, GdkEventMotion * event)
 {
-	GList *wl;
-
-	wl = wlist;
+	GList *wl = wlist;
 	while (wl)
 	{
-		if (((Widget *) wl->data)->motion_cb)
-			((Widget *) wl->data)->motion_cb(widget, event, (Widget *) wl->data);
+		Widget *w = (Widget *) wl->data;
+		if (w->motion_cb)
+			w->motion_cb(widget, event, w);
 		wl = wl->next;
 	}
 }
 
-void draw_widget_list(GList *wlist, cairo_t *cr, gboolean *redraw, gboolean force) {
-    for (GList *l = wlist; l != NULL; l = l->next) {
-        Widget *w = (Widget *)l->data;
-        if (w->visible && (w->redraw || force)) {
-            // Call the new internal draw signature we discussed
-            w->draw(w, cr); 
+void draw_widget_list(GList *wlist, cairo_t *cr, gboolean *redraw, gboolean force)
+{
+    GList *wl = wlist;
+    *redraw = FALSE;
+    while (wl)
+    {
+        Widget *w = (Widget *) wl->data;
+        if (w->visible && (w->redraw || force) && w->draw)
+        {
+            w->draw(w, cr);
             w->redraw = FALSE;
+            *redraw = TRUE;
         }
+        wl = wl->next;
     }
 }
 
-
-/*
-void draw_widget_list(GList * wlist, gboolean * redraw, gboolean force)
+void widget_list_change_pixmap(GList * wlist, cairo_surface_t * surface)
 {
-	/*
-	 * The widget list should be locked before calling this
-	 */
-
-	GList *wl;
-	Widget *w;
-
-	*redraw = FALSE;
-	wl = wlist;
+	GList *wl = wlist;
 	while (wl)
 	{
-		w = (Widget *) wl->data;
-		if ((w->redraw || force) && w->visible && w->draw)
-		{
-			w->draw(w);
-			/*w->redraw=FALSE; */
-			*redraw = TRUE;
-		}
-		wl = wl->next;
-	}
-}
-*/
-
-void widget_list_change_pixmap(GList * wlist, cairo_surface_t * pixmap)
-{
-	GList *wl;
-
-	wl = wlist;
-	while (wl)
-	{
-		((Widget *) wl->data)->parent = pixmap;
+		((Widget *) wl->data)->parent = surface;
 		wl = wl->next;
 	}
 }
 
 void clear_widget_list_redraw(GList * wlist)
 {
-	/*
-	 * The widget list should be locked before calling this
-	 */
-	
-	GList *wl;
-	Widget *w;
-
-	wl = wlist;
+	GList *wl = wlist;
 	while (wl)
 	{
-		w = (Widget *) wl->data;
-		w->redraw = FALSE;
+		((Widget *) wl->data)->redraw = FALSE;
 		wl = wl->next;
 	}
 }
@@ -185,9 +150,7 @@ void unlock_widget(void *w)
 
 void lock_widget_list(GList * wlist)
 {
-	GList *wl;
-
-	wl = wlist;
+	GList *wl = wlist;
 	while (wl)
 	{
 		lock_widget(wl->data);
@@ -197,9 +160,7 @@ void lock_widget_list(GList * wlist)
 
 void unlock_widget_list(GList * wlist)
 {
-	GList *wl;
-
-	wl = wlist;
+	GList *wl = wlist;
 	while (wl)
 	{
 		unlock_widget(wl->data);

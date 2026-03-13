@@ -16,19 +16,17 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 #ifndef EQ_SLIDER_H
-#define EQ_SLIDER_H
+#define	EQ_SLIDER_H
 
 typedef struct
 {
 	Widget es_widget;
-	gint es_position;
+	gint es_position, es_drag_y;
 	gboolean es_isdragging;
-	gint es_drag_y;
-}
-EqSlider;
+} EqSlider;
 
-EqSlider *create_eqslider(GList ** wlist, cairo_surface_t * parent, cairo_t * gc, gint x, gint y);
 void eqslider_set_position(EqSlider * es, gfloat pos);
 gfloat eqslider_get_position(EqSlider * es);
+EqSlider *create_eqslider(GList ** wlist, cairo_surface_t * parent, gint x, gint y);
 
 #endif

@@ -18,19 +18,20 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 #ifndef PLAYLIST_SLIDER_H
-#define PLAYLIST_SLIDER_H
+#define	PLAYLIST_SLIDER_H
 
 typedef struct
 {
 	Widget ps_widget;
-	PlayList_List *ps_list;
+	cairo_surface_t *ps_back_surface;
+	gint ps_prev_y, ps_prev_height;
 	gboolean ps_is_draging;
-	gint ps_drag_y, ps_prev_y, ps_prev_height;
-	GtkImage *ps_back_image;
+	gint ps_drag_y;
 	int ps_skin_id;
+	PlayList_List *ps_list;
 }
 PlaylistSlider;
 
-PlaylistSlider *create_playlistslider(GList ** wlist, cairo_surface_t * parent, cairo_t * gc, gint x, gint y, gint h, PlayList_List * list);
+PlaylistSlider *create_playlistslider(GList ** wlist, cairo_surface_t * parent, gint x, gint y, gint h, PlayList_List * list);
 
 #endif

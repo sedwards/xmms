@@ -16,22 +16,20 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 #ifndef PLAYSTATUS_H
-#define PLAYSTATUS_H
+#define	PLAYSTATUS_H
 
 typedef enum
 {
-	STATUS_STOP, STATUS_PAUSE, STATUS_PLAY
-}
-PStatus;
+	STATUS_STOP, STATUS_PLAY, STATUS_PAUSE
+} PStatus;
 
 typedef struct
 {
 	Widget ps_widget;
 	PStatus ps_status;
-}
-PlayStatus;
+} PlayStatus;
 
 void playstatus_set_status(PlayStatus * ps, PStatus status);
-PlayStatus *create_playstatus(GList ** wlist, cairo_surface_t * parent, cairo_t * gc, gint x, gint y);
+PlayStatus *create_playstatus(GList ** wlist, cairo_surface_t * parent, gint x, gint y);
 
 #endif
