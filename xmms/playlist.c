@@ -763,7 +763,7 @@ gchar *playlist_get_info_text(void)
 	if (playlist_position->title)
 		title = playlist_position->title;
 	else
-		title = g_basename(playlist_position->filename);
+		title = (gchar *)util_basename(playlist_position->filename);
 	
 	if (playlist_position->length != -1)
 		text = g_strdup_printf("%d. %s (%d:%-2.2d)",
@@ -1122,7 +1122,7 @@ gchar * playlist_get_songtitle(gint pos)
 	}
 
 	if (title == NULL)
-		title = g_strdup(g_basename(filename));
+		title = g_strdup((gchar *)util_basename(filename));
 
 	g_free(filename);
 

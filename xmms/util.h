@@ -55,6 +55,8 @@ GArray *string_to_garray(const gchar * str);
 void glist_movedown(GList * list);
 void glist_moveup(GList * list);
 
+const char *util_basename(const char *name);
+
 void util_item_factory_popup(GtkItemFactory * ifactory, guint x, guint y, guint mouse_button, guint32 time);
 void util_item_factory_popup_with_data(GtkItemFactory * ifactory, gpointer data, GDestroyNotify destroy, guint x, guint y, guint mouse_button, guint32 time);
 

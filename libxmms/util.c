@@ -4,6 +4,8 @@
 
 #include <gtk/gtk.h>
 
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+
 #ifdef HAVE_SCHED_H
 #include <sched.h>
 #elif defined HAVE_SYS_SCHED_H
@@ -17,8 +19,7 @@
 #include <sys/time.h>
 #include <time.h>
 #include <unistd.h>
-
-GtkWidget *xmms_show_message(gchar *title, gchar *text, gchar *button_text, gboolean modal, GCallback button_action, gpointer action_data)
+GtkWidget *xmms_show_message(gchar *title, const gchar *text, gchar *button_text, gboolean modal, GCallback button_action, gpointer action_data)
 {
     GtkWidget *dialog, *content_area, *vbox, *label, *action_area, *button;
 
@@ -27,27 +28,22 @@ GtkWidget *xmms_show_message(gchar *title, gchar *text, gchar *button_text, gboo
     gtk_window_set_modal(GTK_WINDOW(dialog), modal);
 
     content_area = gtk_dialog_get_content_area(GTK_DIALOG(dialog));
+    action_area = gtk_dialog_get_action_area(GTK_DIALOG(dialog));
 
-    vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
-    gtk_container_set_border_width(GTK_CONTAINER(vbox), 15);
+    vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 5);
+    gtk_container_set_border_width(GTK_CONTAINER(vbox), 10);
     gtk_box_pack_start(GTK_BOX(content_area), vbox, TRUE, TRUE, 0);
 
     label = gtk_label_new(text);
     gtk_box_pack_start(GTK_BOX(vbox), label, TRUE, TRUE, 0);
 
-    action_area = gtk_dialog_get_action_area(GTK_DIALOG(dialog));
-    gtk_button_box_set_layout(GTK_BUTTON_BOX(action_area), GTK_BUTTONBOX_SPREAD);
-    gtk_container_set_border_width(GTK_CONTAINER(action_area), 5);
-
     button = gtk_button_new_with_label(button_text);
-    
     if (button_action)
         g_signal_connect(button, "clicked", button_action, action_data);
-    
     g_signal_connect_swapped(button, "clicked", G_CALLBACK(gtk_widget_destroy), dialog);
 
     gtk_box_pack_start(GTK_BOX(action_area), button, FALSE, FALSE, 0);
-    
+
     gtk_widget_set_can_default(button, TRUE);
     gtk_widget_grab_default(button);
 
@@ -103,4 +99,15 @@ char *xmms_color_to_hex(GdkColor *color)
 {
     if (!color) return g_strdup("#000000");
     return g_strdup_printf("#%02X%02X%02X", color->red >> 8, color->green >> 8, color->blue >> 8);
+}
+
+const char *util_basename(const char *name)
+{
+	const char *base;
+
+	base = strrchr(name, '/');
+	if (base)
+		return base + 1;
+
+	return name;
 }

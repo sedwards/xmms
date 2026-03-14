@@ -1,6 +1,6 @@
 /*  XMMS - Cross-platform multimedia player
  *  Copyright (C) 1998-2001  Peter Alm, Mikael Alm, Olle Hallnas, Thomas Nilsson and 4Front Technologies
- *  Copyright (C) 1999-2001  Håvard Kvålen
+ *  Copyright (C) 1999-2001  Hï¿½vard Kvï¿½len
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -17,6 +17,7 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 #include "xmms.h"
+#include "libxmms/util.h"
 #include "fft.h"
 #include "libxmms/titlestring.h"
 
@@ -354,7 +355,7 @@ void input_get_song_info(gchar * filename, gchar ** title, gint * length)
 		ext = strrchr(temp, '.');
 		if (ext)
 			*ext = '\0';
-		input->file_name = g_basename(temp);
+		input->file_name = (gchar *)util_basename(temp);
 		input->file_ext = ext ? ext+1 : NULL;
 		input->file_path = temp;
 

@@ -4,6 +4,9 @@
 #include <gtk/gtk.h>
 #include <gdk/gdkkeysyms.h>
 
+/* Suppress deprecated declarations globally for this port */
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+
 /* GTK 3 Compatibility Macros */
 #ifndef GtkObject
 #define GtkObject GObject

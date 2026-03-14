@@ -12,6 +12,8 @@
 
 #include <string.h>
 
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+
 #include "xmms/plugin.h"
 #include "libxmms/configfile.h"
 #include "libxmms/xmmsctrl.h"
@@ -90,15 +92,15 @@ static void cleanup(void)
 
 static void configure_ok_cb(gpointer data)
 {
-	gchar *cmd, *cmd_end;
+	const gchar *cmd, *cmd_end;
 	ConfigFile *cfgfile;
 
 	cmd = gtk_entry_get_text(GTK_ENTRY(cmd_entry));
 	cmd_end = gtk_entry_get_text(GTK_ENTRY(cmd_end_entry));
 
 	cfgfile = xmms_cfg_open_default_file();
-	xmms_cfg_write_string(cfgfile, "song_change", "cmd_line", cmd);
-	xmms_cfg_write_string(cfgfile, "song_change", "cmd_line_end", cmd_end);
+	xmms_cfg_write_string(cfgfile, "song_change", "cmd_line", (gchar *)cmd);
+	xmms_cfg_write_string(cfgfile, "song_change", "cmd_line_end", (gchar *)cmd_end);
 	xmms_cfg_write_default_file(cfgfile);
 	xmms_cfg_free(cfgfile);
 

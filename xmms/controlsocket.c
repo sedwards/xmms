@@ -203,7 +203,7 @@ void *ctrlsocket_func(void *arg)
 		tv.tv_usec = 100000;
 		len = sizeof (saddr);
 		if ((select(ctrl_fd + 1, &set, NULL, NULL, &tv) <= 0) ||
-		    ((fd = accept(ctrl_fd, (struct sockaddr *) &saddr, &len)) == -1))
+		    ((fd = accept(ctrl_fd, (struct sockaddr *) &saddr, (socklen_t *)&len)) == -1))
 			continue;
 
 		pkt = g_malloc0(sizeof (PacketNode));
@@ -244,12 +244,12 @@ void *ctrlsocket_func(void *arg)
 				ctrl_ack_packet(pkt);
 				break;
 			case CMD_GET_VOLUME:
-				input_get_volume(&v[0], &v[1]);
+				input_get_volume((int *)&v[0], (int *)&v[1]);
 				ctrl_write_packet(pkt->fd, v, sizeof (v));
 				ctrl_ack_packet(pkt);
 				break;
 			case CMD_GET_BALANCE:
-				input_get_volume(&v[0], &v[1]);
+				input_get_volume((int *)&v[0], (int *)&v[1]);
 				if (v[0] > v[1])
 					b = -100 + ((v[1] * 100) / v[0]);
 				else if (v[1] > v[0])

@@ -20,58 +20,53 @@
 
 void dock_set_uposition(GtkWidget *widget, gint x, gint y)
 {
-    gtk_widget_set_uposition(widget, x, y);
+    gtk_window_move(GTK_WINDOW(widget), x, y);
 }
 
 GList *dock_add_window(GList *window_list, GtkWidget *window)
 {
+    if (g_list_find(window_list, window)) return window_list;
     return g_list_append(window_list, window);
 }
 
-static void dock_snap(GtkWidget * w, GList *window_list, gint * off_x, gint * off_y)
+static void dock_snap(GtkWidget * w, GList *window_list, gint * nx, gint * ny)
 {
-	gint nx, ny, nw, nh;
+	gint nw, nh;
 	GList *node;
 
-	gdk_window_get_root_origin(gtk_widget_get_window(w), &nx, &ny);
+    if (!gtk_widget_get_window(w)) return;
 	gdk_window_get_size(gtk_widget_get_window(w), &nw, &nh);
-	nx += *off_x;
-	ny += *off_y;
 
 	if (cfg.snap_windows)
 	{
-		if (abs(nx) < cfg.snap_distance)
-			*off_x -= nx;
-		if (abs(ny) < cfg.snap_distance)
-			*off_y -= ny;
-		if (abs(nx + nw - gdk_screen_width()) < cfg.snap_distance)
-			*off_x -= nx + nw - gdk_screen_width();
-		if (abs(ny + nh - gdk_screen_height()) < cfg.snap_distance)
-			*off_y -= ny + nh - gdk_screen_height();
-
+		if (abs(*nx) < cfg.snap_distance)
+			*nx = 0;
+		if (abs(*ny) < cfg.snap_distance)
+			*ny = 0;
+		
 		node = window_list;
 		while (node)
 		{
-			if (GTK_WIDGET(node->data) != w && GTK_WIDGET_VISIBLE(node->data))
+			if (GTK_WIDGET(node->data) != w && gtk_widget_get_visible(GTK_WIDGET(node->data)))
 			{
 				gint tx, ty, tw, th;
 
 				gdk_window_get_root_origin(gtk_widget_get_window(GTK_WIDGET(node->data)), &tx, &ty);
 				gdk_window_get_size(gtk_widget_get_window(GTK_WIDGET(node->data)), &tw, &th);
 
-				if (ny + nh > ty && ny < ty + th)
+				if (*ny + nh > ty && *ny < ty + th)
 				{
-					if (abs(nx + nw - tx) < cfg.snap_distance)
-						*off_x -= nx + nw - tx;
-					if (abs(nx - (tx + tw)) < cfg.snap_distance)
-						*off_x -= nx - (tx + tw);
+					if (abs(*nx + nw - tx) < cfg.snap_distance)
+						*nx = tx - nw;
+					if (abs(*nx - (tx + tw)) < cfg.snap_distance)
+						*nx = tx + tw;
 				}
-				if (nx + nw > tx && nx < tx + tw)
+				if (*nx + nw > tx && *nx < tx + tw)
 				{
-					if (abs(ny + nh - ty) < cfg.snap_distance)
-						*off_y -= ny + nh - ty;
-					if (abs(ny - (ty + th)) < cfg.snap_distance)
-						*off_y -= ny - (ty + th);
+					if (abs(*ny + nh - ty) < cfg.snap_distance)
+						*ny = ty - nh;
+					if (abs(*ny - (ty + th)) < cfg.snap_distance)
+						*ny = ty + th;
 				}
 			}
 			node = node->next;
@@ -79,69 +74,142 @@ static void dock_snap(GtkWidget * w, GList *window_list, gint * off_x, gint * of
 	}
 }
 
+static GList *dock_find_connected(GList *window_list, GtkWidget *w)
+{
+    GList *connected = NULL, *queue = NULL, *node;
+    
+    connected = g_list_append(connected, w);
+    queue = g_list_append(queue, w);
+    
+    while (queue)
+    {
+        GtkWidget *curr = queue->data;
+        queue = g_list_remove(queue, curr);
+        
+        gint cx, cy, cw, ch;
+        gdk_window_get_root_origin(gtk_widget_get_window(curr), &cx, &cy);
+        gdk_window_get_size(gtk_widget_get_window(curr), &cw, &ch);
+        
+        for (node = window_list; node; node = node->next)
+        {
+            GtkWidget *other = node->data;
+            if (other == curr || g_list_find(connected, other) || !gtk_widget_get_visible(other))
+                continue;
+                
+            gint ox, oy, ow, oh;
+            gdk_window_get_root_origin(gtk_widget_get_window(other), &ox, &oy);
+            gdk_window_get_size(gtk_widget_get_window(other), &ow, &oh);
+            
+            /* Check if touching - use a 2px tolerance for docking */
+            gboolean touching = FALSE;
+            gint tolerance = 2;
+            
+            /* Horizontal touch */
+            if (cy + ch + tolerance > oy && cy < oy + oh + tolerance)
+            {
+                if (abs(cx + cw - ox) <= tolerance || abs(cx - (ox + ow)) <= tolerance)
+                    touching = TRUE;
+            }
+            /* Vertical touch */
+            if (cx + cw + tolerance > ox && cx < ox + ow + tolerance)
+            {
+                if (abs(cy + ch - oy) <= tolerance || abs(cy - (oy + oh)) <= tolerance)
+                    touching = TRUE;
+            }
+            
+            if (touching)
+            {
+                connected = g_list_append(connected, other);
+                queue = g_list_append(queue, other);
+            }
+        }
+    }
+    return connected;
+}
+
 void dock_move_press(GList *window_list, GtkWidget * w, GdkEventButton * event, gboolean move_list)
 {
-	gint mx, my;
+    GList *node;
 
 	if (event->button != 1)
 		return;
 
-	gdk_window_get_device_position(gtk_widget_get_window(w), gdk_event_get_device((GdkEvent*)event), &mx, &my, NULL);
 	g_object_set_data(G_OBJECT(w), "is_moving", GINT_TO_POINTER(TRUE));
-    g_object_set_data(G_OBJECT(w), "move_list", GINT_TO_POINTER(move_list));
-    g_object_set_data(G_OBJECT(w), "window_list", window_list);
-	g_object_set_data(G_OBJECT(w), "move_off_x", GINT_TO_POINTER(mx));
-	g_object_set_data(G_OBJECT(w), "move_off_y", GINT_TO_POINTER(my));
+	g_object_set_data(G_OBJECT(w), "root_press_x", GINT_TO_POINTER((gint)event->x_root));
+	g_object_set_data(G_OBJECT(w), "root_press_y", GINT_TO_POINTER((gint)event->y_root));
+
+    GList *connected = NULL;
+    if (move_list)
+        connected = dock_find_connected(window_list, w);
+    else
+        connected = g_list_append(NULL, w);
+
+    g_object_set_data(G_OBJECT(w), "move_list_current", connected);
+
+    /* Store initial positions of all windows in the moving group */
+    for (node = connected; node; node = node->next)
+    {
+        gint wx, wy;
+        gdk_window_get_root_origin(gtk_widget_get_window(GTK_WIDGET(node->data)), &wx, &wy);
+        g_object_set_data(G_OBJECT(node->data), "initial_x", GINT_TO_POINTER(wx));
+        g_object_set_data(G_OBJECT(node->data), "initial_y", GINT_TO_POINTER(wy));
+    }
 }
 
 void dock_move_motion(GtkWidget * w, GdkEventMotion * event)
 {
-	gint mx, my, ox, oy, dx, dy, dw, dh, off_x, off_y;
-	GList *node, *window_list;
-    gboolean move_list;
+	gint mx, my, px, py, dx, dy, delta_x, delta_y;
+	GList *node, *move_list;
 
 	if (!GPOINTER_TO_INT(g_object_get_data(G_OBJECT(w), "is_moving")))
 		return;
 
-	ox = GPOINTER_TO_INT(g_object_get_data(G_OBJECT(w), "move_off_x"));
-	oy = GPOINTER_TO_INT(g_object_get_data(G_OBJECT(w), "move_off_y"));
-    move_list = GPOINTER_TO_INT(g_object_get_data(G_OBJECT(w), "move_list"));
-    window_list = g_object_get_data(G_OBJECT(w), "window_list");
+	px = GPOINTER_TO_INT(g_object_get_data(G_OBJECT(w), "root_press_x"));
+	py = GPOINTER_TO_INT(g_object_get_data(G_OBJECT(w), "root_press_y"));
+    move_list = g_object_get_data(G_OBJECT(w), "move_list_current");
 
-	gdk_window_get_device_position(NULL, gdk_event_get_device((GdkEvent*)event), &mx, &my, NULL);
-	gdk_window_get_root_origin(gtk_widget_get_window(w), &dx, &dy);
-	gdk_window_get_size(gtk_widget_get_window(w), &dw, &dh);
+    mx = (gint)event->x_root;
+    my = (gint)event->y_root;
 
-	off_x = mx - ox - dx;
-	off_y = my - oy - dy;
+    /* How far we've moved from the press point */
+	delta_x = mx - px;
+	delta_y = my - py;
 
-	dock_snap(w, window_list, &off_x, &off_y);
+    /* Target position for the primary window */
+    dx = GPOINTER_TO_INT(g_object_get_data(G_OBJECT(w), "initial_x")) + delta_x;
+    dy = GPOINTER_TO_INT(g_object_get_data(G_OBJECT(w), "initial_y")) + delta_y;
 
-	if (off_x || off_y)
+    /* Apply snap to the primary window */
+    extern GList *dock_window_list;
+	dock_snap(w, dock_window_list, &dx, &dy);
+
+    /* Re-calculate final delta after snapping */
+    delta_x = dx - GPOINTER_TO_INT(g_object_get_data(G_OBJECT(w), "initial_x"));
+    delta_y = dy - GPOINTER_TO_INT(g_object_get_data(G_OBJECT(w), "initial_y"));
+
+    if (delta_x || delta_y)
 	{
-        if (move_list)
-        {
-		    node = window_list;
-		    while (node)
-		    {
-			    if (GTK_WIDGET_VISIBLE(node->data))
-			    {
-				    gint tx, ty;
-				    gdk_window_get_root_origin(gtk_widget_get_window(GTK_WIDGET(node->data)), &tx, &ty);
-				    gtk_widget_set_uposition(GTK_WIDGET(node->data), tx + off_x, ty + off_y);
-			    }
-			    node = node->next;
-		    }
-        }
-        else
-        {
-            gtk_widget_set_uposition(w, dx + off_x, dy + off_y);
-        }
+		node = move_list;
+		while (node)
+		{
+            GtkWidget *win = GTK_WIDGET(node->data);
+            gint ix = GPOINTER_TO_INT(g_object_get_data(G_OBJECT(win), "initial_x"));
+            gint iy = GPOINTER_TO_INT(g_object_get_data(G_OBJECT(win), "initial_y"));
+            
+            gtk_window_move(GTK_WINDOW(win), ix + delta_x, iy + delta_y);
+            node = node->next;
+		}
 	}
 }
 
 void dock_move_release(GtkWidget * w)
 {
+    if (!GPOINTER_TO_INT(g_object_get_data(G_OBJECT(w), "is_moving")))
+        return;
+
+    GList *move_list = g_object_get_data(G_OBJECT(w), "move_list_current");
+    if (move_list) g_list_free(move_list);
+    g_object_set_data(G_OBJECT(w), "move_list_current", NULL);
 	g_object_set_data(G_OBJECT(w), "is_moving", GINT_TO_POINTER(FALSE));
 }
 
@@ -157,7 +225,6 @@ gboolean dock_is_moving(GtkWidget *w)
 
 void dock_shade(GList *window_list, GtkWidget *widget, gint new_h)
 {
-    /* STUB: Implement shading logic if needed for window groups */
 }
 
 void dock_resize(GList *window_list, GtkWidget *w, gint new_w, gint new_h)

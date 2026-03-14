@@ -251,16 +251,95 @@ void g_free_func (gpointer mem) { g_free (mem); }
 /* GtkItemFactory Shims for GTK 3 */
 GtkItemFactory* gtk_item_factory_new(GType container_type, const gchar *path, GtkAccelGroup *accel_group)
 {
-    return (GtkItemFactory*)gtk_menu_new();
+    GtkWidget *menu = gtk_menu_new();
+    /* We can't add an accel group to a menu directly in this way in GTK3 if it's not a window.
+       But we'll store it if we ever need it. */
+    if (accel_group) g_object_set_data(G_OBJECT(menu), "accel_group", accel_group);
+    return (GtkItemFactory*)menu;
 }
 
 GtkWidget* gtk_item_factory_get_widget(GtkItemFactory *ifactory, const gchar *path)
 {
-    /* STUB: Return the factory itself if it's a menu, or a dummy for paths */
-    return GTK_WIDGET(ifactory);
+    if (!path || !*path || !strcmp(path, "<Main>") || !strcmp(path, ""))
+        return GTK_WIDGET(ifactory);
+
+    /* Very basic lookup: if it ends in a known name, try to find/create a menu item */
+    /* This is still a shim, but let's try to return a dummy menu item if it's a path like "/Sort"
+       so that gtk_menu_item_set_submenu doesn't fail. */
+    
+    GtkWidget *item = g_object_get_data(G_OBJECT(ifactory), path);
+    if (!item) {
+        /* Create a dummy menu item and store it */
+        const char *label = strrchr(path, '/');
+        if (label) label++; else label = path;
+        
+        item = gtk_menu_item_new_with_label(label);
+        gtk_menu_shell_append(GTK_MENU_SHELL(ifactory), item);
+        gtk_widget_show(item);
+        g_object_set_data(G_OBJECT(ifactory), path, item);
+    }
+    
+    return item;
 }
 
-void gtk_item_factory_create_items(GtkItemFactory *ifactory, guint n_entries, gpointer entries, gpointer callback_data) {}
+void gtk_item_factory_create_items(GtkItemFactory *ifactory, guint n_entries, gpointer entries, gpointer callback_data) 
+{
+    GtkItemFactoryEntry *factory_entries = (GtkItemFactoryEntry *)entries;
+    GtkWidget *menu = GTK_WIDGET(ifactory);
+    guint i;
+
+    for (i = 0; i < n_entries; i++) {
+        GtkItemFactoryEntry *entry = &factory_entries[i];
+        const char *path = entry->path;
+        
+        if (!path || !*path) continue;
+
+        /* Find parent menu */
+        GtkWidget *parent = menu;
+        char *path_copy = g_strdup(path);
+        char *last_slash = strrchr(path_copy, '/');
+        if (last_slash && last_slash != path_copy) {
+            *last_slash = '\0';
+            /* Recursively find or create parent branch - simplified for now */
+            /* In a real factory, we'd look up the parent by path. 
+               For this port, we'll try to find it or just use the root. */
+            GtkWidget *found_parent = g_object_get_data(G_OBJECT(ifactory), path_copy);
+            if (found_parent && GTK_IS_MENU_ITEM(found_parent)) {
+                parent = gtk_menu_item_get_submenu(GTK_MENU_ITEM(found_parent));
+                if (!parent) {
+                    parent = gtk_menu_new();
+                    gtk_menu_item_set_submenu(GTK_MENU_ITEM(found_parent), parent);
+                }
+            }
+        }
+        g_free(path_copy);
+
+        GtkWidget *widget = NULL;
+        const char *item_name = strrchr(path, '/');
+        if (item_name) item_name++; else item_name = path;
+
+        if (entry->item_type && !strcmp(entry->item_type, "<Separator>")) {
+            widget = gtk_separator_menu_item_new();
+        } else if (entry->item_type && !strcmp(entry->item_type, "<Branch>")) {
+            widget = gtk_menu_item_new_with_label(item_name);
+            gtk_menu_item_set_submenu(GTK_MENU_ITEM(widget), gtk_menu_new());
+        } else {
+            widget = gtk_menu_item_new_with_label(item_name);
+            if (entry->callback) {
+                /* GtkItemFactory callbacks had a specific signature. 
+                   We'll wrap it if needed, but for now just connect. */
+                g_signal_connect_swapped(widget, "activate", G_CALLBACK(entry->callback), GINT_TO_POINTER(entry->callback_action));
+            }
+        }
+
+        if (widget) {
+            gtk_menu_shell_append(GTK_MENU_SHELL(parent), widget);
+            gtk_widget_show(widget);
+            /* Store for lookup */
+            g_object_set_data(G_OBJECT(ifactory), path, widget);
+        }
+    }
+}
 void gtk_item_factory_set_translate_func(GtkItemFactory *ifactory, GtkTranslateFunc func, gpointer data, GDestroyNotify notify) {}
 GtkItemFactory* gtk_item_factory_from_widget(GtkWidget *widget) { return NULL; }
 void gtk_item_factory_dump_rc(const gchar *file_name, const gchar *resource_name, gboolean pass_id) {}

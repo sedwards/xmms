@@ -222,6 +222,7 @@ static void ca_close_audio(void) {
     AudioOutputUnitStop(ca_data.au);
     AudioUnitUninitialize(ca_data.au);
     AudioComponentInstanceDispose(ca_data.au);
+    ring_buffer_cleanup(&ca_data.ring);
 }
 
 static void ca_flush(int time) {

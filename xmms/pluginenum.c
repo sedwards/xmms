@@ -18,7 +18,11 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 #include "xmms.h"
+
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+
 #include "log.h"
+#include "libxmms/util.h"
 
 #ifdef HPUX
 # include <dl.h>
@@ -168,8 +172,8 @@ void init_plugins(void)
 	{
 		op = (OutputPlugin *) node->data;
 		if (cfg.outputplugin && op->filename &&
-            !strcmp(g_basename(cfg.outputplugin),
-			    g_basename(op->filename)))
+            !strcmp(util_basename(cfg.outputplugin),
+			    util_basename(op->filename)))
 			op_data->current_output_plugin = op;
 		if (op->init)
 			op->init();
@@ -195,7 +199,7 @@ void init_plugins(void)
 	{
 		ip = (InputPlugin *) node->data;
         if (ip->filename) {
-		    char *temp_base = g_basename(ip->filename);
+		    char *temp_base = (char *)util_basename(ip->filename);
 		    if (g_list_find_custom(disabled_iplugin_names, temp_base, d_iplist_compare))
 			    disabled_iplugins = g_list_append(disabled_iplugins, ip);
         }
@@ -265,31 +269,31 @@ static void dynamic_lib_error(void)
 static int plugin_check_duplicate(char *filename)
 {
 	GList *l;
-	gchar *base_filename = g_basename(filename);
+	gchar *base_filename = (gchar *)util_basename(filename);
 
 	for (l = ip_data->input_list; l; l = l->next)
 		if (!strcmp(base_filename,
-			    g_basename(((InputPlugin*)l->data)->filename)))
+			    util_basename(((InputPlugin*)l->data)->filename)))
 			return 1;
 
 	for (l = op_data->output_list; l; l = l->next)
 		if (!strcmp(base_filename,
-			    g_basename(((OutputPlugin*)l->data)->filename)))
+			    util_basename(((OutputPlugin*)l->data)->filename)))
 			return 1;
 
 	for (l = ep_data->effect_list; l; l = l->next)
 		if (!strcmp(base_filename,
-			    g_basename(((EffectPlugin*)l->data)->filename)))
+			    util_basename(((EffectPlugin*)l->data)->filename)))
 			return 1;
 
 	for (l = gp_data->general_list; l; l = l->next)
 		if (!strcmp(base_filename,
-			    g_basename(((GeneralPlugin*)l->data)->filename)))
+			    util_basename(((GeneralPlugin*)l->data)->filename)))
 			return 1;
 
 	for (l = vp_data->vis_list; l; l = l->next)
 		if (!strcmp(base_filename,
-			    g_basename(((VisPlugin*)l->data)->filename)))
+			    util_basename(((VisPlugin*)l->data)->filename)))
 			return 1;
 
 	return 0;

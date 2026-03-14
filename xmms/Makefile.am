@@ -51,7 +51,6 @@ about.c about.h \
 sm.c sm.h \
 plugin.h \
 xmms.h \
-getopt.c getopt1.c getopt.h \
 urldecode.c urldecode.h \
 dnd.h \
 mkdtemp.c \

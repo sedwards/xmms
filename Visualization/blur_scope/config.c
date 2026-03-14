@@ -52,7 +52,7 @@ static void config_ok_cb(GtkWidget * widget, gpointer data)
 
 void bscope_configure(void)
 {
-	GtkWidget *vbox, *bbox, *ok, *cancel;
+	GtkWidget *vbox;
     GdkRGBA rgba;
 
 	if (configure_win)

@@ -13,61 +13,6 @@ static GtkWidget *prefswin = NULL;
 static GtkWidget *prefswin_notebook;
 static GtkListStore *in_store, *ef_store, *gen_store, *vis_store;
 static GtkWidget *prefswin_audio_olist;
-static GtkCssProvider *prefswin_css_provider = NULL;
-
-static void prefswin_apply_skin(void)
-{
-    if (!prefswin) return;
-
-    if (!prefswin_css_provider) {
-        prefswin_css_provider = gtk_css_provider_new();
-        gtk_style_context_add_provider_for_screen(gdk_screen_get_default(),
-                                                 GTK_STYLE_PROVIDER(prefswin_css_provider),
-                                                 GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
-    }
-
-    GdkColor *bg = get_skin_color(SKIN_PLEDIT_NORMALBG);
-    GdkColor *fg = get_skin_color(SKIN_PLEDIT_NORMAL);
-    
-    char *bg_hex = xmms_color_to_hex(bg);
-    char *fg_hex = xmms_color_to_hex(fg);
-
-    char *css = g_strdup_printf(
-        "window, notebook, stack, grid, box, frame, label, checkbox, checkbutton, radiobutton, entry, scrolledwindow, treeview {"
-        "  background-color: %s;"
-        "  color: %s;"
-        "  border-color: %s;"
-        "}"
-        "button {"
-        "  background-image: none;"
-        "  background-color: %s;"
-        "  color: %s;"
-        "  border: 1px solid %s;"
-        "}"
-        "notebook tab {"
-        "  background-color: %s;"
-        "  color: %s;"
-        "}"
-        "notebook tab:checked {"
-        "  background-color: %s;"
-        "  color: %s;"
-        "}"
-        "treeview header button {"
-        "  background-color: %s;"
-        "  color: %s;"
-        "}",
-        bg_hex, fg_hex, fg_hex,
-        bg_hex, fg_hex, fg_hex,
-        bg_hex, fg_hex,
-        fg_hex, bg_hex,
-        bg_hex, fg_hex
-    );
-
-    gtk_css_provider_load_from_data(prefswin_css_provider, css, -1, NULL);
-    g_free(css);
-    g_free(bg_hex);
-    g_free(fg_hex);
-}
 
 static void prefswin_destroy_cb(GtkWidget *widget, gpointer data)
 {
@@ -156,6 +101,34 @@ static GtkWidget* create_plugin_page(const char *title, GtkListStore **store_ptr
     return vbox;
 }
 
+static void on_always_on_top_toggled(GtkToggleButton *widget, gpointer data)
+{
+    cfg.always_on_top = gtk_toggle_button_get_active(widget);
+    mainwin_set_always_on_top(cfg.always_on_top);
+}
+
+static gboolean on_doublesize_idle(gpointer data)
+{
+    mainwin_recreate();
+    return FALSE;
+}
+
+static void on_doublesize_toggled(GtkToggleButton *widget, gpointer data)
+{
+    cfg.doublesize = gtk_toggle_button_get_active(widget);
+    g_idle_add(on_doublesize_idle, NULL);
+}
+
+static void on_snap_windows_toggled(GtkToggleButton *widget, gpointer data)
+{
+    cfg.snap_windows = gtk_toggle_button_get_active(widget);
+}
+
+static void on_save_window_pos_toggled(GtkToggleButton *widget, gpointer data)
+{
+    cfg.save_window_position = gtk_toggle_button_get_active(widget);
+}
+
 void show_prefs_window(void)
 {
     if (prefswin) {
@@ -163,10 +136,10 @@ void show_prefs_window(void)
         return;
     }
 
-    xmms_log("Opening skinned preferences window...");
+    xmms_log("Opening preferences window...");
     prefswin = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     gtk_window_set_title(GTK_WINDOW(prefswin), "XMMS Preferences");
-    gtk_window_set_default_size(GTK_WINDOW(prefswin), 550, 450);
+    gtk_window_set_default_size(GTK_WINDOW(prefswin), 600, 500);
     g_signal_connect(prefswin, "destroy", G_CALLBACK(prefswin_destroy_cb), NULL);
 
     GtkWidget *main_vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
@@ -182,39 +155,82 @@ void show_prefs_window(void)
 
     GtkWidget *iframe = gtk_frame_new("Input Plugins");
     gtk_box_pack_start(GTK_BOX(audio_vbox), iframe, TRUE, TRUE, 0);
-    GtkWidget *ivbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 5);
-    gtk_container_set_border_width(GTK_CONTAINER(ivbox), 5);
-    gtk_container_add(GTK_CONTAINER(iframe), ivbox);
-
     in_store = gtk_list_store_new(2, G_TYPE_STRING, G_TYPE_POINTER);
     GtkWidget *in_view = gtk_tree_view_new_with_model(GTK_TREE_MODEL(in_store));
     gtk_tree_view_insert_column_with_attributes(GTK_TREE_VIEW(in_view), -1, "Plugin", gtk_cell_renderer_text_new(), "text", 0, NULL);
     GtkWidget *in_scroll = gtk_scrolled_window_new(NULL, NULL);
     gtk_container_add(GTK_CONTAINER(in_scroll), in_view);
-    gtk_box_pack_start(GTK_BOX(ivbox), in_scroll, TRUE, TRUE, 0);
+    gtk_container_add(GTK_CONTAINER(iframe), in_scroll);
 
     GtkWidget *oframe = gtk_frame_new("Output Plugin");
     gtk_box_pack_start(GTK_BOX(audio_vbox), oframe, FALSE, FALSE, 0);
-    GtkWidget *ovbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 5);
-    gtk_container_set_border_width(GTK_CONTAINER(ovbox), 5);
-    gtk_container_add(GTK_CONTAINER(oframe), ovbox);
-
     prefswin_audio_olist = gtk_combo_box_text_new();
     g_signal_connect(prefswin_audio_olist, "changed", G_CALLBACK(on_output_plugin_changed), NULL);
-    gtk_box_pack_start(GTK_BOX(ovbox), prefswin_audio_olist, FALSE, FALSE, 0);
+    gtk_container_add(GTK_CONTAINER(oframe), prefswin_audio_olist);
 
-    gtk_notebook_append_page(GTK_NOTEBOOK(prefswin_notebook), audio_vbox, gtk_label_new("Audio I/O Plugins"));
+    gtk_notebook_append_page(GTK_NOTEBOOK(prefswin_notebook), audio_vbox, gtk_label_new("Audio I/O"));
 
-    /* 5. Options */
+    /* 2. Effect/General Plugins */
+    GtkWidget *plugins_vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 5);
+    gtk_notebook_append_page(GTK_NOTEBOOK(prefswin_notebook), plugins_vbox, gtk_label_new("Plugins"));
+    gtk_box_pack_start(GTK_BOX(plugins_vbox), create_plugin_page("Effect Plugins", &ef_store), TRUE, TRUE, 0);
+    gtk_box_pack_start(GTK_BOX(plugins_vbox), create_plugin_page("General Plugins", &gen_store), TRUE, TRUE, 0);
+
+    /* 3. Visualization */
+    gtk_notebook_append_page(GTK_NOTEBOOK(prefswin_notebook), create_plugin_page("Visualization Plugins", &vis_store), gtk_label_new("Visualization"));
+
+    /* 4. Options */
     GtkWidget *opt_vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
     gtk_container_set_border_width(GTK_CONTAINER(opt_vbox), 10);
+    
+    GtkWidget *opt_grid = gtk_grid_new();
+    gtk_grid_set_row_spacing(GTK_GRID(opt_grid), 5);
+    gtk_grid_set_column_spacing(GTK_GRID(opt_grid), 20);
+    gtk_box_pack_start(GTK_BOX(opt_vbox), opt_grid, FALSE, FALSE, 0);
+
+    /* Grouped Options */
+    GtkWidget *cb_aot = gtk_check_button_new_with_label("Always on top");
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(cb_aot), cfg.always_on_top);
+    g_signal_connect(cb_aot, "toggled", G_CALLBACK(on_always_on_top_toggled), NULL);
+    gtk_grid_attach(GTK_GRID(opt_grid), cb_aot, 0, 0, 1, 1);
+
+    GtkWidget *cb_ds = gtk_check_button_new_with_label("Double size");
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(cb_ds), cfg.doublesize);
+    g_signal_connect(cb_ds, "toggled", G_CALLBACK(on_doublesize_toggled), NULL);
+    gtk_grid_attach(GTK_GRID(opt_grid), cb_ds, 1, 0, 1, 1);
+
+    GtkWidget *cb_sw = gtk_check_button_new_with_label("Snap windows");
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(cb_sw), cfg.snap_windows);
+    g_signal_connect(cb_sw, "toggled", G_CALLBACK(on_snap_windows_toggled), NULL);
+    gtk_grid_attach(GTK_GRID(opt_grid), cb_sw, 0, 1, 1, 1);
+
+    GtkWidget *cb_swp = gtk_check_button_new_with_label("Save window positions");
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(cb_swp), cfg.save_window_position);
+    g_signal_connect(cb_swp, "toggled", G_CALLBACK(on_save_window_pos_toggled), NULL);
+    gtk_grid_attach(GTK_GRID(opt_grid), cb_swp, 1, 1, 1, 1);
     
     GtkWidget *cb_save = gtk_check_button_new_with_label("Save configuration on quit");
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(cb_save), cfg.save_config_on_quit);
     g_signal_connect(cb_save, "toggled", G_CALLBACK(on_save_on_quit_toggled), NULL);
-    gtk_box_pack_start(GTK_BOX(opt_vbox), cb_save, FALSE, FALSE, 0);
+    gtk_grid_attach(GTK_GRID(opt_grid), cb_save, 0, 2, 1, 1);
 
     gtk_notebook_append_page(GTK_NOTEBOOK(prefswin_notebook), opt_vbox, gtk_label_new("Options"));
+
+    /* 5. Fonts */
+    GtkWidget *fonts_vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
+    gtk_container_set_border_width(GTK_CONTAINER(fonts_vbox), 10);
+    gtk_box_pack_start(GTK_BOX(fonts_vbox), gtk_label_new("Playlist Font:"), FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(fonts_vbox), gtk_entry_new(), FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(fonts_vbox), gtk_label_new("Main Window Font:"), FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(fonts_vbox), gtk_entry_new(), FALSE, FALSE, 0);
+    gtk_notebook_append_page(GTK_NOTEBOOK(prefswin_notebook), fonts_vbox, gtk_label_new("Fonts"));
+
+    /* 6. Title */
+    GtkWidget *title_vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
+    gtk_container_set_border_width(GTK_CONTAINER(title_vbox), 10);
+    gtk_box_pack_start(GTK_BOX(title_vbox), gtk_label_new("Title Format:"), FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(title_vbox), gtk_entry_new(), FALSE, FALSE, 0);
+    gtk_notebook_append_page(GTK_NOTEBOOK(prefswin_notebook), title_vbox, gtk_label_new("Title"));
 
     /* Bottom Buttons */
     GtkWidget *bbox = gtk_button_box_new(GTK_ORIENTATION_HORIZONTAL);
@@ -234,7 +250,6 @@ void show_prefs_window(void)
     add_input_plugins(in_store);
     add_output_plugins(GTK_COMBO_BOX_TEXT(prefswin_audio_olist));
 
-    prefswin_apply_skin();
     gtk_widget_show_all(prefswin);
 }
 

@@ -36,6 +36,7 @@
 GtkWidget *mainwin;
 cairo_surface_t *mainwin_bg = NULL;
 gint scaling_factor = 1;
+GtkAccelGroup *mainwin_accel = NULL;
 
 /* Required Global State Symbols */
 GtkItemFactory *mainwin_options_menu = NULL;
@@ -71,13 +72,13 @@ void load_config(void)
     cfg.equalizer_x = -1;
     cfg.equalizer_y = -1;
     cfg.playlist_width = 275;
-    cfg.playlist_height = 116;
-    cfg.doublesize = FALSE;
+    cfg.playlist_height = 250;
+    cfg.doublesize = FALSE; /* Forced off for now to fix buttons */
     cfg.player_shaded = FALSE;
     cfg.playlist_shaded = FALSE;
     cfg.equalizer_shaded = FALSE;
-    cfg.playlist_visible = TRUE;
-    cfg.equalizer_visible = TRUE;
+    cfg.playlist_visible = FALSE;
+    cfg.equalizer_visible = FALSE;
     cfg.shuffle = FALSE;
     cfg.repeat = FALSE;
     cfg.timer_mode = 0;
@@ -85,6 +86,9 @@ void load_config(void)
     cfg.filesel_path = g_strdup(g_get_home_dir());
     cfg.save_window_position = TRUE;
     cfg.save_config_on_quit = TRUE;
+    cfg.playlist_font = g_strdup("Sans 9");
+    cfg.snap_distance = 10;
+    cfg.snap_windows = TRUE;
 
     if (cfgfile) {
         xmms_cfg_read_int(cfgfile, "xmms", "player_x", &cfg.player_x);
@@ -103,6 +107,9 @@ void load_config(void)
         xmms_cfg_read_boolean(cfgfile, "xmms", "repeat", &cfg.repeat);
         xmms_cfg_read_string(cfgfile, "xmms", "filesel_path", &cfg.filesel_path);
         xmms_cfg_read_boolean(cfgfile, "xmms", "save_config_on_quit", &cfg.save_config_on_quit);
+        xmms_cfg_read_string(cfgfile, "xmms", "playlist_font", &cfg.playlist_font);
+        xmms_cfg_read_int(cfgfile, "xmms", "snap_distance", (gint *)&cfg.snap_distance);
+        xmms_cfg_read_boolean(cfgfile, "xmms", "snap_windows", &cfg.snap_windows);
         xmms_cfg_free(cfgfile);
     }
 }
@@ -132,9 +139,21 @@ void save_config(void)
     xmms_cfg_write_boolean(cfgfile, "xmms", "repeat", cfg.repeat);
     xmms_cfg_write_string(cfgfile, "xmms", "filesel_path", cfg.filesel_path);
     xmms_cfg_write_boolean(cfgfile, "xmms", "save_config_on_quit", cfg.save_config_on_quit);
+    xmms_cfg_write_string(cfgfile, "xmms", "playlist_font", cfg.playlist_font);
+    xmms_cfg_write_int(cfgfile, "xmms", "snap_distance", cfg.snap_distance);
+    xmms_cfg_write_boolean(cfgfile, "xmms", "snap_windows", cfg.snap_windows);
     
     xmms_cfg_write_default_file(cfgfile);
     xmms_cfg_free(cfgfile);
+}
+
+void mainwin_create_menus(void)
+{
+    mainwin_accel = gtk_accel_group_new();
+    mainwin_general_menu = gtk_item_factory_new(GTK_TYPE_MENU, "<Main>", mainwin_accel);
+    mainwin_options_menu = gtk_item_factory_new(GTK_TYPE_MENU, "<Main>", mainwin_accel);
+    mainwin_vis_menu = gtk_item_factory_new(GTK_TYPE_MENU, "<Main>", mainwin_accel);
+    mainwin_songname_menu = gtk_item_factory_new(GTK_TYPE_MENU, "<Main>", mainwin_accel);
 }
 
 static gboolean periodic_save_timer(gpointer data)
@@ -185,6 +204,11 @@ void mainwin_stop_pushed(void) { xmms_log("Stop Button Clicked"); }
 static void mainwin_dir_browser_callback(char *path)
 {
     xmms_log("Native browser selected: %s", path);
+    
+    /* Update filesel_path to the directory of the selected file */
+    if (cfg.filesel_path) g_free(cfg.filesel_path);
+    cfg.filesel_path = g_path_get_dirname(path);
+    
     playlist_add(path);
     playlist_play();
 }
@@ -195,12 +219,33 @@ void mainwin_eject_pushed(void)
     xmms_create_dir_browser(_("Open Files"), cfg.filesel_path, GTK_SELECTION_MULTIPLE, mainwin_dir_browser_callback);
 }
 
+void mainwin_eq_pushed(gboolean toggled)
+{
+    xmms_log("Equalizer button toggled: %d", toggled);
+    equalizerwin_show(toggled);
+}
+
 void mainwin_pl_pushed(gboolean toggled) 
 { 
     xmms_log("Playlist button toggled: %d", toggled);
-    if (toggled) {
-        xmms_create_dir_browser(_("Add to Playlist"), cfg.filesel_path, GTK_SELECTION_MULTIPLE, mainwin_dir_browser_callback);
-    }
+    playlistwin_show(toggled);
+}
+
+static void mainwin_drag_data_received(GtkWidget * widget,
+				       GdkDragContext * context,
+				       gint x,
+				       gint y,
+				       GtkSelectionData * selection_data,
+				       guint info,
+				       guint time,
+				       gpointer user_data)
+{
+	if (gtk_selection_data_get_data(selection_data))
+	{
+		playlist_clear();
+		playlist_add_url_string((gchar *) gtk_selection_data_get_data(selection_data));
+		playlist_play();
+	}
 }
 void mainwin_shuffle_pushed(gboolean toggled) { xmms_log("Shuffle toggled: %d", toggled); cfg.shuffle = toggled; }
 void mainwin_repeat_pushed(gboolean toggled) { xmms_log("Repeat toggled: %d", toggled); cfg.repeat = toggled; }
@@ -212,14 +257,15 @@ void draw_main_window(gboolean force)
     if (!mainwin_bg) return;
 
     cairo_t *cr = cairo_create(mainwin_bg);
-    
+
+    /* Device scale (Retina) is already handled by mainwin_bg surface settings. */
+
     /* Fill with solid black background first to kill transparency */
     cairo_set_source_rgb(cr, 0, 0, 0);
     cairo_paint(cr);
-
     /* Draw the main skin background */
     skin_draw_pixmap(cr, SKIN_MAIN, 0, 0, 0, 0, 275, cfg.player_shaded ? 14 : 116);
-    
+
     lock_widget_list(mainwin_wlist);
     GList *wl = mainwin_wlist;
     while (wl)
@@ -235,23 +281,102 @@ void draw_main_window(gboolean force)
     unlock_widget_list(mainwin_wlist);
 
     cairo_destroy(cr);
-    
+
     if (mainwin) gtk_widget_queue_draw(mainwin);
 }
-
 char *xmms_get_gentitle_format(void) { return "%p - %t"; }
 void xmms_usleep(gint usec) { g_usleep(usec); }
 
-void mainwin_adjust_volume_motion(gint pos) { xmms_log("Volume adjust motion: %d", pos); }
-void mainwin_adjust_volume_release(void) { xmms_log("Volume adjust release"); }
-void mainwin_adjust_balance_motion(gint pos) { xmms_log("Balance adjust motion: %d", pos); }
-void mainwin_adjust_balance_release(void) { xmms_log("Balance adjust release"); }
-void mainwin_set_volume_slider(gint volume) {}
-void mainwin_set_balance_slider(gint balance) {}
+static gboolean setting_volume = FALSE;
+static gint balance = 0;
+
+void mainwin_lock_info_text(gchar *text)
+{
+    if (mainwin_info) textbox_set_text(mainwin_info, text);
+}
+
+void mainwin_release_info_text(void)
+{
+    mainwin_set_info_text();
+}
+
+void mainwin_adjust_volume_motion(gint v)
+{
+	gchar *tmp;
+    gint vl, vr;
+
+	setting_volume = TRUE;
+	tmp = g_strdup_printf(_("VOLUME: %d%%"), v);
+	mainwin_lock_info_text(tmp);
+	g_free(tmp);
+
+	if (balance < 0) {
+		vl = v;
+        vr = (v * (100 - abs(balance))) / 100;
+    } else {
+		vl = (v * (100 - balance)) / 100;
+        vr = v;
+    }
+    input_set_volume(vl, vr);
+}
+
+void mainwin_adjust_volume_release(void)
+{
+	setting_volume = FALSE;
+	mainwin_release_info_text();
+    save_config();
+}
+
+void mainwin_adjust_balance_motion(gint b)
+{
+	gchar *tmp;
+    gint v, vl, vr;
+    int cur_l, cur_r;
+
+	balance = b;
+	if (balance > 0)
+		tmp = g_strdup_printf(_("BALANCE: %d%% RIGHT"), balance);
+	else if (balance < 0)
+		tmp = g_strdup_printf(_("BALANCE: %d%% LEFT"), abs(balance));
+	else
+		tmp = g_strdup(_("BALANCE: CENTER"));
+
+	mainwin_lock_info_text(tmp);
+	g_free(tmp);
+
+    input_get_volume(&cur_l, &cur_r);
+    v = MAX(cur_l, cur_r);
+
+	if (balance < 0) {
+		vl = v;
+        vr = (v * (100 - abs(balance))) / 100;
+    } else {
+		vl = (v * (100 - balance)) / 100;
+        vr = v;
+    }
+    input_set_volume(vl, vr);
+}
+
+void mainwin_adjust_balance_release(void)
+{
+	mainwin_release_info_text();
+    save_config();
+}
+
+void mainwin_set_volume_slider(gint percent)
+{
+	if (mainwin_volume) hslider_set_position(mainwin_volume, (percent * 51) / 100);
+}
+
+void mainwin_set_balance_slider(gint percent)
+{
+    /* -100 to 100 scale maps to 0-24 in the skin/hslider */
+	if (mainwin_balance) hslider_set_position(mainwin_balance, ((percent + 100) * 24) / 200);
+}
+
 void mainwin_set_balance_diff(gint diff) {}
 
 void equalizerwin_load_auto_preset(gchar *filename) {}
-void equalizerwin_presets_menu_cb(gpointer cb_data, guint action, GtkWidget *w) {}
 
 /* Callbacks */
 static void mainwin_mr_change(MenuRowItem item) { xmms_log("MenuRow item change: %d", item); }
@@ -272,34 +397,13 @@ static void mainwin_spos_release_cb(gint pos) { xmms_log("Shaded position releas
 /* Drawing Callback for the Window */
 static gboolean mainwin_draw_cb(GtkWidget *widget, cairo_t *cr, gpointer data)
 {
-    cairo_save(cr);
-    
-    /* Scaling factor handled by GTK for sharpness, 
-       but if window is 275 and we draw 275, it's correct. */
-
 	if (mainwin_bg)
 	{
 		cairo_set_source_surface(cr, mainwin_bg, 0, 0);
 		cairo_paint(cr);
 	}
-
-    /* We also draw widgets directly here to ensure they are updated 
-       if they weren't rendered into the background surface yet */
-    lock_widget_list(mainwin_wlist);
-    GList *wl = mainwin_wlist;
-    while (wl)
-    {
-        Widget *w = (Widget *)wl->data;
-        if (w && w->visible && w->draw)
-            w->draw(w, cr);
-        wl = wl->next;
-    }
-    unlock_widget_list(mainwin_wlist);
-
-    cairo_restore(cr);
 	return TRUE;
 }
-
 static void mainwin_pl_toggle_cb(GtkCheckMenuItem *item, gpointer data)
 {
     gboolean active = gtk_check_menu_item_get_active(item);
@@ -314,7 +418,7 @@ static void mainwin_eq_toggle_cb(GtkCheckMenuItem *item, gpointer data)
     else equalizerwin_real_hide();
 }
 
-static void mainwin_show_context_menu(GdkEventButton *event)
+void mainwin_show_context_menu(GdkEventButton *event)
 {
     GtkWidget *menu = gtk_menu_new();
     GtkWidget *item;
@@ -349,6 +453,14 @@ static void mainwin_show_context_menu(GdkEventButton *event)
     gtk_menu_popup_at_pointer(GTK_MENU(menu), (GdkEvent *)event);
 }
 
+static gboolean mainwin_configure(GtkWidget *window, GdkEventConfigure *event, gpointer data)
+{
+    if (gtk_widget_get_visible(window)) {
+        gtk_window_get_position(GTK_WINDOW(window), &cfg.player_x, &cfg.player_y);
+    }
+    return FALSE;
+}
+
 static gboolean mainwin_button_press(GtkWidget *widget, GdkEventButton *event, gpointer data)
 {
     if (event->button == 3) {
@@ -361,15 +473,25 @@ static gboolean mainwin_button_press(GtkWidget *widget, GdkEventButton *event, g
 
     /* If no widget was hit, allow window dragging if it's a left click on the background */
     if (!hit && event->button == 1) {
-        xmms_log("Starting window drag...");
-        gtk_window_begin_move_drag(GTK_WINDOW(mainwin), event->button, event->x_root, event->y_root, event->time);
-    } else if (hit) {
-        xmms_log("Widget hit - bypassing window drag");
+        dock_move_press(dock_window_list, mainwin, event, TRUE);
     }
-    
+
     return TRUE;
 }
 
+static gboolean mainwin_button_release(GtkWidget *widget, GdkEventButton *event, gpointer data)
+{
+    handle_release_cb(widget, event, &mainwin_wlist);
+    dock_move_release(mainwin);
+    return TRUE;
+}
+
+static gboolean mainwin_motion_notify(GtkWidget *widget, GdkEventMotion *event, gpointer data)
+{
+    handle_motion_cb(widget, event, &mainwin_wlist);
+    dock_move_motion(mainwin, event);
+    return TRUE;
+}
 static void mainwin_create_widgets(void)
 {
     xmms_log("Creating main window widgets...");
@@ -395,7 +517,7 @@ static void mainwin_create_widgets(void)
 	mainwin_shuffle = create_tbutton(&mainwin_wlist, mainwin_bg, 164, 89, 46, 15, 28, 0, 28, 15, 28, 30, 28, 45, mainwin_shuffle_pushed, SKIN_SHUFREP);
 	mainwin_repeat = create_tbutton(&mainwin_wlist, mainwin_bg, 210, 89, 28, 15, 0, 0, 0, 15, 0, 30, 0, 45, mainwin_repeat_pushed, SKIN_SHUFREP);
 
-	mainwin_eq = create_tbutton(&mainwin_wlist, mainwin_bg, 219, 58, 23, 12, 0, 61, 46, 61, 0, 73, 46, 73, (void*)equalizerwin_show, SKIN_SHUFREP);
+	mainwin_eq = create_tbutton(&mainwin_wlist, mainwin_bg, 219, 58, 23, 12, 0, 61, 46, 61, 0, 73, 46, 73, mainwin_eq_pushed, SKIN_SHUFREP);
 	mainwin_pl = create_tbutton(&mainwin_wlist, mainwin_bg, 242, 58, 23, 12, 23, 61, 69, 61, 23, 73, 69, 73, mainwin_pl_pushed, SKIN_SHUFREP);
 
 	mainwin_info = create_textbox(&mainwin_wlist, mainwin_bg, 112, 27, 153, 1, SKIN_TEXT);
@@ -518,13 +640,18 @@ static void mainwin_create_gtk(void)
     
 	g_signal_connect(da, "draw", G_CALLBACK(mainwin_draw_cb), NULL);
 	g_signal_connect(mainwin, "destroy", G_CALLBACK(mainwin_quit_cb), NULL);
+    g_signal_connect(mainwin, "configure-event", G_CALLBACK(mainwin_configure), NULL);
 
     /* Events for custom widgets - connect to the drawing area now */
     gtk_widget_add_events(da, GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK | GDK_POINTER_MOTION_MASK);
     
     g_signal_connect(da, "button-press-event", G_CALLBACK(mainwin_button_press), NULL);
-    g_signal_connect(da, "button-release-event", G_CALLBACK(handle_release_cb), &mainwin_wlist);
-    g_signal_connect(da, "motion-notify-event", G_CALLBACK(handle_motion_cb), &mainwin_wlist);
+    g_signal_connect(da, "button-release-event", G_CALLBACK(mainwin_button_release), NULL);
+    g_signal_connect(da, "motion-notify-event", G_CALLBACK(mainwin_motion_notify), NULL);
+
+    /* Setup Drag and Drop */
+    xmms_drag_dest_set(mainwin);
+    g_signal_connect(mainwin, "drag-data-received", G_CALLBACK(mainwin_drag_data_received), NULL);
 
 	gtk_widget_realize(mainwin);
     xmms_log("GTK window realized.");
@@ -540,7 +667,17 @@ void mainwin_set_shape_mask(void)
 
 void mainwin_create(void)
 {
-	mainwin_bg = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, 275, 116);
+    gint w = 275, h = 116;
+    
+    if (mainwin_bg) {
+        cairo_surface_destroy(mainwin_bg);
+        mainwin_bg = NULL;
+    }
+
+    /* System scaling factor is for Retina (usually 2). WinAmp doublesize is disabled for now. */
+	mainwin_bg = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, w * scaling_factor, h * scaling_factor);
+    cairo_surface_set_device_scale(mainwin_bg, (double)scaling_factor, (double)scaling_factor);
+
 	mainwin_create_widgets();
 	mainwin_create_gtk();
     draw_main_window(TRUE);
@@ -615,6 +752,49 @@ static gboolean mainwin_update_timer(gpointer data)
 
     return TRUE;
 }
+void mainwin_recreate(void)
+{
+    xmms_log("Recreating windows for scale/size change...");
+    
+    /* Save positions */
+    if (mainwin) gtk_window_get_position(GTK_WINDOW(mainwin), &cfg.player_x, &cfg.player_y);
+    if (playlistwin) gtk_window_get_position(GTK_WINDOW(playlistwin), &cfg.playlist_x, &cfg.playlist_y);
+    if (equalizerwin) gtk_window_get_position(GTK_WINDOW(equalizerwin), &cfg.equalizer_x, &cfg.equalizer_y);
+
+    /* Remove from dock list */
+    dock_window_list = g_list_remove(dock_window_list, mainwin);
+    dock_window_list = g_list_remove(dock_window_list, playlistwin);
+    dock_window_list = g_list_remove(dock_window_list, equalizerwin);
+
+    /* Clear widget lists to avoid double-rendering when they are re-created */
+    if (mainwin_wlist) { g_list_free_full(mainwin_wlist, g_free); mainwin_wlist = NULL; }
+    if (playlistwin_wlist) { g_list_free_full(playlistwin_wlist, g_free); playlistwin_wlist = NULL; }
+    if (equalizerwin_wlist) { g_list_free_full(equalizerwin_wlist, g_free); equalizerwin_wlist = NULL; }
+
+    /* Destroy windows */
+    if (mainwin) gtk_widget_destroy(mainwin);
+    if (playlistwin) gtk_widget_destroy(playlistwin);
+    if (equalizerwin) gtk_widget_destroy(equalizerwin);
+
+    /* Re-create */
+    mainwin_create();
+    playlistwin_create();
+    equalizerwin_create();
+
+    /* Restore positions and visibility */
+    gtk_window_move(GTK_WINDOW(mainwin), cfg.player_x, cfg.player_y);
+    mainwin_show(TRUE);
+
+    if (cfg.playlist_visible) {
+        playlistwin_real_show();
+        gtk_window_move(GTK_WINDOW(playlistwin), cfg.playlist_x, cfg.playlist_y);
+    }
+    if (cfg.equalizer_visible) {
+        equalizerwin_real_show();
+        gtk_window_move(GTK_WINDOW(equalizerwin), cfg.equalizer_x, cfg.equalizer_y);
+    }
+}
+
 void mainwin_set_volume_diff(int diff) {}
 void mainwin_set_volume(int vol) {}
 void mainwin_set_balance(int bal) {}
@@ -622,8 +802,6 @@ void mainwin_set_always_on_top(gboolean always) {}
 void mainwin_set_shade(gboolean shaded) {}
 void mainwin_set_back_pixmap(void) {}
 void mainwin_disable_seekbar(void) {}
-void mainwin_lock_info_text(char *text) {}
-void mainwin_release_info_text(void) {}
 
 /* Main Entry Point */
 int main(int argc, char *argv[])
@@ -643,6 +821,7 @@ int main(int argc, char *argv[])
     init_plugins();
     xmms_log("Plugins initialized.");
     
+    mainwin_create_menus();
 	mainwin_create();
     xmms_log("Main window created.");
 
@@ -672,13 +851,13 @@ int main(int argc, char *argv[])
             if (cfg.doublesize) { win_w *= 2; win_h *= 2; }
             
             cfg.player_x = geo.x + (geo.width - win_w) / 2;
-            cfg.player_y = geo.y + (geo.height - (win_h + 116 + 116)) / 2;
+            cfg.player_y = geo.y + 100; /* Start a bit from the top for better visibility on macOS */
             
             cfg.playlist_x = cfg.player_x;
             cfg.playlist_y = cfg.player_y + win_h;
             
             cfg.equalizer_x = cfg.player_x;
-            cfg.equalizer_y = cfg.playlist_y + 116;
+            cfg.equalizer_y = cfg.playlist_y + cfg.playlist_height;
             
             xmms_log("First run: Centering windows at %d, %d (Monitor: %dx%d)", cfg.player_x, cfg.player_y, geo.width, geo.height);
         }

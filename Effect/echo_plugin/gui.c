@@ -11,7 +11,7 @@ N_("Echo Plugin\n"
    "Surround echo by Carl van Schaik 1999");
 
 static GtkWidget *conf_dialog = NULL, *surround_btn;
-static GtkObject *echo_delay_adj, *echo_feedback_adj, *echo_volume_adj;
+static GtkAdjustment *echo_delay_adj, *echo_feedback_adj, *echo_volume_adj;
 
 void echo_about(void)
 {
@@ -31,9 +31,9 @@ void echo_about(void)
 static void apply_changes(void)
 {
 	ConfigFile *cfg;
-	echo_delay = gtk_adjustment_value(echo_delay_adj);
-	echo_feedback = gtk_adjustment_value(echo_feedback_adj);
-	echo_volume = gtk_adjustment_value(echo_volume_adj);
+	echo_delay = gtk_adjustment_get_value(echo_delay_adj);
+	echo_feedback = gtk_adjustment_get_value(echo_feedback_adj);
+	echo_volume = gtk_adjustment_get_value(echo_volume_adj);
 	echo_surround_enable =
 		gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(surround_btn));
 

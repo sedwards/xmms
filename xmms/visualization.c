@@ -18,6 +18,7 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 #include "xmms.h"
+#include "libxmms/util.h"
 #include "fft.h"
 
 struct VisPluginData *vp_data;
@@ -133,12 +134,12 @@ gchar *vis_stringify_enabled_list(void)
 
 	if (g_list_length(node))
 	{
-		enalist = g_strdup(g_basename(((VisPlugin *) node->data)->filename));
+		enalist = g_strdup(util_basename(((VisPlugin *) node->data)->filename));
 		node = node->next;
 		while (node)
 		{
 			temp = enalist;
-			temp2 = g_strdup(g_basename(((VisPlugin *) node->data)->filename));
+			temp2 = g_strdup(util_basename(((VisPlugin *) node->data)->filename));
 			enalist = g_strconcat(temp, ",", temp2, NULL);
 			g_free(temp);
 			g_free(temp2);
@@ -163,7 +164,7 @@ void vis_enable_from_stringified_list(gchar * list)
 		node = vp_data->vis_list;
  		while (node)
 		{
-			base = g_basename(((VisPlugin *) node->data)->filename);
+			base = (gchar *)util_basename(((VisPlugin *) node->data)->filename);
 			if (!strcmp(plugins[i], base))
 			{
 				vp = node->data;
@@ -433,7 +434,7 @@ void vis_send_data(gint16 pcm_data[2][512], int nch, int length)
 		}
 	}
 	if (cfg.player_shaded && cfg.player_visible)
-		svis_timeout_func(mainwin_svis, intern_vis_data);
+		svis_timeout_func(mainwin_svis, (guchar *)intern_vis_data);
 	else
-		vis_timeout_func(active_vis, intern_vis_data);
+		vis_timeout_func(active_vis, (guchar *)intern_vis_data);
 }

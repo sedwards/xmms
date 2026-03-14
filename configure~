@@ -15241,7 +15241,11 @@ XMMS_DEFINES="-DDATA_DIR=\\\"$datadir/xmms\\\" \
 
 
 
-PLUGIN_LDFLAGS='-module -avoid-version -export-symbols-regex "get_.plugin_info"'
+if test "x$HAVE_MACOS" = "xyes"; then
+  PLUGIN_LDFLAGS='-module -avoid-version -export-symbols-regex "get_.plugin_info" -undefined dynamic_lookup'
+else
+  PLUGIN_LDFLAGS='-module -avoid-version -export-symbols-regex "get_.plugin_info"'
+fi
 
 
 

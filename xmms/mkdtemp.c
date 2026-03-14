@@ -34,7 +34,7 @@
 /*
  * This has been derived from the implementation in the FreeBSD libc.
  *
- * 2000-12-28  Håvard Kvålen <havardk@xmms.org>:
+ * 2000-12-28  Hï¿½vard Kvï¿½len <havardk@xmms.org>:
  * Stripped down to only mkdtemp() and made more portable
  * 
  */
@@ -114,7 +114,7 @@ char * mkdtemp(char *path)
 		for (trv = start;;) {
 			if (*trv == '\0' || trv == suffp)
 				return NULL;
-			pad = strchr(padchar, *trv);
+			pad = strchr((const char *)padchar, *trv);
 			if (pad == NULL || !*++pad)
 				*trv++ = padchar[0];
 			else {

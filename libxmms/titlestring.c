@@ -27,7 +27,10 @@
 #include <stdio.h>
 #include <string.h>
 
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+
 #include "titlestring.h"
+#include "util.h"
 #include "../xmms/i18n.h"
 
 #define CHECK(input, field) \

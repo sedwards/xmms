@@ -121,8 +121,8 @@ am_xmms_OBJECTS = bmp.$(OBJEXT) skin.$(OBJEXT) util.$(OBJEXT) \
 	eq_graph.$(OBJEXT) eq_slider.$(OBJEXT) main.$(OBJEXT) \
 	skinwin.$(OBJEXT) prefswin.$(OBJEXT) playlistwin.$(OBJEXT) \
 	equalizer.$(OBJEXT) hints.$(OBJEXT) about.$(OBJEXT) \
-	sm.$(OBJEXT) getopt.$(OBJEXT) getopt1.$(OBJEXT) \
-	urldecode.$(OBJEXT) mkdtemp.$(OBJEXT) log.$(OBJEXT)
+	sm.$(OBJEXT) urldecode.$(OBJEXT) mkdtemp.$(OBJEXT) \
+	log.$(OBJEXT)
 xmms_OBJECTS = $(am_xmms_OBJECTS)
 am__DEPENDENCIES_1 =
 xmms_DEPENDENCIES = $(am__DEPENDENCIES_1) \
@@ -154,8 +154,7 @@ am__depfiles_remade = ./$(DEPDIR)/about.Po ./$(DEPDIR)/bmp.Po \
 	./$(DEPDIR)/effect.Po ./$(DEPDIR)/eq_graph.Po \
 	./$(DEPDIR)/eq_slider.Po ./$(DEPDIR)/equalizer.Po \
 	./$(DEPDIR)/fft.Po ./$(DEPDIR)/fullscreen.Po \
-	./$(DEPDIR)/general.Po ./$(DEPDIR)/getopt.Po \
-	./$(DEPDIR)/getopt1.Po ./$(DEPDIR)/hints.Po \
+	./$(DEPDIR)/general.Po ./$(DEPDIR)/hints.Po \
 	./$(DEPDIR)/hslider.Po ./$(DEPDIR)/input.Po ./$(DEPDIR)/log.Po \
 	./$(DEPDIR)/main.Po ./$(DEPDIR)/menurow.Po \
 	./$(DEPDIR)/mkdtemp.Po ./$(DEPDIR)/monostereo.Po \
@@ -490,7 +489,6 @@ about.c about.h \
 sm.c sm.h \
 plugin.h \
 xmms.h \
-getopt.c getopt1.c getopt.h \
 urldecode.c urldecode.h \
 dnd.h \
 mkdtemp.c \
@@ -609,8 +607,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fft.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fullscreen.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/general.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/getopt.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/getopt1.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hints.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hslider.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/input.Po@am__quote@ # am--include-marker
@@ -911,8 +907,6 @@ distclean: distclean-recursive
 	-rm -f ./$(DEPDIR)/fft.Po
 	-rm -f ./$(DEPDIR)/fullscreen.Po
 	-rm -f ./$(DEPDIR)/general.Po
-	-rm -f ./$(DEPDIR)/getopt.Po
-	-rm -f ./$(DEPDIR)/getopt1.Po
 	-rm -f ./$(DEPDIR)/hints.Po
 	-rm -f ./$(DEPDIR)/hslider.Po
 	-rm -f ./$(DEPDIR)/input.Po
@@ -1000,8 +994,6 @@ maintainer-clean: maintainer-clean-recursive
 	-rm -f ./$(DEPDIR)/fft.Po
 	-rm -f ./$(DEPDIR)/fullscreen.Po
 	-rm -f ./$(DEPDIR)/general.Po
-	-rm -f ./$(DEPDIR)/getopt.Po
-	-rm -f ./$(DEPDIR)/getopt1.Po
 	-rm -f ./$(DEPDIR)/hints.Po
 	-rm -f ./$(DEPDIR)/hslider.Po
 	-rm -f ./$(DEPDIR)/input.Po

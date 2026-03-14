@@ -1,6 +1,6 @@
 /*  XMMS - Cross-platform multimedia player
  *  Copyright (C) 1998-2000  Peter Alm, Mikael Alm, Olle Hallnas, Thomas Nilsson and 4Front Technologies
- *  Copyright (C) 1999,2000  Håvard Kvålen
+ *  Copyright (C) 1999,2000  Hï¿½vard Kvï¿½len
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -45,5 +45,6 @@ void playlistwin_create_mask(void);
 void playlistwin_set_hints(void);
 
 extern Vis *playlistwin_vis;
+extern GList *playlistwin_wlist;
 
 #endif

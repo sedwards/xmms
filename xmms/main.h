@@ -104,6 +104,7 @@ void mainwin_set_balance_slider(gint percent);
 void mainwin_vis_set_type(InputVisType mode);
 
 void mainwin_set_info_text(void);
+void mainwin_show_context_menu(GdkEventButton *event);
 void mainwin_set_song_info(gint rate, gint freq, gint nch);
 
 void mainwin_set_always_on_top(gboolean always);

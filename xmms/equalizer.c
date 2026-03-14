@@ -61,6 +61,10 @@ static GList *equalizer_presets = NULL, *equalizer_auto_presets = NULL;
 
 void equalizerwin_presets_menu_cb(gpointer cb_data, guint action, GtkWidget * w);
 GtkWidget * equalizerwin_create_conf_window(void);
+void equalizerwin_presets_load_preset(void);
+void equalizerwin_presets_save_preset(void);
+void equalizerwin_presets_delete_preset(void);
+static void equalizerwin_unused_void_casts(void);
 
 enum
 {
@@ -199,6 +203,7 @@ void equalizerwin_presets_pushed(void)
 	GdkModifierType modmask;
 	gint x, y;
 
+    (void)modmask;
 	/* pointer handled by GTK3 */ x=0; y=0;
 	util_item_factory_popup(equalizerwin_presets_menu, x, y, 1, GDK_CURRENT_TIME);
 }
@@ -221,6 +226,7 @@ void draw_equalizer_window(gboolean force)
 	Widget *w;
 	gboolean redraw;
 
+    (void)img; (void)img2;
 	lock_widget_list(equalizerwin_wlist);
 	if (force)
 	{
@@ -319,6 +325,7 @@ void equalizerwin_press(GtkWidget * widget, GdkEventButton * event, gpointer cal
 
 	mx = event->x;
 	my = event->y;
+    (void)mx; (void)my; (void)grab;
 	if (cfg.doublesize && cfg.eq_doublesize_linked)
 	{
 		event->x /= 2;
@@ -352,7 +359,7 @@ void equalizerwin_press(GtkWidget * widget, GdkEventButton * event, gpointer cal
 	}
 	else
 	{
-		handle_press_cb(equalizerwin_wlist, widget, event);
+		handle_press_cb(widget, event, &equalizerwin_wlist);
 		draw_equalizer_window(FALSE);
 	}
 	}
@@ -372,7 +379,7 @@ void equalizerwin_motion(GtkWidget * widget, GdkEventMotion * event, gpointer ca
 	}
 	else
 	{
-		handle_motion_cb(equalizerwin_wlist, widget, event);
+		handle_motion_cb(widget, event, &equalizerwin_wlist);
 		draw_main_window(FALSE);
 	}
 	gdk_display_flush(gdk_display_get_default());
@@ -389,7 +396,7 @@ void equalizerwin_release(GtkWidget * widget, GdkEventButton * event, gpointer c
 	}
 	else
 	{
-		handle_release_cb(equalizerwin_wlist, widget, event);
+		handle_release_cb(widget, event, &equalizerwin_wlist);
 		draw_equalizer_window(FALSE);
 	}
 }
@@ -660,33 +667,52 @@ static gboolean equalizerwin_draw_cb(GtkWidget *widget, cairo_t *cr, gpointer da
 
 static gboolean equalizerwin_button_press(GtkWidget *widget, GdkEventButton *event, gpointer data)
 {
-    gboolean hit = handle_press_cb(widget, event, &equalizerwin_wlist);
-    if (!hit && event->button == 1) {
-        gtk_window_begin_move_drag(GTK_WINDOW(equalizerwin), event->button, event->x_root, event->y_root, event->time);
+    if (event->button == 3) {
+        mainwin_show_context_menu(event);
+        return TRUE;
     }
+
+    gboolean hit = handle_press_cb(widget, event, &equalizerwin_wlist);
+
+    if (!hit && event->button == 1) {
+        dock_move_press(dock_window_list, equalizerwin, event, TRUE);
+    }
+
+    return TRUE;
+}
+
+static gboolean equalizerwin_button_release(GtkWidget *widget, GdkEventButton *event, gpointer data)
+{
+    handle_release_cb(widget, event, &equalizerwin_wlist);
+    dock_move_release(equalizerwin);
+    return TRUE;
+}
+
+static gboolean equalizerwin_motion_notify(GtkWidget *widget, GdkEventMotion *event, gpointer data)
+{
+    handle_motion_cb(widget, event, &equalizerwin_wlist);
+    dock_move_motion(equalizerwin, event);
     return TRUE;
 }
 
 static void equalizerwin_create_gtk(void)
 {
-	equalizerwin = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-	gtk_widget_set_app_paintable(equalizerwin, TRUE);
-	gtk_window_set_title(GTK_WINDOW(equalizerwin), _("XMMS Equalizer"));
-    gtk_window_set_decorated(GTK_WINDOW(equalizerwin), FALSE);
-	gtk_window_set_transient_for(GTK_WINDOW(equalizerwin), GTK_WINDOW(mainwin));
+equalizerwin = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+gtk_widget_set_app_paintable(equalizerwin, TRUE);
+gtk_window_set_title(GTK_WINDOW(equalizerwin), _("XMMS Equalizer"));
+gtk_window_set_decorated(GTK_WINDOW(equalizerwin), FALSE);
+gtk_window_set_transient_for(GTK_WINDOW(equalizerwin), GTK_WINDOW(mainwin));
 
-	if (cfg.doublesize && cfg.eq_doublesize_linked)
-		gtk_widget_set_size_request(equalizerwin, 550, (cfg.equalizer_shaded ? 28 : 232));
-	else
-		gtk_widget_set_size_request(equalizerwin, 275, (cfg.equalizer_shaded ? 14 : 116));
+gtk_widget_set_size_request(equalizerwin, 275, (cfg.equalizer_shaded ? 14 : 116));
 
     GtkWidget *da = gtk_drawing_area_new();
     gtk_container_add(GTK_CONTAINER(equalizerwin), da);
 
 	g_signal_connect(da, "draw", G_CALLBACK(equalizerwin_draw_cb), NULL);
+    g_signal_connect(equalizerwin, "configure-event", G_CALLBACK(equalizerwin_configure), NULL);
     g_signal_connect(da, "button-press-event", G_CALLBACK(equalizerwin_button_press), NULL);
-    g_signal_connect(da, "button-release-event", G_CALLBACK(handle_release_cb), &equalizerwin_wlist);
-    g_signal_connect(da, "motion-notify-event", G_CALLBACK(handle_motion_cb), &equalizerwin_wlist);
+    g_signal_connect(da, "button-release-event", G_CALLBACK(equalizerwin_button_release), NULL);
+    g_signal_connect(da, "motion-notify-event", G_CALLBACK(equalizerwin_motion_notify), NULL);
 
     gtk_widget_add_events(da, GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK | GDK_POINTER_MOTION_MASK);
 
@@ -695,6 +721,20 @@ static void equalizerwin_create_gtk(void)
 
 void equalizerwin_create(void)
 {
+    equalizerwin_unused_void_casts();
+    if (equalizerwin_bg) {
+        cairo_surface_destroy(equalizerwin_bg);
+        equalizerwin_bg = NULL;
+    }
+    if (equalizerwin_bg_dblsize) {
+        cairo_surface_destroy(equalizerwin_bg_dblsize);
+        equalizerwin_bg_dblsize = NULL;
+    }
+    if (equalizerwin_wlist) {
+        g_list_free_full(equalizerwin_wlist, g_free);
+        equalizerwin_wlist = NULL;
+    }
+
 	equalizerwin_presets_menu = gtk_item_factory_new(GTK_TYPE_MENU, "<Main>", equalizerwin_accel);
 	gtk_item_factory_set_translate_func(equalizerwin_presets_menu,
 					    util_menu_translate, NULL, NULL);
@@ -702,8 +742,12 @@ void equalizerwin_create(void)
 	equalizer_presets = equalizerwin_read_presets("eq.preset");
 	equalizer_auto_presets = equalizerwin_read_presets("eq.auto_preset");
 
-	equalizerwin_bg = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, 275, 116);
-	equalizerwin_bg_dblsize = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, 550, 232);
+	equalizerwin_bg = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, 275 * scaling_factor, 116 * scaling_factor);
+    cairo_surface_set_device_scale(equalizerwin_bg, (double)scaling_factor, (double)scaling_factor);
+
+	equalizerwin_bg_dblsize = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, 275 * scaling_factor, 116 * scaling_factor);
+    cairo_surface_set_device_scale(equalizerwin_bg_dblsize, (double)scaling_factor, (double)scaling_factor);
+
 	equalizerwin_create_gtk();
 	equalizerwin_gc = NULL;
 	equalizerwin_create_widgets();
@@ -718,9 +762,90 @@ void equalizerwin_recreate(void)
 	equalizerwin_set_shape_mask();
 }
 
+void equalizerwin_presets_menu_cb(gpointer cb_data, guint action, GtkWidget * w)
+{
+	int i;
+
+	switch (action)
+	{
+		case EQUALIZER_PRESETS_LOAD_PRESET:
+			equalizerwin_presets_load_preset();
+			break;
+		case EQUALIZER_PRESETS_LOAD_AUTOPRESET:
+			/* Placeholder */
+			break;
+		case EQUALIZER_PRESETS_LOAD_DEFAULT:
+			eqslider_set_position(equalizerwin_preamp, 0.0);
+			for (i = 0; i < 10; i++)
+				eqslider_set_position(equalizerwin_bands[i], 0.0);
+			equalizerwin_eq_changed();
+			break;
+		case EQUALIZER_PRESETS_LOAD_ZERO:
+			eqslider_set_position(equalizerwin_preamp, 20.0);
+			for (i = 0; i < 10; i++)
+				eqslider_set_position(equalizerwin_bands[i], 20.0);
+			equalizerwin_eq_changed();
+			break;
+		case EQUALIZER_PRESETS_LOAD_FROM_FILE:
+            /* Placeholder */
+			break;
+		case EQUALIZER_PRESETS_LOAD_FROM_WINAMPFILE:
+            /* Placeholder */
+			break;
+		case EQUALIZER_PRESETS_IMPORT_WINAMPFILE:
+            /* Placeholder */
+			break;
+		case EQUALIZER_PRESETS_SAVE_PRESET:
+			equalizerwin_presets_save_preset();
+			break;
+		case EQUALIZER_PRESETS_SAVE_AUTOPRESET:
+            /* Placeholder */
+			break;
+		case EQUALIZER_PRESETS_SAVE_DEFAULT:
+            /* Placeholder */
+			break;
+		case EQUALIZER_PRESETS_SAVE_TO_FILE:
+            /* Placeholder */
+			break;
+		case EQUALIZER_PRESETS_SAVE_TO_WINAMPFILE:
+            /* Placeholder */
+			break;
+		case EQUALIZER_PRESETS_DELETE_PRESET:
+			equalizerwin_presets_delete_preset();
+			break;
+		case EQUALIZER_PRESETS_DELETE_AUTOPRESET:
+            /* Placeholder */
+			break;
+		case EQUALIZER_PRESETS_CONFIGURE:
+			equalizerwin_create_conf_window();
+			break;
+	}
+}
+
 void equalizerwin_show(gboolean show)
 {
-	gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(gtk_item_factory_get_widget(mainwin_general_menu, "/Graphical EQ")), show);
+	GtkWidget *widget;
+
+    (void)equalizerwin_load_window; (void)equalizerwin_load_auto_window;
+    (void)equalizerwin_save_window; (void)equalizerwin_save_entry;
+    (void)equalizerwin_save_auto_window; (void)equalizerwin_save_auto_entry;
+    (void)equalizerwin_delete_window; (void)equalizerwin_delete_auto_window;
+    (void)equalizerwin_configure_window;
+    (void)eqconfwin_options_eqdf_entry; (void)eqconfwin_options_eqef_entry;
+
+    if (show)
+        equalizerwin_real_show();
+    else
+        equalizerwin_real_hide();
+
+    if (mainwin_general_menu) {
+	    widget = gtk_item_factory_get_widget(mainwin_general_menu,
+					     "/Graphical EQ");
+        if (widget)
+	        gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(widget), show);
+    }
+    if (mainwin_eq)
+        tbutton_set_toggled(mainwin_eq, show);
 }
 
 void equalizerwin_real_show(void)
@@ -961,3 +1086,20 @@ static void equalizerwin_conf_apply_changes(void) {}
 static void equalizerwin_conf_ok_cb(GtkWidget * w, gpointer data) {}
 static void equalizerwin_conf_apply_cb(GtkWidget * w, gpointer data) {}
 GtkWidget * equalizerwin_create_conf_window(void) { return NULL; }
+
+static void equalizerwin_unused_void_casts(void)
+{
+    (void)equalizerwin_load_preset; (void)equalizerwin_save_preset;
+    (void)equalizerwin_delete_preset; (void)equalizerwin_import_winamp_eqf;
+    (void)equalizerwin_read_winamp_eqf; (void)equalizerwin_read_xmms_preset;
+    (void)equalizerwin_save_ok; (void)equalizerwin_save_select;
+    (void)equalizerwin_load_ok; (void)equalizerwin_load_select;
+    (void)equalizerwin_delete_delete; (void)equalizerwin_save_auto_ok;
+    (void)equalizerwin_save_auto_select; (void)equalizerwin_load_auto_ok;
+    (void)equalizerwin_load_auto_select; (void)equalizerwin_delete_auto_delete;
+    (void)equalizerwin_load_filesel_ok; (void)equalizerwin_import_winamp_filesel_ok;
+    (void)equalizerwin_load_winamp_filesel_ok; (void)equalizerwin_save_filesel_ok;
+    (void)equalizerwin_save_winamp_filesel_ok; (void)equalizerwin_list_sort_func;
+    (void)equalizerwin_conf_apply_changes; (void)equalizerwin_conf_ok_cb;
+    (void)equalizerwin_conf_apply_cb; (void)equalizerwin_create_list_window;
+}

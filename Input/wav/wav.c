@@ -311,7 +311,7 @@ static void play_file(char *filename)
 			wav_file = NULL;
 			return;
 		}
-		read_le_long(wav_file->file, &len);
+		read_le_long(wav_file->file, (long *)&len);
 		fread(magic, 1, 4, wav_file->file);
 		if (strncmp(magic, "WAVE", 4))
 		{
@@ -323,7 +323,7 @@ static void play_file(char *filename)
 		for (;;)
 		{
 			fread(magic, 1, 4, wav_file->file);
-			if (!read_le_long(wav_file->file, &len))
+			if (!read_le_long(wav_file->file, (long *)&len))
 			{
 				fclose(wav_file->file);
 				g_free(wav_file);
@@ -360,8 +360,8 @@ static void play_file(char *filename)
 				return;
 		}
 		read_le_short(wav_file->file, &wav_file->channels);
-		read_le_long(wav_file->file, &wav_file->samples_per_sec);
-		read_le_long(wav_file->file, &wav_file->avg_bytes_per_sec);
+		read_le_long(wav_file->file, (long *)&wav_file->samples_per_sec);
+		read_le_long(wav_file->file, (long *)&wav_file->avg_bytes_per_sec);
 		read_le_short(wav_file->file, &wav_file->block_align);
 		read_le_short(wav_file->file, &wav_file->bits_per_sample);
 		if (wav_file->bits_per_sample != 8 && wav_file->bits_per_sample != 16)
@@ -379,7 +379,7 @@ static void play_file(char *filename)
 		{
 			fread(magic, 4, 1, wav_file->file);
 
-			if (!read_le_long(wav_file->file, &len))
+			if (!read_le_long(wav_file->file, (long *)&len))
 			{
 				fclose(wav_file->file);
 				g_free(wav_file);
@@ -478,7 +478,7 @@ static void get_song_info(char *filename, char **title, int *length)
 		wav_file = NULL;
 		return;
 	}
-	read_le_long(wav_file->file, &len);
+	read_le_long(wav_file->file, (long *)&len);
 	fread(magic, 1, 4, wav_file->file);
 	if (strncmp(magic, "WAVE", 4))
 	{
@@ -490,7 +490,7 @@ static void get_song_info(char *filename, char **title, int *length)
 	for (;;)
 	{
 		fread(magic, 1, 4, wav_file->file);
-		if (!read_le_long(wav_file->file, &len))
+		if (!read_le_long(wav_file->file, (long *)&len))
 		{
 			fclose(wav_file->file);
 			g_free(wav_file);
@@ -527,8 +527,8 @@ static void get_song_info(char *filename, char **title, int *length)
 			return;
 	}
 	read_le_short(wav_file->file, &wav_file->channels);
-	read_le_long(wav_file->file, &wav_file->samples_per_sec);
-	read_le_long(wav_file->file, &wav_file->avg_bytes_per_sec);
+	read_le_long(wav_file->file, (long *)&wav_file->samples_per_sec);
+	read_le_long(wav_file->file, (long *)&wav_file->avg_bytes_per_sec);
 	read_le_short(wav_file->file, &wav_file->block_align);
 	read_le_short(wav_file->file, &wav_file->bits_per_sample);
 	if (wav_file->bits_per_sample != 8 && wav_file->bits_per_sample != 16)
@@ -546,7 +546,7 @@ static void get_song_info(char *filename, char **title, int *length)
 	{
 		fread(magic, 4, 1, wav_file->file);
 
-		if (!read_le_long(wav_file->file, &len))
+		if (!read_le_long(wav_file->file, (long *)&len))
 		{
 			fclose(wav_file->file);
 			g_free(wav_file);
