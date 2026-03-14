@@ -5,6 +5,7 @@
 #include <unistd.h>
 #include <pthread.h>
 #include <glib.h>
+#include <math.h>
 
 #include <CoreAudio/CoreAudio.h>
 #include <AudioUnit/AudioUnit.h>
@@ -35,6 +36,7 @@ static struct {
     gboolean paused;
     gboolean active;
     gint written_bytes;
+    int vol_l, vol_r;
 } ca_data;
 
 static void ring_buffer_init(RingBuffer *rb) {
@@ -47,7 +49,10 @@ static void ring_buffer_init(RingBuffer *rb) {
 }
 
 static void ring_buffer_cleanup(RingBuffer *rb) {
-    g_free(rb->data);
+    if (rb->data) {
+        g_free(rb->data);
+        rb->data = NULL;
+    }
     pthread_mutex_destroy(&rb->mutex);
     pthread_cond_destroy(&rb->cond_free);
 }
@@ -73,7 +78,7 @@ static OSStatus ca_render_cb(void *inRefCon,
 
     pthread_mutex_lock(&rb->mutex);
 
-    if (ca_data.paused || rb->filled == 0) {
+    if (ca_data.paused || rb->filled == 0 || !ca_data.active) {
         memset(out, 0, bytes_needed);
         pthread_mutex_unlock(&rb->mutex);
         return noErr;
@@ -102,7 +107,13 @@ static OSStatus ca_render_cb(void *inRefCon,
 
 static void ca_init(void) {
     memset(&ca_data, 0, sizeof(ca_data));
+    ca_data.vol_l = 100;
+    ca_data.vol_r = 100;
     ring_buffer_init(&ca_data.ring);
+}
+
+static void ca_cleanup(void) {
+    ring_buffer_cleanup(&ca_data.ring);
 }
 
 static void ca_about(void) {
@@ -113,15 +124,16 @@ static void ca_about(void) {
 }
 
 static void ca_configure(void) {
-    /* STUB */
 }
 
 static void ca_get_volume(int *l, int *r) {
-    *l = *r = 100;
+    *l = ca_data.vol_l;
+    *r = ca_data.vol_r;
 }
 
 static void ca_set_volume(int l, int r) {
-    /* STUB */
+    ca_data.vol_l = l;
+    ca_data.vol_r = r;
 }
 
 static int ca_open_audio(AFormat fmt, int rate, int nch) {
@@ -131,6 +143,7 @@ static int ca_open_audio(AFormat fmt, int rate, int nch) {
     ca_data.written_bytes = 0;
 
     AudioStreamBasicDescription asbd;
+    memset(&asbd, 0, sizeof(asbd));
     asbd.mSampleRate = rate;
     asbd.mFormatID = kAudioFormatLinearPCM;
     asbd.mFormatFlags = kAudioFormatFlagIsPacked | kAudioFormatFlagsNativeEndian;
@@ -145,11 +158,10 @@ static int ca_open_audio(AFormat fmt, int rate, int nch) {
     asbd.mBytesPerPacket = asbd.mBytesPerFrame;
 
     AudioComponentDescription desc;
+    memset(&desc, 0, sizeof(desc));
     desc.componentType = kAudioUnitType_Output;
     desc.componentSubType = kAudioUnitSubType_DefaultOutput;
     desc.componentManufacturer = kAudioUnitManufacturer_Apple;
-    desc.componentFlags = 0;
-    desc.componentFlagsMask = 0;
 
     AudioComponent comp = AudioComponentFindNext(NULL, &desc);
     if (!comp) return 0;
@@ -172,14 +184,37 @@ static int ca_open_audio(AFormat fmt, int rate, int nch) {
 
     ca_data.active = TRUE;
     ca_data.paused = FALSE;
-
+    
     return 1;
 }
 
 static void ca_write_audio(void *ptr, int length) {
     RingBuffer *rb = &ca_data.ring;
-    guchar *src = (guchar *)ptr;
     gint remaining = length;
+    
+    /* Software volume control */
+    guchar *src;
+    gboolean free_src = FALSE;
+    
+    if (ca_data.vol_l != 100 || ca_data.vol_r != 100) {
+        src = g_malloc(length);
+        memcpy(src, ptr, length);
+        free_src = TRUE;
+        
+        float vl = (float)ca_data.vol_l / 100.0f;
+        float vr = (float)ca_data.vol_r / 100.0f;
+        
+        if (ca_data.fmt == FMT_S16_LE || ca_data.fmt == FMT_S16_BE || ca_data.fmt == FMT_S16_NE) {
+            gint16 *s = (gint16 *)src;
+            int samples = length / 2;
+            for (int i = 0; i < samples; i += ca_data.nch) {
+                s[i] = (gint16)((float)s[i] * vl);
+                if (ca_data.nch > 1) s[i+1] = (gint16)((float)s[i+1] * vr);
+            }
+        }
+    } else {
+        src = (guchar *)ptr;
+    }
 
     while (remaining > 0 && ca_data.active) {
         pthread_mutex_lock(&rb->mutex);
@@ -196,19 +231,20 @@ static void ca_write_audio(void *ptr, int length) {
         gint can_write = MIN(remaining, BUFFER_SIZE - rb->filled);
         gint first_part = MIN(can_write, BUFFER_SIZE - rb->write_pos);
 
-        memcpy(rb->data + rb->write_pos, src, first_part);
+        memcpy(rb->data + rb->write_pos, src + (length - remaining), first_part);
         if (can_write > first_part) {
-            memcpy(rb->data, src + first_part, can_write - first_part);
+            memcpy(rb->data, src + (length - remaining) + first_part, can_write - first_part);
         }
 
         rb->write_pos = (rb->write_pos + can_write) % BUFFER_SIZE;
         rb->filled += can_write;
-        src += can_write;
         remaining -= can_write;
         ca_data.written_bytes += can_write;
 
         pthread_mutex_unlock(&rb->mutex);
     }
+    
+    if (free_src) g_free(src);
 }
 
 static void ca_close_audio(void) {
@@ -219,10 +255,12 @@ static void ca_close_audio(void) {
     pthread_cond_broadcast(&ca_data.ring.cond_free);
     pthread_mutex_unlock(&ca_data.ring.mutex);
 
-    AudioOutputUnitStop(ca_data.au);
-    AudioUnitUninitialize(ca_data.au);
-    AudioComponentInstanceDispose(ca_data.au);
-    ring_buffer_cleanup(&ca_data.ring);
+    if (ca_data.au) {
+        AudioOutputUnitStop(ca_data.au);
+        AudioUnitUninitialize(ca_data.au);
+        AudioComponentInstanceDispose(ca_data.au);
+        ca_data.au = NULL;
+    }
 }
 
 static void ca_flush(int time) {
@@ -246,12 +284,17 @@ static int ca_buffer_playing(void) {
 }
 
 static int ca_output_time(void) {
-    /* Rough estimate */
-    return (ca_data.written_bytes - ca_data.ring.filled) * 1000 / (ca_data.rate * ca_data.nch * ((ca_data.fmt == FMT_U8 || ca_data.fmt == FMT_S8) ? 1 : 2));
+    if (ca_data.rate == 0 || ca_data.nch == 0) return 0;
+    int bytes_per_sec = ca_data.rate * ca_data.nch * ((ca_data.fmt == FMT_U8 || ca_data.fmt == FMT_S8) ? 1 : 2);
+    if (bytes_per_sec == 0) return 0;
+    return (ca_data.written_bytes - ca_data.ring.filled) * 1000 / bytes_per_sec;
 }
 
 static int ca_written_time(void) {
-    return ca_data.written_bytes * 1000 / (ca_data.rate * ca_data.nch * ((ca_data.fmt == FMT_U8 || ca_data.fmt == FMT_S8) ? 1 : 2));
+    if (ca_data.rate == 0 || ca_data.nch == 0) return 0;
+    int bytes_per_sec = ca_data.rate * ca_data.nch * ((ca_data.fmt == FMT_U8 || ca_data.fmt == FMT_S8) ? 1 : 2);
+    if (bytes_per_sec == 0) return 0;
+    return ca_data.written_bytes * 1000 / bytes_per_sec;
 }
 
 OutputPlugin ca_op = {
@@ -271,7 +314,10 @@ OutputPlugin ca_op = {
     ca_buffer_free,
     ca_buffer_playing,
     ca_output_time,
-    ca_written_time
+    ca_written_time,
+    NULL, /* add_vis_func */
+    NULL, /* del_vis_func */
+    ca_cleanup
 };
 
 OutputPlugin *get_oplugin_info(void) {

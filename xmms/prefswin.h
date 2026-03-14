@@ -21,6 +21,7 @@
 
 void create_prefs_window(void);
 void show_prefs_window(void);
+void setup_mac_main_menu(void);
 void prefswin_vplugins_rescan(void);
 void prefswin_show_vis_plugins_page(void);
 

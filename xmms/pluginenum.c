@@ -149,8 +149,6 @@ void init_plugins(void)
 	}
 
 	op_data->output_list = g_list_sort(op_data->output_list, outputlist_compare_func);
-	if (!op_data->current_output_plugin && g_list_length(op_data->output_list))
-		op_data->current_output_plugin = op_data->output_list->data;
 	ip_data->input_list = g_list_sort(ip_data->input_list, inputlist_compare_func);
 	ep_data->effect_list = g_list_sort(ep_data->effect_list, effectlist_compare_func);
 	if (!ep_data->current_effect_plugin && g_list_length(ep_data->effect_list))
@@ -179,6 +177,9 @@ void init_plugins(void)
 			op->init();
 		node = node->next;
 	}
+
+	if (!op_data->current_output_plugin && g_list_length(op_data->output_list))
+		op_data->current_output_plugin = op_data->output_list->data;
 
 	node = ep_data->effect_list;
 	while (node)
@@ -429,6 +430,8 @@ void cleanup_plugins(void)
 	while (node)
 	{
 		op = (OutputPlugin *) node->data;
+		if (op->cleanup)
+			op->cleanup();
 		close_dynamic_lib(op->handle);
 		node = node->next;
 	}

@@ -1612,12 +1612,12 @@ void *playlist_get_info_func(void *arg)
 
 		if (update_playlistwin)
 		{
-			playlistwin_update_list();
+			g_idle_add((GSourceFunc)playlistwin_update_list, NULL);
 			update_playlistwin = FALSE;
 		}
 		if (update_mainwin)
 		{
-			mainwin_set_info_text();
+			g_idle_add((GSourceFunc)mainwin_set_info_text, NULL);
 			update_mainwin = FALSE;
 		}
 	}

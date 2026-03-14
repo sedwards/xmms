@@ -52,6 +52,7 @@ sm.c sm.h \
 plugin.h \
 xmms.h \
 urldecode.c urldecode.h \
+mac_menu.c \
 dnd.h \
 mkdtemp.c \
 log.c log.h

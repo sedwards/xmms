@@ -418,11 +418,12 @@ void input_get_volume(int *l, int *r)
 		}
 	}
 	output_get_volume(l, r);
-
+    /* xmms_log("input_get_volume: %d, %d", *l, *r); */
 }
 
 void input_set_volume(int l, int r)
 {
+    /* xmms_log("input_set_volume: %d, %d", l, r); */
 	if (get_input_playing())
 	{
 		if (get_current_input_plugin() &&

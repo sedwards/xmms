@@ -121,8 +121,8 @@ am_xmms_OBJECTS = bmp.$(OBJEXT) skin.$(OBJEXT) util.$(OBJEXT) \
 	eq_graph.$(OBJEXT) eq_slider.$(OBJEXT) main.$(OBJEXT) \
 	skinwin.$(OBJEXT) prefswin.$(OBJEXT) playlistwin.$(OBJEXT) \
 	equalizer.$(OBJEXT) hints.$(OBJEXT) about.$(OBJEXT) \
-	sm.$(OBJEXT) urldecode.$(OBJEXT) mkdtemp.$(OBJEXT) \
-	log.$(OBJEXT)
+	sm.$(OBJEXT) urldecode.$(OBJEXT) mac_menu.$(OBJEXT) \
+	mkdtemp.$(OBJEXT) log.$(OBJEXT)
 xmms_OBJECTS = $(am_xmms_OBJECTS)
 am__DEPENDENCIES_1 =
 xmms_DEPENDENCIES = $(am__DEPENDENCIES_1) \
@@ -156,19 +156,20 @@ am__depfiles_remade = ./$(DEPDIR)/about.Po ./$(DEPDIR)/bmp.Po \
 	./$(DEPDIR)/fft.Po ./$(DEPDIR)/fullscreen.Po \
 	./$(DEPDIR)/general.Po ./$(DEPDIR)/hints.Po \
 	./$(DEPDIR)/hslider.Po ./$(DEPDIR)/input.Po ./$(DEPDIR)/log.Po \
-	./$(DEPDIR)/main.Po ./$(DEPDIR)/menurow.Po \
-	./$(DEPDIR)/mkdtemp.Po ./$(DEPDIR)/monostereo.Po \
-	./$(DEPDIR)/number.Po ./$(DEPDIR)/output.Po \
-	./$(DEPDIR)/pbutton.Po ./$(DEPDIR)/playlist.Po \
-	./$(DEPDIR)/playlist_list.Po ./$(DEPDIR)/playlist_popup.Po \
-	./$(DEPDIR)/playlist_slider.Po ./$(DEPDIR)/playlistwin.Po \
-	./$(DEPDIR)/playstatus.Po ./$(DEPDIR)/pluginenum.Po \
-	./$(DEPDIR)/prefswin.Po ./$(DEPDIR)/sbutton.Po \
-	./$(DEPDIR)/skin.Po ./$(DEPDIR)/skinwin.Po ./$(DEPDIR)/sm.Po \
-	./$(DEPDIR)/svis.Po ./$(DEPDIR)/tbutton.Po \
-	./$(DEPDIR)/textbox.Po ./$(DEPDIR)/urldecode.Po \
-	./$(DEPDIR)/util.Po ./$(DEPDIR)/vis.Po \
-	./$(DEPDIR)/visualization.Po ./$(DEPDIR)/widget.Po
+	./$(DEPDIR)/mac_menu.Po ./$(DEPDIR)/main.Po \
+	./$(DEPDIR)/menurow.Po ./$(DEPDIR)/mkdtemp.Po \
+	./$(DEPDIR)/monostereo.Po ./$(DEPDIR)/number.Po \
+	./$(DEPDIR)/output.Po ./$(DEPDIR)/pbutton.Po \
+	./$(DEPDIR)/playlist.Po ./$(DEPDIR)/playlist_list.Po \
+	./$(DEPDIR)/playlist_popup.Po ./$(DEPDIR)/playlist_slider.Po \
+	./$(DEPDIR)/playlistwin.Po ./$(DEPDIR)/playstatus.Po \
+	./$(DEPDIR)/pluginenum.Po ./$(DEPDIR)/prefswin.Po \
+	./$(DEPDIR)/sbutton.Po ./$(DEPDIR)/skin.Po \
+	./$(DEPDIR)/skinwin.Po ./$(DEPDIR)/sm.Po ./$(DEPDIR)/svis.Po \
+	./$(DEPDIR)/tbutton.Po ./$(DEPDIR)/textbox.Po \
+	./$(DEPDIR)/urldecode.Po ./$(DEPDIR)/util.Po \
+	./$(DEPDIR)/vis.Po ./$(DEPDIR)/visualization.Po \
+	./$(DEPDIR)/widget.Po
 am__mv = mv -f
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
@@ -490,6 +491,7 @@ sm.c sm.h \
 plugin.h \
 xmms.h \
 urldecode.c urldecode.h \
+mac_menu.c \
 dnd.h \
 mkdtemp.c \
 log.c log.h
@@ -611,6 +613,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hslider.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/input.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/log.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mac_menu.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/main.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/menurow.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mkdtemp.Po@am__quote@ # am--include-marker
@@ -911,6 +914,7 @@ distclean: distclean-recursive
 	-rm -f ./$(DEPDIR)/hslider.Po
 	-rm -f ./$(DEPDIR)/input.Po
 	-rm -f ./$(DEPDIR)/log.Po
+	-rm -f ./$(DEPDIR)/mac_menu.Po
 	-rm -f ./$(DEPDIR)/main.Po
 	-rm -f ./$(DEPDIR)/menurow.Po
 	-rm -f ./$(DEPDIR)/mkdtemp.Po
@@ -998,6 +1002,7 @@ maintainer-clean: maintainer-clean-recursive
 	-rm -f ./$(DEPDIR)/hslider.Po
 	-rm -f ./$(DEPDIR)/input.Po
 	-rm -f ./$(DEPDIR)/log.Po
+	-rm -f ./$(DEPDIR)/mac_menu.Po
 	-rm -f ./$(DEPDIR)/main.Po
 	-rm -f ./$(DEPDIR)/menurow.Po
 	-rm -f ./$(DEPDIR)/mkdtemp.Po

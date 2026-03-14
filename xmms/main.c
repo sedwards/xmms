@@ -30,6 +30,7 @@
 
 #ifdef HAVE_GTK_MAC
 #include <gtkosxapplication.h>
+void setup_mac_main_menu(void);
 #endif
 
 /* Global Window and Background */
@@ -288,7 +289,7 @@ char *xmms_get_gentitle_format(void) { return "%p - %t"; }
 void xmms_usleep(gint usec) { g_usleep(usec); }
 
 static gboolean setting_volume = FALSE;
-static gint balance = 0;
+static gint balance_val = 0;
 
 void mainwin_lock_info_text(gchar *text)
 {
@@ -310,11 +311,11 @@ void mainwin_adjust_volume_motion(gint v)
 	mainwin_lock_info_text(tmp);
 	g_free(tmp);
 
-	if (balance < 0) {
+	if (balance_val < 0) {
 		vl = v;
-        vr = (v * (100 - abs(balance))) / 100;
+        vr = (v * (100 - abs(balance_val))) / 100;
     } else {
-		vl = (v * (100 - balance)) / 100;
+		vl = (v * (100 - balance_val)) / 100;
         vr = v;
     }
     input_set_volume(vl, vr);
@@ -333,11 +334,11 @@ void mainwin_adjust_balance_motion(gint b)
     gint v, vl, vr;
     int cur_l, cur_r;
 
-	balance = b;
-	if (balance > 0)
-		tmp = g_strdup_printf(_("BALANCE: %d%% RIGHT"), balance);
-	else if (balance < 0)
-		tmp = g_strdup_printf(_("BALANCE: %d%% LEFT"), abs(balance));
+	balance_val = b;
+	if (balance_val > 0)
+		tmp = g_strdup_printf(_("BALANCE: %d%% RIGHT"), balance_val);
+	else if (balance_val < 0)
+		tmp = g_strdup_printf(_("BALANCE: %d%% LEFT"), abs(balance_val));
 	else
 		tmp = g_strdup(_("BALANCE: CENTER"));
 
@@ -347,11 +348,11 @@ void mainwin_adjust_balance_motion(gint b)
     input_get_volume(&cur_l, &cur_r);
     v = MAX(cur_l, cur_r);
 
-	if (balance < 0) {
+	if (balance_val < 0) {
 		vl = v;
-        vr = (v * (100 - abs(balance))) / 100;
+        vr = (v * (100 - abs(balance_val))) / 100;
     } else {
-		vl = (v * (100 - balance)) / 100;
+		vl = (v * (100 - balance_val)) / 100;
         vr = v;
     }
     input_set_volume(vl, vr);
@@ -382,11 +383,11 @@ void equalizerwin_load_auto_preset(gchar *filename) {}
 static void mainwin_mr_change(MenuRowItem item) { xmms_log("MenuRow item change: %d", item); }
 static void mainwin_mr_release(MenuRowItem item) { xmms_log("MenuRow item release: %d", item); }
 
-static gint mainwin_volume_framecb(gint pos) { return (pos * 27) / 100; }
-static void mainwin_volume_motioncb(gint pos) { mainwin_adjust_volume_motion(pos); }
+static gint mainwin_volume_framecb(gint pos) { return (pos * 27) / 51; }
+static void mainwin_volume_motioncb(gint pos) { mainwin_adjust_volume_motion((pos * 100) / 51); }
 static void mainwin_volume_releasecb(gint pos) { mainwin_adjust_volume_release(); }
-static gint mainwin_balance_framecb(gint pos) { return (pos * 27) / 100; }
-static void mainwin_balance_motioncb(gint pos) { mainwin_adjust_balance_motion(pos); }
+static gint mainwin_balance_framecb(gint pos) { return (pos * 27) / 24; }
+static void mainwin_balance_motioncb(gint pos) { mainwin_adjust_balance_motion(((pos * 200) / 24) - 100); }
 static void mainwin_balance_releasecb(gint pos) { mainwin_adjust_balance_release(); }
 static void mainwin_position_motioncb(gint pos) { xmms_log("Position motion: %d", pos); }
 static void mainwin_position_releasecb(gint pos) { xmms_log("Position release: %d", pos); }
@@ -568,44 +569,40 @@ static void mainwin_create_widgets(void)
 
 static void mainwin_create_menubar(GtkWidget *vbox)
 {
+#ifdef HAVE_GTK_MAC
+    setup_mac_main_menu();
+#else
     GtkWidget *menubar = gtk_menu_bar_new();
-    
+
     /* File Menu */
     GtkWidget *file_menu = gtk_menu_new();
     GtkWidget *file_item = gtk_menu_item_new_with_mnemonic("_File");
     gtk_menu_item_set_submenu(GTK_MENU_ITEM(file_item), file_menu);
-    
+
     GtkWidget *open_item = gtk_menu_item_new_with_label("Play File...");
     g_signal_connect(open_item, "activate", G_CALLBACK(mainwin_eject_pushed), NULL);
     gtk_menu_shell_append(GTK_MENU_SHELL(file_menu), open_item);
-    
+
     GtkWidget *quit_item = gtk_menu_item_new_with_label("Quit");
     g_signal_connect(quit_item, "activate", G_CALLBACK(mainwin_quit_cb), NULL);
     gtk_menu_shell_append(GTK_MENU_SHELL(file_menu), quit_item);
-    
+
     gtk_menu_shell_append(GTK_MENU_SHELL(menubar), file_item);
-    
+
     /* View Menu */
     GtkWidget *view_menu = gtk_menu_new();
     GtkWidget *view_item = gtk_menu_item_new_with_mnemonic("_View");
     gtk_menu_item_set_submenu(GTK_MENU_ITEM(view_item), view_menu);
-    
+
     GtkWidget *pref_item = gtk_menu_item_new_with_label("Preferences...");
     g_signal_connect(pref_item, "activate", G_CALLBACK(show_prefs_window), NULL);
     gtk_menu_shell_append(GTK_MENU_SHELL(view_menu), pref_item);
-    
+
     gtk_menu_shell_append(GTK_MENU_SHELL(menubar), view_item);
 
-#ifdef HAVE_GTK_MAC
-    GtkosxApplication *theApp = g_object_new(GTKOSX_TYPE_APPLICATION, NULL);
-    gtkosx_application_set_menu_bar(theApp, GTK_MENU_SHELL(menubar));
-    gtk_widget_hide(menubar);
-    gtkosx_application_ready(theApp);
-#else
     gtk_box_pack_start(GTK_BOX(vbox), menubar, FALSE, FALSE, 0);
 #endif
 }
-
 static void mainwin_create_gtk(void)
 {
     xmms_log("Creating GTK window...");
@@ -668,13 +665,24 @@ void mainwin_set_shape_mask(void)
 void mainwin_create(void)
 {
     gint w = 275, h = 116;
+    if (cfg.doublesize) { w *= 2; h *= 2; }
+
+    /* Get HiDPI scale factor before surface creation */
+    if (mainwin) {
+        scaling_factor = gtk_widget_get_scale_factor(mainwin);
+    } else {
+        /* Temporary window to detect scale if mainwin doesn't exist yet */
+        GtkWidget *temp = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+        scaling_factor = gtk_widget_get_scale_factor(temp);
+        gtk_widget_destroy(temp);
+    }
+    xmms_log("System scaling factor for surface: %d", scaling_factor);
     
     if (mainwin_bg) {
         cairo_surface_destroy(mainwin_bg);
         mainwin_bg = NULL;
     }
 
-    /* System scaling factor is for Retina (usually 2). WinAmp doublesize is disabled for now. */
 	mainwin_bg = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, w * scaling_factor, h * scaling_factor);
     cairo_surface_set_device_scale(mainwin_bg, (double)scaling_factor, (double)scaling_factor);
 
@@ -742,12 +750,27 @@ static gboolean mainwin_update_timer(gpointer data)
     }
 
     if (get_input_playing()) {
+        input_update_vis(time);
         if (get_input_paused())
             playstatus_set_status(mainwin_playstatus, STATUS_PAUSE);
         else
             playstatus_set_status(mainwin_playstatus, STATUS_PLAY);
     } else {
         playstatus_set_status(mainwin_playstatus, STATUS_STOP);
+    }
+
+    if (!setting_volume) {
+        int vl, vr;
+        input_get_volume(&vl, &vr);
+        int v = MAX(vl, vr);
+        mainwin_set_volume_slider(v);
+        
+        int b = 0;
+        if (vl > vr)
+            b = -100 + ((vr * 100) / vl);
+        else if (vr > vl)
+            b = 100 - ((vl * 100) / vr);
+        mainwin_set_balance_slider(b);
     }
 
     return TRUE;
@@ -795,10 +818,32 @@ void mainwin_recreate(void)
     }
 }
 
-void mainwin_set_volume_diff(int diff) {}
-void mainwin_set_volume(int vol) {}
-void mainwin_set_balance(int bal) {}
-void mainwin_set_always_on_top(gboolean always) {}
+void mainwin_set_volume_diff(int diff) 
+{
+    int vl, vr;
+    input_get_volume(&vl, &vr);
+    int v = MAX(vl, vr) + diff;
+    v = CLAMP(v, 0, 100);
+    mainwin_adjust_volume_motion(v);
+}
+
+void mainwin_set_volume(int vol) 
+{
+    mainwin_adjust_volume_motion(vol);
+}
+
+void mainwin_set_balance(int bal) 
+{
+    mainwin_adjust_balance_motion(bal);
+}
+
+void mainwin_set_always_on_top(gboolean always) 
+{
+    cfg.always_on_top = always;
+    if (mainwin) gtk_window_set_keep_above(GTK_WINDOW(mainwin), always);
+    if (playlistwin) gtk_window_set_keep_above(GTK_WINDOW(playlistwin), always);
+    if (equalizerwin) gtk_window_set_keep_above(GTK_WINDOW(equalizerwin), always);
+}
 void mainwin_set_shade(gboolean shaded) {}
 void mainwin_set_back_pixmap(void) {}
 void mainwin_disable_seekbar(void) {}
@@ -833,8 +878,25 @@ int main(int argc, char *argv[])
     
     mainwin_set_info_text();
 
-    /* Show windows first, THEN move them. 
-       This often works better with modern window managers/GTK on macOS. */
+    /* Initialize volume and balance sliders from current output plugin state */
+    {
+        int vl, vr;
+        input_get_volume(&vl, &vr);
+        if (vl != -1) {
+            int v = MAX(vl, vr);
+            mainwin_set_volume_slider(v);
+            
+            int b = 0;
+            if (vl > vr)
+                b = -100 + ((vr * 100) / vl);
+            else if (vr > vl)
+                b = 100 - ((vl * 100) / vr);
+            mainwin_set_balance_slider(b);
+            balance_val = b;
+        }
+    }
+
+    /* Show windows first, THEN move them. */
     mainwin_show(TRUE);
     if (cfg.playlist_visible) playlistwin_real_show();
     if (cfg.equalizer_visible) equalizerwin_real_show();
@@ -873,8 +935,8 @@ int main(int argc, char *argv[])
         gtk_window_move(GTK_WINDOW(equalizerwin), cfg.equalizer_x, cfg.equalizer_y);
     }
 
-    /* 100ms UI update timer */
-    g_timeout_add(100, mainwin_update_timer, NULL);
+    /* UI update timer */
+    g_timeout_add(30, mainwin_update_timer, NULL);
     
     /* 3-minute periodic save timer (180,000 ms) */
     g_timeout_add(180000, periodic_save_timer, NULL);

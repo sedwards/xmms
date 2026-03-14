@@ -58,6 +58,9 @@ typedef struct
 	int (*output_time) (void);	/* Return the current playing time */
 	int (*written_time) (void);	/* Return the length of all the data that has been written to
 					   the buffer */
+	void (*add_vis_func) (void (*func) (int time, AFormat fmt, int nch, int length, void *ptr));
+	void (*del_vis_func) (void (*func) (int time, AFormat fmt, int nch, int length, void *ptr));
+	void (*cleanup) (void);
 }
 OutputPlugin;
 

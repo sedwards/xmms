@@ -9,4 +9,4 @@ Makefile.la
 xmms/xmms
 .DS_Store
 /build
-
+XMMS.app
