@@ -21,7 +21,7 @@ XMMS_PREFIX="$HOME/source/xmms/xmms-install"
 XMMS_SOURCE="$(cd "$(dirname "$0")" && pwd)"
 DEST_DIR="${DEST_DIR:-.}"
 APP_NAME="XMMS"
-BUNDLE_ID="org.updatez.xmms-gtk"
+BUNDLE_ID="org.updatez.xmms"
 VERSION="2.99.1"
 
 # --- Find AppBundleGenerator ---
@@ -146,6 +146,14 @@ echo "  Building..."
 
  ./configure CFLAGS="$CFLAGS -Wall" --disable-opengl --enable-metal --enable-macos-audio --prefix="$XMMS_PREFIX"
   make
+
+  #libtool --finish /Users/sedwards/source/xmms/build/lib
+  #libtool --finish /Users/sedwards/source/xmms/build/lib/xmms/Output
+  #libtool --finish /Users/sedwards/source/xmms/build/lib/xmms/Input
+  #libtool --finish /Users/sedwards/source/xmms/build/lib/xmms/Effect
+  #libtool --finish /Users/sedwards/source/xmms/build/lib/xmms/General
+  #libtool --finish /Users/sedwards/source/xmms/build/lib/xmms/Visualization
+
   make install
 
 if [ $? -ne 0 ]; then
@@ -283,7 +291,7 @@ if [ ! -f "$USER_BOOKMARKS" ]; then
     fi
 fi
 
-exec "$BUNDLE_DIR/Contents/Resources/bin/xmms-gtk" "$@"
+exec "$BUNDLE_DIR/Contents/Resources/bin/xmms" "$@"
 EOF
 chmod +x "$WRAPPER_SCRIPT"
 
@@ -312,11 +320,11 @@ BUNDLE_PATH="$DEST_DIR/$APP_NAME.app"
 echo -e "${GREEN}✓ App bundle created${NC}"
 echo ""
 
-# Explicitly copy xmms-gtk into the bundle's Resources/bin
-echo -e "${YELLOW}Copying xmms-gtk to bundle...${NC}"
+# Explicitly copy xmms into the bundle's Resources/bin
+echo -e "${YELLOW}Copying xmms to bundle...${NC}"
 mkdir -p "$BUNDLE_PATH/Contents/Resources/bin"
-cp "$XMMS_PREFIX/bin/xmms-gtk" "$BUNDLE_PATH/Contents/Resources/bin/xmms-gtk"
-echo -e "${GREEN}✓ xmms-gtk copied to bundle${NC}"
+cp "$XMMS_PREFIX/bin/xmms" "$BUNDLE_PATH/Contents/Resources/bin/xmms"
+echo -e "${GREEN}✓ xmms copied to bundle${NC}"
 echo ""
 
 # Explicitly copy default config files (xmmsrc and bookmarks) into the bundle
@@ -399,7 +407,7 @@ fi
 
 # Find the main executable
 MAIN_BINARY=""
-for candidate in "$BUNDLE_PATH/Contents/MacOS/xmms-gtk" \
+for candidate in "$BUNDLE_PATH/Contents/MacOS/xmms" \
                  "$BUNDLE_PATH/Contents/MacOS/XMMS" \
                  "$BUNDLE_PATH/Contents/MacOS/xmms-launcher.sh"; do
     if [ -f "$candidate" ] && file "$candidate" 2>/dev/null | grep -q "Mach-O"; then
@@ -428,7 +436,7 @@ echo -e "${GREEN}     Build Complete!${NC}"
 echo -e "${GREEN}=====================================${NC}"
 echo ""
 echo -e "${BLUE}Installed files:${NC}"
-echo "  XMMS GTK: $XMMS_PREFIX/bin/xmms-gtk"
+echo "  XMMS GTK: $XMMS_PREFIX/bin/xmms"
 echo "  XMMS Text: $XMMS_PREFIX/bin/xmms-text (included as resource)"
 echo ""
 
@@ -441,7 +449,7 @@ if [ -d "$BUNDLE_PATH" ]; then
     echo ""
 else
     echo -e "${BLUE}To run XMMS:${NC}"
-    echo "  $XMMS_PREFIX/bin/xmms-gtk"
+    echo "  $XMMS_PREFIX/bin/xmms"
     echo ""
 fi
 
